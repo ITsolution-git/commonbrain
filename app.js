@@ -20,9 +20,9 @@ app.use((req, res, next) => {
   }
   next();
 });
-app.use("/api/users", userRoutes);
-app.use("/api/upload", uploadRoutes);
-app.use("/api/auth", authRoutes);
+app.use("/users", userRoutes);
+app.use("/upload", uploadRoutes);
+app.use("/auth", authRoutes);
 
 app.use((req, res, next) => {
   const error = new Error("Not Found");
