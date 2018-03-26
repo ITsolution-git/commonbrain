@@ -11,6 +11,8 @@
     "lint": "eslint --ext .js,.vue src",
     "build": "node build/build.js"
   },
+  "proxy": "http://localhost:3000/",
+
   "dependencies": {
     "axios": "^0.17.1",
     "base64-js": "^1.2.3",

@@ -1,6 +1,6 @@
 import axios from "axios";
 import router from "./router";
-import config from "./config.json";
+//import config from "./config.json";
 import jwt_decode from "jwt-decode";
 import { store } from "./store/store.js";
 export default {
@@ -9,7 +9,7 @@ export default {
   },
   login(creds) {
     return new Promise((resolve, reject) => {
-      axios.post(config.api + "/auth", creds).then(
+      axios.post("/api/auth", creds).then(
         res => {
           localStorage.setItem("token", res.data.token);
           this.user.authenticated = true;
