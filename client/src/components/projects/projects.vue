@@ -2,7 +2,7 @@
 <div>
     <ProjectSidebar />
   <div class="projects-container">
-      PROJECTS
+      <div class="main-title">Projects</div>
   </div>
   </div>
 </template>
@@ -19,5 +19,19 @@ export default {
 };
 </script>
 <style>
-
+.projects-container {
+  position: fixed;
+  top: 70px;
+  width: 100%;
+  left: 300px;
+}
+.main-title {
+  font-size: 15pt;
+  padding: 15px;
+  display: flex;
+  height: 70px;
+  align-items: center;
+  border-bottom: solid 1px #eaeaea;
+  width: 100%;
+}
 </style>

@@ -1,7 +1,9 @@
 <template>
+<div>
+  <AddProject v-if="addProjectOpen" :hide="toggleAddProject"/>
     <div class="sidebar-container">
         <div class="sidebar-title">
-            Projects <i class="fa fa-plus"></i>
+            Projects <i @click="toggleAddProject" class="fa fa-plus"></i>
         </div>
         <div class="project-list">
             <div v-on:mouseover="mouseOver(1)" v-on:mouseout="mouseOver(0)" class="project-item">
@@ -17,19 +19,28 @@
         </div>
                
     </div>
+    </div>
 </template>
 <script>
+import AddProject from "./add_project";
 export default {
   name: "project-sidebar",
   data() {
     return {
-      hovered: 0
+      hovered: 0,
+      addProjectOpen: false
     };
   },
   methods: {
+    toggleAddProject() {
+      this.addProjectOpen = !this.addProjectOpen;
+    },
     mouseOver(num) {
       this.hovered = num;
     }
+  },
+  components: {
+    AddProject
   }
 };
 </script>

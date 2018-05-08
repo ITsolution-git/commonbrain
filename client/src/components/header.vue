@@ -6,13 +6,29 @@
       <div class="nav-item">Templates</div>
     </div>
     <div class="user-nav">
-      <div class="nav-item"><i class="fa fa-user-circle-o"></i></div>
+      <div @click="toggleUserDropdown" class="nav-item"><i class="fa fa-user-circle-o"></i>
+        <div v-click-outside="toggleUserDropdown" v-if="userDropdown" class="simple-dropdown animated-fast fadeInDown">
+          <ul>
+            <li>Sign Out</li>
+          </ul>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 <script>
 export default {
-  name: "header"
+  name: "header_main",
+  data() {
+    return {
+      userDropdown: false
+    };
+  },
+  methods: {
+    toggleUserDropdown() {
+      this.userDropdown = !this.userDropdown;
+    }
+  }
 };
 </script>
 <style>
@@ -46,6 +62,7 @@ export default {
   text-align: center;
   font-weight: 300;
   cursor: pointer;
+  position: relative;
 }
 .nav-item:hover {
   color: #31a6d1;
@@ -61,5 +78,19 @@ export default {
   top: 0;
   display: flex;
   align-items: center;
+}
+.simple-dropdown {
+  position: absolute;
+  background: #ffffff;
+  border-radius: 3px;
+  box-shadow: 1px 3px 3px rgba(0, 0, 0, 0.2);
+  right: 0;
+  top: 45px;
+  min-width: 170px;
+}
+.simple-dropdown li {
+  padding: 10px;
+  text-align: left;
+  white-space: nowrap;
 }
 </style>
