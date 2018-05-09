@@ -3,6 +3,7 @@ import Router from "vue-router";
 import Login from "@/components/login/login";
 
 import ProjectRoutes from "./project";
+import FileRoutes from "./file";
 
 //import { store } from "../store/store.js";
 
@@ -15,7 +16,7 @@ var baseRoutes = [
   }
 ];
 
-const routes = baseRoutes.concat(ProjectRoutes);
+const routes = baseRoutes.concat(ProjectRoutes).concat(FileRoutes);
 
 Vue.use(Router);
 

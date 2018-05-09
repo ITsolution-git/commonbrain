@@ -11,9 +11,13 @@ var URL =
 
 router.get("/", (req, res, next) => {
   var token = req.headers["authorization"];
-  token = token.split(" ");
-  if (!token[1])
-    return res.status(401).send({ auth: false, message: "No token provided." });
+  if (token == null) {
+    res.status(500).send({ auth: false, message: "No token provided." });
+  }
+  // token = token.split(" ");
+  // if (!token[1]) {
+  //   return res.status(401).send({ auth: false, message: "No token provided." });
+  // }
   MongoClient.connect(URL, function(err, db) {
     if (err) throw err;
     var collection = db.collection("users");

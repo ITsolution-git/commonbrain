@@ -27,6 +27,7 @@ module.exports = {
     "spaced-comment": "off",
     "handle-callback-err": "off",
     "no-trailing-spaces": "off",
+    "no-multiple-empty-lines": "off",
     // allow debugger during development
     "no-debugger": process.env.NODE_ENV === "production" ? "error" : "off"
   }

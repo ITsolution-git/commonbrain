@@ -12,30 +12,41 @@ var config = require("../config");
 var URL =
   "mongodb://dexhonsa:Awesomeo21!@cluster0-shard-00-00-puscy.mongodb.net:27017,cluster0-shard-00-01-puscy.mongodb.net:27017,cluster0-shard-00-02-puscy.mongodb.net:27017/test?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin";
 
-router.post("/", (req, res, next) => {
-  const { username, password } = req.body;
-  var passwordHash = crypto
-    .createHash("md5")
-    .update(password)
-    .digest("hex");
+router.get("/:userId", (req, res, next) => {
+  const userId = req.params.userId;
   MongoClient.connect(URL, function(err, db) {
     if (err) throw err;
-    var collection = db.collection("users");
-    collection.findOne({ username: username, password: passwordHash }).then(
-      result => {
-        if (result != null) {
-          var token = jwt.sign({ id: result._id }, config.secret, {
-            expiresIn: 86400 // expires in 24 hours
-          });
-          res.send({ auth: true, token: token });
-        } else {
-          res.status(401).send({ error: "Incorrect Credentials" });
+    var collection = db.collection("projects");
+    collection
+      .find({ user_id: userId })
+      .toArray()
+      .then(result => {
+        res.send(result);
+      });
+  });
+});
+
+router.post("/:userId/add", (req, res, next) => {
+  var userId = req.params.userId;
+  const { project_name, project_create_date } = req.body;
+
+  MongoClient.connect(URL, function(err, db) {
+    if (err) throw err;
+    var collection = db.collection("projects");
+    collection
+      .insert({
+        project_name: project_name,
+        project_create_date: project_create_date,
+        user_id: userId
+      })
+      .then(
+        result => {
+          res.send(result);
+        },
+        err => {
+          res.status(401).send({ error: err });
         }
-      },
-      err => {
-        res.status(401).send({ error: err });
-      }
-    );
+      );
   });
 });
 router.post("/signup", (req, res, next) => {
