@@ -22,11 +22,11 @@ app.use((req, res, next) => {
   }
   next();
 });
-app.use("/users", userRoutes);
-app.use("/upload", uploadRoutes);
-app.use("/auth", authRoutes);
-app.use("/projects", projectRoutes);
-app.use("/files", fileRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/upload", uploadRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/projects", projectRoutes);
+app.use("/api/files", fileRoutes);
 
 app.use((req, res, next) => {
   const error = new Error("Not Found");
