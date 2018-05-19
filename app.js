@@ -7,6 +7,7 @@ var userRoutes = require("./routes/users");
 var uploadRoutes = require("./routes/upload");
 var authRoutes = require("./routes/auth");
 var projectRoutes = require("./routes/projects");
+var fileRoutes = require("./routes/files");
 var morgan = require("morgan");
 
 app.use(morgan("dev"));
@@ -25,6 +26,7 @@ app.use("/users", userRoutes);
 app.use("/upload", uploadRoutes);
 app.use("/auth", authRoutes);
 app.use("/projects", projectRoutes);
+app.use("/files", fileRoutes);
 
 app.use((req, res, next) => {
   const error = new Error("Not Found");

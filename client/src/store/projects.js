@@ -1,5 +1,5 @@
 import axios from "axios";
-import store from "./index";
+
 export default {
   state: {
     projects: []
@@ -11,10 +11,20 @@ export default {
   },
   getters: {},
   actions: {
-    getProjects: (context, payload) => {
-      axios.get("/projects/" + store.state.user.id).then(res => {
-        context.commit("GET_PROJECTS", res.data.items);
-      });
+    deleteProject({state, commit, rootState}, payload) {
+      return new Promise(function(resolve, reject) {
+        axios.delete("/api/projects/" + payload.userId + "/" + payload.projectId).then(res => {
+          resolve();
+        })
+      })
+    },
+    getProjects({state, commit, rootState}, payload) {
+      return new Promise(function(resolve, reject) {
+        axios.get("/api/projects/" + rootState.user.id).then(res => {
+          commit("GET_PROJECTS", res.data);
+          resolve();
+        });
+      })
     }
   }
 };

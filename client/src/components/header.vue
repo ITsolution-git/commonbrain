@@ -1,7 +1,7 @@
 <template>
   <div class="top-bar">
     <div class="nav-bar">
-      <div class="nav-item active">Projects</div>
+      <div @click="$router.push('/projects')" class="nav-item active">Projects</div>
       <img src="../img/brain_white.svg" alt="">
       <div class="nav-item">Templates</div>
     </div>

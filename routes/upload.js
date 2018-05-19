@@ -12,7 +12,7 @@ const dbName = "test";
 
 var storage = multer.diskStorage({
   destination: function(req, file, cb) {
-    cb(null, "../tmp/");
+    cb(null, "./tmp/");
   },
   filename: function(req, file, cb) {
     //var datetimestamp = Date.now();
@@ -32,25 +32,8 @@ var upload = multer({
 //--------------------------------
 
 router.post("/", (req, res, next) => {
-  upload(req, res, function(err) {
-    mkdirp("../uploads/test", function(err) {
-      var dir = "/uploads/test";
-      //console.log(req.file);
-      var filename = req.file.filename;
-      fs.move("../tmp/" + filename, "../" + dir + "/" + filename, function(
-        err
-      ) {
-        if (err) {
-          console.log(err);
-          res.status(401).json({
-            errors: {
-              form: "File Exists"
-            }
-          });
-        }
-      });
-    });
-  });
+  
+
 });
 
 //--------------------------------

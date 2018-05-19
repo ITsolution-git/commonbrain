@@ -6,34 +6,44 @@
                   <div class="modal-title">Add Project</div>
                   <div class="modal-close"><i @click="hideThis" class="fa fa-close"></i></div>
               </div>
+              <form @submit.prevent="createProject">
               <div class="modal-inner">
                   <StandardInput
                   field="Project Name"
                   name="project_name"
+                  type="text"
                   width="100%"
-                  require="true"
+                  required="true"
                   />
-                  <StandardSelect />
               </div>
               <div class="modal-buttons">
                   <div @click="hideThis" class="modal-btn cancel">Cancel</div>
-                  <div class="modal-btn confirm">Create</div>
+                  <button type="submit" class="modal-btn confirm"><span v-if="!isLoading">Create</span><img v-if="isLoading" class="spinner" src="../../img/spinner_white.svg" alt=""></button>
+              </div>
+              </form>
               </div>
           </div>
       </div>
-  </div>
+  
 </template>
 <script>
 import StandardInput from "../form_elements/standard_input";
 import StandardSelect from "../form_elements/custom_select";
+import axios from "axios";
+import auth from "../../auth.js";
 export default {
   name: "add_project",
   data() {
     return {
-      hidden: false
+      hidden: false,
+      imageName: "No Image",
+      isLoading: false
     };
   },
-  props: ["hide"],
+  $_veeValidate: {
+    validator: "new"
+  },
+  props: ["hide", "create"],
   methods: {
     submit() {},
     hideThis() {
@@ -42,6 +52,57 @@ export default {
       setTimeout(function() {
         that.hide();
       }, 300);
+    },
+    uploadImage(e) {
+      //console.log(e.target.files[0].name);
+      this.imageName = e.target.files[0].name;
+    },
+    removeFile() {
+      this.imageName = "No Image";
+    },
+    createProject(e) {
+      this.isLoading = true;
+      e.preventDefault();
+      this.$validator.validateAll().then(result => {
+        if (!result) {
+          this.isLoading = false;
+          return;
+        }
+        var form = event.target;
+        var data = new FormData(form);
+        data = data.entries();
+        var obj = data.next();
+        var retrieved = {};
+        while (undefined !== obj.value) {
+          retrieved[obj.value[0]] = obj.value[1];
+          obj = data.next();
+        }
+        retrieved.project_create_date = new Date();
+
+        if (!this.errors.any()) {
+          this.isLoading = false;
+          axios
+            .post("/api/projects/" + this.userId + "/add", retrieved, {
+              headers: auth.getHeaders()
+            })
+            .then(
+              res => {
+                console.log(res.data);
+                this.$router.push("/projects/" + res.data.insertedIds[0]);
+                this.create();
+              },
+              err => {
+                console.log(err);
+              }
+            );
+        } else {
+        }
+      });
+    }
+  },
+  computed: {
+    userId() {
+      return this.$store.state.user.id;
     }
   },
   components: {
@@ -51,92 +112,4 @@ export default {
 };
 </script>
 <style>
-.overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 100vh;
-  width: 100%;
-  background: rgba(0, 0, 0, 0.3);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-.modal-1 {
-  max-width: 500px;
-  border-radius: 3px;
-  overflow: hidden;
-  width: 100%;
-  background: #fff;
-}
-.modal-top {
-  padding: 15px;
-  display: flex;
-  align-items: center;
-  background: #ffffff;
-  border-bottom: solid 1px #eaeaea;
-}
-.modal-close {
-  margin-left: auto;
-}
-.modal-inner {
-  padding: 15px;
-}
-.modal-buttons {
-  padding: 15px;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-}
-.modal-btn {
-  padding: 10px 25px;
-  border-radius: 3px;
-  margin-left: 10px;
-  font-size: 10pt;
-}
-.modal-btn.cancel {
-  background: #fff;
-  color: #688187;
-  border: solid 1px #d6dfe1;
-}
-
-.modal-btn.cancel:hover {
-  cursor: pointer;
-  background: #f8fafb;
-}
-
-.modal-btn.cancel:active {
-  background: #eaeff2;
-}
-.modal-btn.confirm {
-  background: #66d0f7;
-  color: #fff;
-}
-.modal-btn.confirm:hover {
-  background: #35c0f4;
-  cursor: pointer;
-}
-.modal-btn.delete {
-  background: #e35f6b;
-}
-
-.modal-btn.delete:hover {
-  background: #d1535e;
-}
-
-.modal-btn.cancel {
-  background: #fff;
-  color: #688187;
-  border: solid 1px #d6dfe1;
-}
-
-.modal-btn.cancel:hover {
-  cursor: pointer;
-  background: #f8fafb;
-}
-
-.modal-btn.cancel:active {
-  background: #eaeff2;
-}
 </style>

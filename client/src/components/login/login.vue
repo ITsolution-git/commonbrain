@@ -5,7 +5,7 @@
     </div>
     <div class="login-panel">
       <div class="net"></div>
-    <form @submit.prevent="submitForm">
+    <form class="login-form" @submit.prevent="submitForm">
       <div class="logo-container">
         <img class="small-logo" src="../../img/brain.svg" alt="">
       </div>
@@ -72,104 +72,4 @@ export default {
 };
 </script>
 <style>
-.forgot-password {
-  position: absolute;
-  left: 50%;
-  bottom: 10px;
-  font-size: 9pt;
-  color: #d0d0d0;
-  -webkit-transform: translateY(-100%);
-  transform: translateX(-50%);
-  display: inline-block;
-}
-.top-bar {
-  height: 70px;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #66d0f7;
-  position: relative;
-  z-index: 10;
-}
-.logo-container {
-  text-align: center;
-  width: 100%;
-}
-.small-logo {
-  display: inline-block;
-  width: 100px;
-  position: relative;
-  z-index: 1;
-}
-.top-bar img {
-  height: 70%;
-}
-form {
-  width: 100%;
-  padding: 45px 15px;
-  background: #f8fafb;
-  box-shadow: 1px 1px 2px 0px #f0f0fa;
-  border-radius: 3px;
-  border: solid 1px #eaeaea;
-  max-width: 300px;
-  text-align: center;
-  overflow: hidden;
-  position: relative;
-  transform: translateY(-100px);
-}
-.logo {
-  position: absolute;
-  top: -108px;
-  left: -150px;
-  opacity: 0.1;
-  z-index: 0;
-  pointer-events: none;
-  width: 700px;
-  display: none;
-}
-.login-panel {
-  height: 100vh;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 770px;
-}
-.net {
-  background-image: url("../../img/neural_net2.jpg");
-  background-size: cover;
-  background-position: center center;
-  width: 100%;
-  height: 50%;
-  box-shadow: inset 0px -120px 200px #fff;
-  position: absolute;
-  top: 0;
-  left: 0;
-}
-.alert-danger {
-  padding: 15px;
-  border-radius: 3px;
-  margin-top: 15px;
-  text-align: center;
-  z-index: 1;
-}
-.submit-btn {
-  position: relative;
-  z-index: 1;
-  padding: 7px 45px;
-  margin-top: 10px;
-}
-.login-panel-title {
-  text-align: center;
-  padding: 15px;
-  font-size: 14pt;
-  z-index: 1;
-  position: relative;
-  font-weight: bold;
-}
 </style>

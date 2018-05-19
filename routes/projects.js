@@ -4,6 +4,8 @@ var multer = require("multer");
 var MongoClient = require("mongodb").MongoClient;
 var CircularJSON = require("circular-json");
 var ObjectId = require("mongodb").ObjectId;
+var mkdirp = require("mkdirp");
+var fs = require("fs-extra");
 var crypto = require("crypto");
 var jwt = require("jsonwebtoken");
 //var bcrypt = require("bcryptjs");
@@ -42,6 +44,28 @@ router.post("/:userId/add", (req, res, next) => {
       .then(
         result => {
           res.send(result);
+        },
+        err => {
+          res.status(401).send({ error: err });
+        }
+      );
+  });
+});
+router.delete("/:userId/:projectId", (req, res, next) => {
+  var userId = req.params.userId;
+  var projectId = req.params.projectId
+
+  MongoClient.connect(URL, function(err, db) {
+    if (err) throw err;
+    var collection = db.collection("projects");
+    collection
+      .remove({
+        _id: ObjectId(projectId),
+      })
+      .then(
+        result => {
+          fs.rmdir("./" + userId + "/" + projectId);
+          res.status(200).send({message:'Deleted'})
         },
         err => {
           res.status(401).send({ error: err });

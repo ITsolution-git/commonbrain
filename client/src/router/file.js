@@ -4,7 +4,7 @@ import { getDefaultComponents } from "./helper";
 
 export default [
   {
-    path: "/projects/:id/file/:id",
+    path: "/projects/:projectId/file/:fileId",
     ...getDefaultComponents(ViewFile)
   }
 ];

@@ -42,7 +42,6 @@ export default {
   logout() {
     localStorage.removeItem("token");
     this.user.authenticated = false;
-
     store.dispatch("setUser", {});
     router.push("/");
   }

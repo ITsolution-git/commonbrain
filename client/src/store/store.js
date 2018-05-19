@@ -1,11 +1,16 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import jwt_decode from "jwt-decode";
+import projectStore from './projects';
+import fileStore from './files';
 
 Vue.use(Vuex);
 
 export const store = new Vuex.Store({
-  modules: {},
+  modules: {
+    projectStore,
+    fileStore
+  },
   state: {
     user: {}
   },

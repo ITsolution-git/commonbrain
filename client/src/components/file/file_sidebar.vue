@@ -4,19 +4,17 @@
     <div class="sidebar-container">
         <div @click="$router.go(-1)" class="standard-btn back"><i class="fa fa-angle-left"></i> Back</div>
         <div class="sidebar-title">
-            File {{$route.params.id}} 
+            
         </div>
         <div class="file-logo">
             <img src="../../img/appfolio.png" alt="">
         </div>
-        <div class="file-image">
+        <!-- <div class="file-image">
             
-        </div>
+        </div> -->
         <div class="file-nav">
             <ul>
-                <li :class="{'active':activeNav == 1}">Asset Summary</li>
-                <li>Summary</li>
-                <li>Summary 23</li>
+                <li v-for="(sheet,i) in sheets" :key="i" :class="{'active':(activeNav == i)}" @click="activateSheet(i,sheet)">{{sheet}}</li>
             </ul>
         </div>
                
@@ -26,11 +24,12 @@
 <script>
 export default {
   name: "file-sidebar",
+  props: ["sheets", "activate"],
   data() {
     return {
       hovered: 0,
       addProjectOpen: false,
-      activeNav: 1
+      activeNav: 0
     };
   },
   methods: {
@@ -39,6 +38,10 @@ export default {
     },
     mouseOver(num) {
       this.hovered = num;
+    },
+    activateSheet(i, sheet) {
+      this.activeNav = i;
+      this.activate(sheet);
     }
   }
 };
