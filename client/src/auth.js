@@ -43,6 +43,8 @@ export default {
     localStorage.removeItem("token");
     this.user.authenticated = false;
     store.dispatch("setUser", {});
+
     router.push("/");
+    window.location.reload();
   }
 };

@@ -61,28 +61,42 @@ export default {
       return this.$store.state.projectStore.projects;
     },
     projectId() {
-      return this.$route.params.id;
+      return this.$route.params.projectId;
+    },
+    userId() {
+      return this.$store.state.user.id;
     }
   },
   mounted() {
-    this.getProjects().then(res => {
-      if (this.$route.params.id != null) {
-        for (var i = 0; i < this.projects.length; i++) {
-          if (this.$route.params.id == this.projects[i]._id) {
-            this.activeProject = i;
-          }
-        }
-      }
-    });
+    if (this.projects.length > 0) {
+      this.isLoading = false;
+    }
   },
   watch: {
+    userId(val, oldVal) {
+      if (val != null && oldVal != val) {
+        this.getProjects().then(res => {
+          if (this.$route.params.id != null) {
+            for (var i = 0; i < this.projects.length; i++) {
+              if (this.$route.params.id == this.projects[i]._id) {
+                this.activeProject = i;
+              }
+            }
+          }
+        });
+      }
+    },
     projects(val) {
       if (val.length > 0) {
         this.isLoading = false;
       }
     },
-    projectId(val) {
+    projectId(val, oldVal) {
       if (val == null) {
+        this.getProjects();
+        this.activeProject = -1;
+      }
+      if (val != oldVal) {
         this.getProjects();
       }
     }

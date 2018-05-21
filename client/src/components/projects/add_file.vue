@@ -81,10 +81,19 @@ export default {
       formData.append("fileName", retrieved.file_name);
       formData.append("userId", this.userId);
       formData.append("projectId", this.$route.params.id);
+      var channel = this.$pusher.subscribe("file");
+      channel.bind("upload", function(data) {
+        console.log(data);
+      });
 
       axios
         .post("/api/files/" + this.$route.params.id + "/add", formData, {
-          headers: auth.getHeaders()
+          headers: auth.getHeaders(),
+          onUploadProgress: function(progressEvent) {
+            console.log(
+              Math.round(progressEvent.loaded * 100 / progressEvent.total)
+            );
+          }
         })
         .then(
           res => {

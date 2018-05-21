@@ -9,7 +9,7 @@
       <div @click="toggleUserDropdown" class="nav-item"><i class="fa fa-user-circle-o"></i>
         <div v-click-outside="toggleUserDropdown" v-if="userDropdown" class="simple-dropdown animated-fast fadeInDown">
           <ul>
-            <li>Sign Out</li>
+            <li @click="logout">Sign Out</li>
           </ul>
         </div>
       </div>
@@ -17,6 +17,7 @@
   </div>
 </template>
 <script>
+import auth from "../auth";
 export default {
   name: "header_main",
   data() {
@@ -27,6 +28,9 @@ export default {
   methods: {
     toggleUserDropdown() {
       this.userDropdown = !this.userDropdown;
+    },
+    logout() {
+      auth.logout();
     }
   }
 };

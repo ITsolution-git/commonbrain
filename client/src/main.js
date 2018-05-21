@@ -8,6 +8,7 @@ import VTooltip from "v-tooltip";
 import vSelect from "vue-select";
 import VueCroppie from "vue-croppie";
 import Loader from "vue-spinner/src/RingLoader.vue";
+import pusher from "vue-pusher";
 
 require("./css/bootstrap.min.css");
 require("./css/font-awesome.min.css");
@@ -16,6 +17,13 @@ require("./css/animate.css");
 require("./css/tooltip.css");
 
 Vue.config.productionTip = false;
+Vue.use(pusher, {
+  api_key: "edc0fafa92d65aa9bace",
+  options: {
+    cluster: "us2",
+    encrypted: true
+  }
+});
 Vue.use(VueResource);
 Vue.use(VTooltip);
 Vue.use(VeeValidate, { inject: false });

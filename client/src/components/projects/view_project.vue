@@ -1,6 +1,6 @@
 <template>
   <div>
-      <ProjectSidebar />
+      <!-- <ProjectSidebar /> -->
       <FileUpload v-if="fileUpload" :hide="toggleFileUpload" :uploaded="uploaded" />
       <ConfirmDelete :hide="toggleConfirmDelete" :del="deleteThisProject" v-if="confirmDelete"/>
       <div class="projects-container">
@@ -49,7 +49,7 @@ export default {
       fileUpload: false,
       optionsDropdown: false,
       projectName: "",
-      isLoading: true,
+      isLoading: false,
       filesLoading: true,
       confirmDelete: false
     };
@@ -143,7 +143,7 @@ export default {
       return this.$store.state.fileStore.files;
     },
     project() {
-      var id = this.$route.params.id;
+      var id = this.$route.params.projectId;
       var projects = JSON.parse(
         JSON.stringify(this.$store.state.projectStore.projects)
       );
@@ -154,7 +154,7 @@ export default {
       }
     },
     projectId() {
-      return this.$route.params.id;
+      return this.$route.params.projectId;
     }
   },
   watch: {

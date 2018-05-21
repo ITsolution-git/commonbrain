@@ -1,13 +1,17 @@
 <template>
 <div>
-
+  <Cropper :upload="toggleCropper"  :hide="toggleCropper" v-if="cropper"></Cropper>
     <div class="sidebar-container">
         <div @click="$router.go(-1)" class="standard-btn back"><i class="fa fa-angle-left"></i> Back</div>
         <div class="sidebar-title">
             
         </div>
-        <div class="file-logo">
-            <img src="../../img/appfolio.png" alt="">
+        <div @click="toggleCropper" class="file-logo">
+          <div v-if="!hasImage">
+            <i class="fa fa-camera"></i>
+            Add Image
+            </div>
+            <img v-if="hasImage" src="../../img/appfolio.png" alt="">
         </div>
         <!-- <div class="file-image">
             
@@ -22,6 +26,7 @@
     </div>
 </template>
 <script>
+import Cropper from "./cropper";
 export default {
   name: "file-sidebar",
   props: ["sheets", "activate"],
@@ -29,10 +34,18 @@ export default {
     return {
       hovered: 0,
       addProjectOpen: false,
-      activeNav: 0
+      activeNav: 0,
+      cropper: false,
+      hasImage: false
     };
   },
+  components: {
+    Cropper
+  },
   methods: {
+    toggleCropper: function() {
+      this.cropper = !this.cropper;
+    },
     toggleAddProject() {
       this.addProjectOpen = !this.addProjectOpen;
     },
@@ -68,7 +81,8 @@ export default {
   height: 150px;
   width: 100%;
 }
-.file-logo img {
+.file-logo img,
+.file-logo div {
   width: 100%;
   padding: 15px;
 }

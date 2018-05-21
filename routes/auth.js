@@ -6,7 +6,6 @@ var CircularJSON = require("circular-json");
 var ObjectId = require("mongodb").ObjectId;
 var crypto = require("crypto");
 var jwt = require("jsonwebtoken");
-//var bcrypt = require("bcryptjs");
 var config = require("../config");
 
 var URL =
@@ -27,6 +26,7 @@ router.post("/", (req, res, next) => {
           var token = jwt.sign({ id: result._id }, config.secret, {
             expiresIn: 86400 // expires in 24 hours
           });
+
           res.send({ auth: true, token: token });
         } else {
           res.status(401).send({ error: "Incorrect Credentials" });

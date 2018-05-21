@@ -1,5 +1,5 @@
 import Projects from "@/components/projects/projects";
-import ViewProject from "@/components/projects/view_project";
+// import ViewProject from "@/components/projects/view_project";
 
 import { getDefaultComponents } from "./helper";
 
@@ -9,7 +9,7 @@ export default [
     ...getDefaultComponents(Projects)
   },
   {
-    path: "/projects/:id",
-    ...getDefaultComponents(ViewProject)
+    path: "/projects/:projectId",
+    ...getDefaultComponents(Projects)
   }
 ];

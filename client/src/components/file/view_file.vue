@@ -1,11 +1,14 @@
 <template>
   <div>
       <FileSidebar :sheets="sheets" :activate="activateSheet" />
+      
       <div class="projects-container">
               <div class="tab-container">
                   <div v-for="(tab,i) in tabs" :class="{'active':(activeTab == tab)}" :key="i" @click="activateTab(i,tab)" class="tab">{{tab}}</div>
               </div>
-              <img class="spinner" v-if="isLoading" src="../../img/spinner.svg" alt="">
+              <div v-if="isLoading"  style="display:flex; align-items:center; justify-content:center;width:100%; height:100%;">
+              <img class="spinner-big" src="../../img/spinner.svg" alt="">
+              </div>
               <div v-if="!isLoading" class="main-data-container animated-fast fadeInUp">
 
               <div v-for="(data,i) in mainData" :key="i" class="data-container">
@@ -31,6 +34,7 @@
 <script>
 import FileSidebar from "./file_sidebar";
 import { mapActions } from "vuex";
+
 export default {
   name: "view_file",
   data() {
@@ -41,6 +45,7 @@ export default {
       activeSheet: "",
       activeTab: "",
       isLoading: true,
+
       activeRows: [],
       activeData: [],
       activeSubData: []
@@ -48,6 +53,7 @@ export default {
   },
   methods: {
     ...mapActions(["getFile"]),
+
     round(data) {
       if (typeof data == "number") {
         return Math.round(data);

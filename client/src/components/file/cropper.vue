@@ -1,0 +1,121 @@
+<template lang="html">
+  <div class="overlay animated-fast fadeIn" >
+    <div class="modal-1 animated-fast zoomIn" style="width: 400px">
+      <div class="modal-top">
+        <div class="modal-title"> Change Logo / Image</div>
+        <div v-on:click="hide" class="modal-close"><img src="../../img/close.svg"/></div>
+      </div>
+      <div class="modal-inner">
+        <div v-bind:class="{'hide':pic}" class="pic-button modal-btn cancel" style="text-align:center;position:relative">Choose Picture<input style="width:100%; height:100%;position:absolute;top:0;left:0; opacity:0;cursor:pointer;"  ref="imageUpload" @change="uploadImage" type="file"></div>
+
+        <vue-croppie
+            v-if="pic"
+            ref=croppieRef
+            :enableOrientation="true"
+            @result="result"
+            :viewport="{width:'100%',height:'300'}"
+            :boundary="{width:'100%',height:'300'}"
+            @update="update">
+        </vue-croppie>
+
+        <div class="modal-btn-container">
+          <div @click="hide"  class="modal-btn cancel">Cancel</div>
+          <div @click="crop()"  class="modal-btn confirm">Confirm</div>
+        </div>
+      </div>
+    </div>
+    </div>
+</template>
+
+<script>
+import axios from "axios";
+import auth from "../../auth";
+export default {
+  props: ["hide", "upload"],
+  data() {
+    return {
+      cropped: null,
+      pic: false
+    };
+  },
+  methods: {
+    uploadImage() {
+      this.pic = true;
+      var that = this;
+      setTimeout(function() {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+          that.$refs.croppieRef.bind({
+            url: e.target.result
+          });
+        };
+        reader.readAsDataURL(that.$refs.imageUpload.files[0]);
+      }, 100);
+    },
+    bind() {
+      // Randomize cat photos, nothing special here.
+      //let url = this.images[Math.floor(Math.random() * 4)];
+      // Just like what we did with .bind({...}) on
+      // the mounted() function above.
+      // this.$refs.croppieRef.bind({
+      //   url: url
+      // });
+    },
+    dataURLtoFile(dataurl, filename) {
+      var arr = dataurl.split(",");
+      var mime = arr[0].match(/:(.*?);/)[1];
+      var bstr = atob(arr[1]);
+      var n = bstr.length;
+      var u8arr = new Uint8Array(n);
+      while (n--) {
+        u8arr[n] = bstr.charCodeAt(n);
+      }
+      return new File([u8arr], filename, { type: mime });
+    },
+    crop() {
+      const options = {
+        format: "jpeg",
+        circle: true
+      };
+      this.$refs.croppieRef.result(options, output => {
+        this.cropped = output;
+        var file = this.dataURLtoFile(this.cropped, "file.png");
+
+        console.log(file);
+      });
+    },
+    cropViaEvent() {
+      //this.$refs.croppieRef.result(options);
+    },
+    result(output) {
+      this.cropped = output;
+    },
+    update(val) {},
+    rotate(rotationAngle) {
+      // Rotates the image
+      this.$refs.croppieRef.rotate(rotationAngle);
+    },
+    confirmUpload() {
+      console.log(this.cropped);
+    }
+  },
+  computed: {
+    projectId() {
+      return this.$route.params.projectId;
+    },
+    userId() {
+      return this.$store.state.user.id;
+    },
+    fileId() {
+      return this.$route.params.fileId;
+    }
+  }
+};
+</script>
+<style>
+.hide {
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+}
+</style>
