@@ -1,5 +1,6 @@
 var express = require("express");
 var app = express();
+var path = require('path');
 var bodyParser = require("body-parser");
 var mongoose = require("mongoose");
 var router = express.Router();
@@ -27,12 +28,16 @@ app.use("/api/upload", uploadRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/projects", projectRoutes);
 app.use("/api/files", fileRoutes);
+app.use('/api/static', express.static(path.join(__dirname + '/uploads')));
 
 app.use((req, res, next) => {
   const error = new Error("Not Found");
   res.status(404);
   next(error);
 });
+
+//app.use(express.static('./uploads/'));
+
 
 app.use((error, req, res, next) => {
   res.status(error.status || 500);
@@ -42,6 +47,8 @@ app.use((error, req, res, next) => {
     }
   });
 });
+//console.log(path.join(__dirname + '/uploads'));
+
 
 mongoose.connect(
   "mongodb://dexhonsa:Awesomeo21!@cluster0-shard-00-00-puscy.mongodb.net:27017,cluster0-shard-00-01-puscy.mongodb.net:27017,cluster0-shard-00-02-puscy.mongodb.net:27017/test?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin"

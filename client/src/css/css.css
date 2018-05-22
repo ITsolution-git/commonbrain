@@ -889,3 +889,10 @@ table td {
   position: relative;
   font-weight: bold;
 }
+.no-items{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height:100px;
+  color:#d0d0d0;
+}

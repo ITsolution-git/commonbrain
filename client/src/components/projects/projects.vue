@@ -27,6 +27,11 @@ export default {
       return this.$route.params.projectId;
     }
   },
+  mounted() {
+    if (this.$route.params.projectId != null) {
+      this.viewingProject = true;
+    }
+  },
   components: {
     ProjectSidebar,
     ViewProject

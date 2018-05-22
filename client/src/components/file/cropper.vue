@@ -12,9 +12,10 @@
             v-if="pic"
             ref=croppieRef
             :enableOrientation="true"
+            :enableResize="true"
             @result="result"
-            :viewport="{width:'100%',height:'300'}"
-            :boundary="{width:'100%',height:'300'}"
+            :viewport="{ width: 200, height: 250 }"
+            :boundary="{width:'100%',height:250}"
             @update="update">
         </vue-croppie>
 
@@ -29,7 +30,7 @@
 
 <script>
 import axios from "axios";
-import auth from "../../auth";
+//import auth from "../../auth";
 export default {
   props: ["hide", "upload"],
   data() {
@@ -75,13 +76,29 @@ export default {
     crop() {
       const options = {
         format: "jpeg",
-        circle: true
+        circle: false
       };
       this.$refs.croppieRef.result(options, output => {
         this.cropped = output;
-        var file = this.dataURLtoFile(this.cropped, "file.png");
-
-        console.log(file);
+        var file = this.dataURLtoFile(this.cropped, "file.jpg");
+        var form = window.document.createElement("form");
+        var formData = new FormData();
+        formData.append("file", file);
+        axios
+          .post(
+            "/api/files/" +
+              this.userId +
+              "/" +
+              this.projectId +
+              "/" +
+              this.fileId +
+              "/image",
+            formData
+          )
+          .then(res => {
+            //console.log(res.data);
+            window.location.reload();
+          });
       });
     },
     cropViaEvent() {
@@ -95,9 +112,7 @@ export default {
       // Rotates the image
       this.$refs.croppieRef.rotate(rotationAngle);
     },
-    confirmUpload() {
-      console.log(this.cropped);
-    }
+    confirmUpload() {}
   },
   computed: {
     projectId() {

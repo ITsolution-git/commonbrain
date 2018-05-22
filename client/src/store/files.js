@@ -15,7 +15,6 @@ export default {
   },
   getters: {},
   actions: {
-   
     getFiles({state, commit, rootState}, payload) {
       return new Promise(function(resolve, reject) {
         axios.get("/api/files/" + payload.userId + "/" + payload.projectId).then(res => {

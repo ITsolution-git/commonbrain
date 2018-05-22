@@ -58,19 +58,38 @@ router.delete("/:userId/:projectId", (req, res, next) => {
   MongoClient.connect(URL, function(err, db) {
     if (err) throw err;
     var collection = db.collection("projects");
+    var collectionFiles = db.collection("files");
+
     collection
       .remove({
         _id: ObjectId(projectId),
       })
       .then(
         result => {
-          fs.rmdir("./" + userId + "/" + projectId);
-          res.status(200).send({message:'Deleted'})
+          
+          collectionFiles
+          .remove({
+            project_id: projectId,
+          })
+          .then(
+            result => {
+              fs.remove("./uploads/" + userId + "/" + projectId);
+              res.status(200).send({message:'Deleted'})
+              
+            },
+            err => {
+              res.status(401).send({ error: err });
+            }
+          );
+          
+          
         },
         err => {
           res.status(401).send({ error: err });
         }
       );
+
+
   });
 });
 router.post("/signup", (req, res, next) => {

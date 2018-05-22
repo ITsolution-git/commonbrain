@@ -13,6 +13,7 @@
           </div>
           
         </div>
+        <div class="no-items" v-if="!isLoading && projects.length < 1">No Projects</div>
         <div v-if="!isLoading" class="project-list animated-fast fadeInLeft">
             <div v-for="(project, i) in projects" :key="i" v-on:mouseover="mouseOver(i)" v-on:mouseout="mouseOver(-1)" class="project-item" :class="{'active':(activeProject == i)}" @click="activateProject(i, project._id)">
                 <i class="fa fa-folder-o"></i> 
@@ -54,6 +55,18 @@ export default {
     activateProject(i, id) {
       this.activeProject = i;
       this.$router.push("/projects/" + id);
+    },
+    refreshProjects() {
+      this.getProjects().then(res => {
+        this.isLoading = false;
+        if (this.$route.params.projectId != null) {
+          for (var i = 0; i < this.projects.length; i++) {
+            if (this.$route.params.projectId == this.projects[i]._id) {
+              this.activeProject = i;
+            }
+          }
+        }
+      });
     }
   },
   computed: {
@@ -68,17 +81,16 @@ export default {
     }
   },
   mounted() {
-    if (this.projects.length > 0) {
-      this.isLoading = false;
-    }
+    this.refreshProjects();
   },
   watch: {
     userId(val, oldVal) {
       if (val != null && oldVal != val) {
         this.getProjects().then(res => {
-          if (this.$route.params.id != null) {
+          this.isLoading = false;
+          if (this.$route.params.projectId != null) {
             for (var i = 0; i < this.projects.length; i++) {
-              if (this.$route.params.id == this.projects[i]._id) {
+              if (this.$route.params.projectId == this.projects[i]._id) {
                 this.activeProject = i;
               }
             }

@@ -78,12 +78,50 @@ router.get("/:userId/:projectId/:fileId", (req, res, next) => {
 });
 
 //--------------------------------
+// Upload File Image
+//--------------------------------
+
+router.post("/:userId/:projectId/:fileId/image", (req, res, next) => {
+  upload(req, res, function(err) {
+    var userId = req.params.userId;
+    var projectId = req.params.projectId;
+    var fileId = req.params.fileId;
+    if(err){
+      console.log(err)
+    }
+    var extension = req.file.filename.substr(-4);
+    var fileName = req.params.fileId;
+    fs.rename('./tmp/' + req.file.filename, './tmp/'+ fileName + extension).then(res1=>{
+      fs.move('./tmp/' + fileName + extension, './uploads/'+userId+'/'+projectId+'/' + fileName + extension, { overwrite: true }).then(result=>{
+        MongoClient.connect(URL, function(err, db) {
+          if (err) throw err;
+          var collection = db.collection("files");
+          collection.findOne({ _id: ObjectId(fileId) }).then(result => {
+            if (result != null) {
+              collection
+                .update({ _id: ObjectId(fileId) },{$set : {"image":true}})
+                .then(result => {
+                  res.status(200).send({message:'uploaded'})
+                });
+            } else {
+              res.status(401).send({ error: err });
+            }
+          });
+        });
+        
+      })
+    });
+    
+    
+  })
+})
+
+//--------------------------------
 // Upload File
 //--------------------------------
 
 router.post("/:projectId/add", (req, res, next) => {
   fake_background_job("file");
-  console.log("started");
 
   upload(req, res, function(err) {
     var projectId = req.params.projectId;

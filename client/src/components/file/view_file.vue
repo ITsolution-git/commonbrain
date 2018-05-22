@@ -265,7 +265,8 @@ export default {
   color: #00bbff;
 }
 .main-data-container {
-  display: flex;
+  /* display: flex; */
+  max-width: 1200px;
   flex-wrap: wrap;
   margin-top: 25px;
   height: calc(100vh - 180px);

@@ -87,7 +87,7 @@ export default {
       });
 
       axios
-        .post("/api/files/" + this.$route.params.id + "/add", formData, {
+        .post("/api/files/" + this.$route.params.projectId + "/add", formData, {
           headers: auth.getHeaders(),
           onUploadProgress: function(progressEvent) {
             console.log(
