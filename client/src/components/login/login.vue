@@ -9,7 +9,7 @@
           <ul>
             <li>Home</li>
             <li>About</li>
-            <li>Benefits</li>
+            <li>Services</li>
             <li>Company</li>
             <li><div @click="toggleLearnMore" class="get-started">Get Started</div></li>
           </ul>
@@ -22,7 +22,7 @@
           <ul>
             <li>Home</li>
             <li>About</li>
-            <li>Benefits</li>
+            <li>Services</li>
             <li>Company</li>
             <li><div @click="toggleLearnMore" class="get-started">Get Started</div></li>
           </ul>
@@ -83,6 +83,65 @@
             <div>
             <h1>CommonBrain Keeps Everything in One Place</h1>
             <span class="sub-text">CommonBrain keeps, organizes and references all kinds of data, images, pdf, and assets.  You can link dropbox files, attach pdfs, or supply links to other resources quickly and easily. </span>
+            </div>
+          </div>
+          
+          
+        </div>
+      </div>
+    </div>
+    <div class="section-4">
+      <div class="container" style="text-align:center">
+        <h1 style="color:#fff"> Our Services</h1>
+        <div class="row" style="padding-top:25px; align-items:start">
+          <div class="col-sm-4" style="display:flex;align-items:center; padding-bottom:55px;  justify-content:center; text-align:center; ">
+            <div class="service-container">
+            <h1>Due Diligence</h1>
+            <span class="sub-text">
+            <b><i style="font-size:12pt;" class="fa fa-angle-right"></i> Lease Review</b><span style="display:inline-block;margin-left:25px;">- Loan abstracts / Rent Roll; Loan Subordination / Estoppels</span>
+            <b><i style="font-size:12pt;" class="fa fa-angle-right"></i> Third Party Reports</b>
+            <b><i style="font-size:12pt;" class="fa fa-angle-right"></i> Financial Cash Flow & Review</b><br><span style="display:inline-block;margin-left:25px;">- Cash Flow modeling / valuation <br>
+            - Acquisition / Disposition analysis<br>
+            - Investment analysis & waterfall</span>
+            <b><i style="font-size:12pt;" class="fa fa-angle-right"></i> Scheduled valuation updates</b>
+            <b><i style="font-size:12pt;" class="fa fa-angle-right"></i> Property Tax review</b>
+            <span style="display:inline-block;margin-left:25px;">- Real estate tax search
+            Tax Historical and outstanding appeal</span>
+            <b><i style="font-size:12pt;" class="fa fa-angle-right"></i> Loan Agreements</b>
+
+            </span>
+            </div>
+          </div>
+          <div class="col-sm-4" style="display:flex;align-items:center; padding-bottom:55px; justify-content:center; text-align:left; ">
+            <div class="service-container">
+            <h1>Corporate Compliance</h1>
+            <span class="sub-text">
+            <b><i style="font-size:12pt;" class="fa fa-angle-right"></i> Public record due diligence</b><span style="display:inline-block;margin-left:25px;">- Status Searches<br>Good Standing Certificate & Certified Copies
+            <br>- UCC Searches and Filings
+            </span>
+            <b><i style="font-size:12pt;" class="fa fa-angle-right"></i> Entity Formation</b><span style="display:inline-block;margin-left:25px;">- Single Purpose Entity<br>- Independent Director<br>- Contract Agency</span>
+            <b><i style="font-size:12pt;" class="fa fa-angle-right"></i> Public Record Compliance</b><br><span style="display:inline-block;margin-left:25px;">- Title Insurance</span>
+
+            </span>
+            </div>
+          </div>
+          <div class="col-sm-4" style="display:flex;align-items:center; padding-bottom:55px; justify-content:center; text-align:left; ">
+            <div class="service-container">
+           <h1>Collateral Monitoring, Loan Servicing</h1>
+            <span class="sub-text">
+            <b><i style="font-size:12pt;" class="fa fa-angle-right"></i> Collateral Management</b><span style="display:inline-block;margin-left:25px;">- Update lease amendments and modifications<br>
+            - Set-up CAM in all standard property management systems<br>
+            - RE Tax Filings <br>
+            - Lease Audits; Property Inspections, <br>
+            - Credit Insurance, UCC administration<br>
+            </span>
+            <b><i style="font-size:12pt;" class="fa fa-angle-right"></i> Loan Servicing</b><span style="display:inline-block;margin-left:25px;">- Billing & Collections<br>
+            - Escrow administration<br>
+            - Compliance monitoring, and loan payoff. 
+            </span>
+            
+
+            </span>
             </div>
           </div>
           
@@ -184,7 +243,30 @@ export default {
 };
 </script>
 <style>
+.service-container {
+  text-align: center;
+  color: #fff;
+  background: #2ea5d4;
+  padding: 25px;
+}
+.service-container h1 {
+  font-size: 25pt;
+  display: flex;
+  align-items: center;
+
+  justify-content: center;
+}
+.service-container b {
+  margin-top: 45px;
+  font-size: 1.2em;
+  margin-bottom: 10px;
+  color: #b9ebff;
+  display: inline-block;
+  line-height: 20px;
+}
 .sub-text {
+  text-align: left;
+  display: inline-block;
   font-size: 14pt;
 }
 .footer-links {
@@ -214,6 +296,11 @@ export default {
 }
 .section-3 {
   background: #fff;
+  padding: 55px 15px;
+  width: 100%;
+}
+.section-4 {
+  background: #3abaeb;
   padding: 55px 15px;
   width: 100%;
 }
@@ -322,7 +409,15 @@ export default {
   background: #fff;
   border-color: #fff;
 }
+@media (max-width: 1250px) {
+  .service-container h1 {
+    font-size: 20pt;
+  }
+}
 @media (max-width: 728px) {
+  .service-container h1 {
+    font-size: 20pt;
+  }
   .sub-text {
     font-size: 12pt;
   }
