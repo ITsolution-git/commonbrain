@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="overflow:hidden">
     <LearnMore v-if="learnMore" :hide="toggleLearnMore"/>
     <div class="main-container">
       <div class="web-top-bar">
