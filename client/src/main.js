@@ -9,6 +9,7 @@ import vSelect from "vue-select";
 import VueCroppie from "vue-croppie";
 import Loader from "vue-spinner/src/RingLoader.vue";
 import pusher from "vue-pusher";
+import VueMq from 'vue-mq';
 
 require("./css/bootstrap.min.css");
 require("./css/font-awesome.min.css");
@@ -30,6 +31,14 @@ Vue.use(VeeValidate, { inject: false });
 Vue.use(VueCroppie);
 Vue.component("v-select", vSelect);
 Vue.component("v-loader", Loader);
+
+Vue.use(VueMq, {
+  breakpoints: {
+    sm: 728,
+    md: 1200,
+    lg: Infinity
+  }
+})
 
 Vue.directive("click-outside", {
   bind: function(el, binding, vnode) {

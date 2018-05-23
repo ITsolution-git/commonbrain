@@ -26,6 +26,10 @@
   font-weight: 600;
   src: url(../fonts/ProximaNova-Bold.otf);
 }
+
+input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 30px white inset;
+}
 /* width */
 
 ::-webkit-scrollbar {
@@ -285,7 +289,7 @@ table td {
 }
 
 .checkbox-container input:checked ~ .standard-checkbox {
-  background: #66d0f7;
+  background: #3db1dc;
   border: none;
 }
 
@@ -819,7 +823,7 @@ table td {
   position: relative;
   z-index: 1;
 }
-.top-bar img {
+.top-bar img, .web-top-bar img {
   height: 70%;
 }
 .login-form {
@@ -829,11 +833,10 @@ table td {
   box-shadow: 1px 1px 2px 0px #f0f0fa;
   border-radius: 3px;
   border: solid 1px #eaeaea;
-  max-width: 300px;
+  
   text-align: center;
   overflow: hidden;
   position: relative;
-  transform: translateY(-100px);
 }
 .logo {
   position: absolute;
@@ -846,8 +849,7 @@ table td {
   display: none;
 }
 .login-panel {
-  height: 100vh;
-  position: absolute;
+  height: 500px;
   top: 0;
   left: 0;
   width: 100%;
@@ -855,7 +857,7 @@ table td {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 770px;
+  min-height: 470px;
 }
 .net {
   background-image: url("../img/neural_net2.jpg");

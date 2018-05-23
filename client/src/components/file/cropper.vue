@@ -81,7 +81,6 @@ export default {
       this.$refs.croppieRef.result(options, output => {
         this.cropped = output;
         var file = this.dataURLtoFile(this.cropped, "file.jpg");
-        var form = window.document.createElement("form");
         var formData = new FormData();
         formData.append("file", file);
         axios
