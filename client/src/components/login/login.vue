@@ -32,7 +32,7 @@
     <div id="login-panel" class="login-panel">
       <div class="net"></div>
       <div class="main-splash">
-        <div style="flex:1; max-width:600px"><h1>Make Spreadsheets Fun</h1><span>An easy way to collect all your data in one place.</span><br><div @click="toggleLearnMore" class="main-btn">Get Started</div></div>
+        <div style="flex:1; max-width:600px"><h1>Make Data Management Fun</h1><span>An easy way to collect all your data in one place.</span><br><div @click="toggleLearnMore" class="main-btn">Get Started</div></div>
         <div v-if="$mq == 'lg'" style="flex:1; display:flex;align-items:center;justify-content:center;"><img style="width:200px;" src="../../img/brain.svg" alt=""></div>
 
       </div>
@@ -43,13 +43,13 @@
     <div class="section-1">
       <div class="container">
         <div class="row" style="padding-top:25px;">
-          <div class="col-sm-12">
+          <div v-if="$mq != 'sm'" class="col-sm-12">
             <img style="width:100%;" src="../../img/rait_1_1.png" alt="">
           </div>
           <div class="col-sm-12" style="display:flex;align-items:center; justify-content:center; text-align:center; color:#fff; ">
             <div>
-            <h1>Visualize Your Assets</h1>
-            <span class="sub-text">CommonBrain makes it very easy to add aspects of your business like operations and financial , and legal compliance data on our dashboard. CommonBrain is totally customizable by you so you can decide what is important to see. While things like Entity Management appears to be ease to handle, with the fast pace of lending and M&A due diligence, simple business tasks become complex and annoying without an easy to edit, change and share your portfolios on the fly.</span>
+            <h1>Visualize Your Assets</h1><br>
+            <span class="sub-text">CommonBrain makes it easy to add important aspects of your business – operational, financial  and legal compliance data on our dashboard. CommonBrain is totally customizable by you so you can decide what is important to see. With the fast pace of changes for your needs, simple business tasks become complex and annoying without an easy way to edit and share your assets or asset portfolios on the fly.</span>
             </div>
           </div>
           
@@ -62,8 +62,8 @@
           
           <div class="col-sm-6" style="display:flex;align-items:center; height:400px; justify-content:center; text-align:left; ">
             <div>
-            <h1>Quickly Create Webpages for your Excel Documents</h1>
-            <span class="sub-text">With the power of CommonBrain, you can whip up fantastic web pages that display the data you want.  You can then share your web pages with colleages or even export and send in an email.</span>
+            <h1>Quickly Create Webpages for your Excel Documents</h1><br>
+            <span class="sub-text">With the power of CommonBrain, you can whip up fantastic web pages that display your data you want. You can then share your Business Intelligence with colleagues or just export and send in an email.  CommonBrain is a web publisher driven entirely off a simple Excel models.</span>
             </div>
           </div>
           <div v-if="$mq != 'sm'" class="col-sm-6" style="display:flex;align-items:center; height:400px; justify-content:center; text-align:center; ">
@@ -76,13 +76,23 @@
      <div class="section-3">
       <div class="container">
         <div class="row" style="padding-top:25px;">
-          <div  class="col-sm-6" style="display:flex;align-items:center;  justify-content:center; text-align:center; ">
-            <img src="../../img/common_square.jpg" style="width:100%; padding-bottom:25px;" alt="">
+          <div  class="col-sm-12" style="display:flex;align-items:center;  justify-content:center; text-align:center; ">
+            <img src="../../img/common_square.jpg" style="width:100%;  max-width:500px;padding-bottom:25px;" alt="">
           </div>
-          <div class="col-sm-6" style="display:flex;align-items:center; justify-content:center; text-align:left; ">
+          <div class="col-sm-12" style="display:flex;align-items:center; justify-content:center; text-align:left; ">
             <div>
-            <h1>CommonBrain Keeps Everything in One Place</h1>
-            <span class="sub-text">CommonBrain keeps, organizes and references all kinds of data, images, pdf, and assets.  You can link dropbox files, attach pdfs, or supply links to other resources quickly and easily. </span>
+            <h1 style="text-align:center">CommonBrain Keeps Everything in One Place</h1><br>
+            <span class="sub-text">CommonBrain stores, organizes and references all kinds of data, whether they are images, pdfs, or even formulas within an Excel file. If you can export data from other systems to Excel, you can integrate/link to other resources quickly and easily, from CRM to accounting software.<br><br>
+
+            CommonBrain finds a middle ground between legacy systems and comfortable workstyles.   We allow users to store their data in one place, and publish their work on the web for easy distribution. CommonBrain was founded by principals that understand asset management, and in particular real estate asset management, from a financial, operational and legal perspective.  They have also lived through integration of popular software, with mixed success.<br><br>
+
+            
+
+            CommonBrain is an easy-to-use web publisher for Excel files, which allows for the curb appeal of PowerPoint with the auditability of Excel, and distributed over the internet.  CommonBrain finds a middle ground between legacy systems and comfortable workstyles.   CommonBrain connects clients’ internal data with external information.  We allow users to store their data in one place, and publish their work on the web for easy distribution.<br><br>
+
+            
+
+            It is very easy to deploy and does not require programming knowledge beyond Excel, and organizations can be up and running in literally minutes.  If your data is disparate, we can help integrate and tie it together for you. </span>
             </div>
           </div>
           
@@ -253,7 +263,7 @@ export default {
   font-size: 25pt;
   display: flex;
   align-items: center;
-
+  height: 100px;
   justify-content: center;
 }
 .service-container b {
@@ -415,6 +425,9 @@ export default {
   }
 }
 @media (max-width: 728px) {
+  .web-top-bar {
+    /* position: absolute; */
+  }
   .service-container h1 {
     font-size: 20pt;
   }
@@ -468,6 +481,7 @@ export default {
   }
   .main-splash {
     text-align: center;
+    padding-top: unset !important;
   }
   .main-splash h1 {
     font-size: 24pt;
