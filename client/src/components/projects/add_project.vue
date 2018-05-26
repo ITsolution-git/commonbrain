@@ -31,6 +31,7 @@ import StandardInput from "../form_elements/standard_input";
 import StandardSelect from "../form_elements/custom_select";
 import axios from "axios";
 import auth from "../../auth.js";
+import { mapActions } from "vuex";
 export default {
   name: "add_project",
   data() {
@@ -45,6 +46,7 @@ export default {
   },
   props: ["hide", "create"],
   methods: {
+    ...mapActions(["getProjects"]),
     submit() {},
     hideThis() {
       var that = this;
@@ -87,9 +89,11 @@ export default {
             })
             .then(
               res => {
-                console.log(res.data);
-                this.$router.push("/projects/" + res.data.insertedIds[0]);
-                this.create();
+                var id = res.data.insertedIds[0];
+                this.getProjects().then(res2 => {
+                  this.$router.push("/projects/" + id);
+                  this.create();
+                });
               },
               err => {
                 console.log(err);

@@ -10,6 +10,7 @@
         <div v-click-outside="toggleUserDropdown" v-if="userDropdown" class="simple-dropdown animated-fast fadeInDown">
           <ul>
             <li @click="logout">Sign Out</li>
+            <li @click="$router.push('/profile')">Profile</li>
           </ul>
         </div>
       </div>
@@ -18,6 +19,7 @@
 </template>
 <script>
 import auth from "../auth";
+import { mapMutations } from "vuex";
 export default {
   name: "header_main",
   data() {
@@ -26,10 +28,12 @@ export default {
     };
   },
   methods: {
+    ...mapMutations("projects", ["resetState"]),
     toggleUserDropdown() {
       this.userDropdown = !this.userDropdown;
     },
     logout() {
+      this.resetState();
       auth.logout();
     }
   }

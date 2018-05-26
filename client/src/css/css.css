@@ -340,7 +340,7 @@ table td {
   width: 300px;
   background: #f8fafb;
   border: solid 1px #eaeaea;
-  box-shadow: 0px 0px 18px rgba(0,0,0,0.2);
+  box-shadow: 0px 0px 18px rgba(0, 0, 0, 0.2);
   margin-top: 70px;
   top: 0;
 }
@@ -378,7 +378,7 @@ table td {
 .project-list {
   border-top: solid 1px #eaeaea;
   height: calc(100% - 60px);
-  overflow:auto;
+  overflow: auto;
 }
 .project-item {
   display: flex;
@@ -423,13 +423,14 @@ table td {
 .project-item:hover .project-item-options {
   opacity: 1;
 }
-.projects-container {
+.projects-container,
+.profile-container {
   position: fixed;
   top: 70px;
   width: calc(100% - 300px);
-  height:calc(100% - 70px);
+  height: calc(100% - 70px);
   left: 300px;
-  z-index:-1;
+  z-index: -1;
 }
 .main-title {
   font-size: 15pt;
@@ -491,7 +492,7 @@ table td {
   bottom: 15px;
   right: 15px;
   float: left;
-  margin-right:10px;
+  margin-right: 10px;
 }
 .overlay {
   position: fixed;
@@ -591,7 +592,7 @@ table td {
 }
 .modal-btn.delete {
   background: #e35f6b;
-  color:#fff;
+  color: #fff;
   cursor: pointer;
 }
 
@@ -657,33 +658,33 @@ table td {
 .left-sub-sidebar-options {
   position: relative;
   display: flex;
-  margin-left:15px;
+  margin-left: 15px;
 }
 
 .left-sub-sidebar-options i {
   background: #fff;
-    width: 30px;
-    height: 30px;
-    display: -webkit-box;
-    display: -ms-flexbox;
-    display: flex;
-    -webkit-box-align: center;
-    -ms-flex-align: center;
-    align-items: center;
-    -webkit-box-pack: center;
-    -ms-flex-pack: center;
-    justify-content: center;
-    border: solid 1px #eaeaea;
-    border-radius: 3px;
-    margin-left: auto;
-    font-size: 10pt;
-    -webkit-transition: -webkit-box-shadow 0.2s ease;
-    transition: -webkit-box-shadow 0.2s ease;
-    transition: box-shadow 0.2s ease;
-    transition: box-shadow 0.2s ease, -webkit-box-shadow 0.2s ease;
-    cursor: pointer;
-    -webkit-box-shadow: 0px 0px 0px 0px #66d0f7;
-    box-shadow: 0px 0px 0px 0px #66d0f7;
+  width: 30px;
+  height: 30px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  border: solid 1px #eaeaea;
+  border-radius: 3px;
+  margin-left: auto;
+  font-size: 10pt;
+  -webkit-transition: -webkit-box-shadow 0.2s ease;
+  transition: -webkit-box-shadow 0.2s ease;
+  transition: box-shadow 0.2s ease;
+  transition: box-shadow 0.2s ease, -webkit-box-shadow 0.2s ease;
+  cursor: pointer;
+  -webkit-box-shadow: 0px 0px 0px 0px #66d0f7;
+  box-shadow: 0px 0px 0px 0px #66d0f7;
 }
 
 .left-sub-sidebar-options i:hover {
@@ -691,7 +692,7 @@ table td {
   border: solid 1px #66d0f7;
   color: #fff;
   -webkit-box-shadow: 0px 0px 0px 2px #66d0f7;
-  box-shadow: 0px 0px 0px 2px #66d0f7
+  box-shadow: 0px 0px 0px 2px #66d0f7;
 }
 
 .left-sub-sidebar-options i:active {
@@ -756,7 +757,7 @@ table td {
   background: #fff;
   color: #000;
   position: absolute;
-  left:0;
+  left: 0;
   top: calc(100% + 10px);
   box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.2);
   border-radius: 3px;
@@ -780,13 +781,13 @@ table td {
 .basic-dropdown li:hover {
   color: #000;
 }
-.spinner{
-  height:25px;
-  width:25px;
+.spinner {
+  height: 25px;
+  width: 25px;
 }
-.spinner-big{
-  height:35px;
-  width:35px;
+.spinner-big {
+  height: 35px;
+  width: 35px;
 }
 .is-danger {
   border-color: #de6767 !important;
@@ -809,7 +810,7 @@ table td {
   align-items: center;
   justify-content: center;
   background: #66d0f7;
-  box-shadow: 0px 0px 18px rgba(0,0,0,0.2);
+  box-shadow: 0px 0px 18px rgba(0, 0, 0, 0.2);
   position: relative;
   z-index: 10;
 }
@@ -823,7 +824,8 @@ table td {
   position: relative;
   z-index: 1;
 }
-.top-bar img, .web-top-bar img {
+.top-bar img,
+.web-top-bar img {
   height: 70%;
 }
 .login-form {
@@ -833,7 +835,7 @@ table td {
   box-shadow: 1px 1px 2px 0px #f0f0fa;
   border-radius: 3px;
   border: solid 1px #eaeaea;
-  
+
   text-align: center;
   overflow: hidden;
   position: relative;
@@ -891,10 +893,10 @@ table td {
   position: relative;
   font-weight: bold;
 }
-.no-items{
+.no-items {
   display: flex;
   align-items: center;
   justify-content: center;
-  height:100px;
-  color:#d0d0d0;
+  height: 100px;
+  color: #d0d0d0;
 }

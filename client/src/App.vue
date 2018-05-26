@@ -21,9 +21,8 @@ export default {
   mounted() {
     const token = localStorage.getItem("token");
     if (token) {
-      console.log(decode(token));
-      this.setToken(token);
-      this.setUser(decode(token));
+      // this.setToken(token);
+      // this.setUser(decode(token));
     } else {
       this.$router.push("/");
     }

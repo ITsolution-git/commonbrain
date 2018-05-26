@@ -1,7 +1,7 @@
 import Vue from "vue";
 import Router from "vue-router";
 import Login from "@/components/login/login";
-
+import ProfileRoutes from "./profile";
 import ProjectRoutes from "./project";
 import FileRoutes from "./file";
 
@@ -16,7 +16,10 @@ var baseRoutes = [
   }
 ];
 
-const routes = baseRoutes.concat(ProjectRoutes).concat(FileRoutes);
+const routes = baseRoutes
+  .concat(ProfileRoutes)
+  .concat(ProjectRoutes)
+  .concat(FileRoutes);
 
 Vue.use(Router);
 

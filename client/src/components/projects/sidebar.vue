@@ -36,18 +36,18 @@ export default {
       hovered: -1,
       addProjectOpen: false,
       activeProject: -1,
-      isLoading: true
+      isLoading: false
     };
   },
   methods: {
-    ...mapActions(["getProjects"]),
+    ...mapActions(["getProjects", "getFiles"]),
     toggleAddProject() {
       this.addProjectOpen = !this.addProjectOpen;
     },
     projectCreated() {
       this.addProjectOpen = false;
       this.activeProject = this.projects.length;
-      this.getProjects();
+      this.refreshProjects();
     },
     mouseOver(num) {
       this.hovered = num;
@@ -55,6 +55,7 @@ export default {
     activateProject(i, id) {
       this.activeProject = i;
       this.$router.push("/projects/" + id);
+      this.getFiles({ projectId: id });
     },
     refreshProjects() {
       this.getProjects().then(res => {
@@ -81,21 +82,27 @@ export default {
     }
   },
   mounted() {
-    this.refreshProjects();
+    if (this.$route.params.projectId != null) {
+      for (var i = 0; i < this.projects.length; i++) {
+        if (this.$route.params.projectId == this.projects[i]._id) {
+          this.activeProject = i;
+        }
+      }
+    }
   },
   watch: {
     userId(val, oldVal) {
       if (val != null && oldVal != val) {
-        this.getProjects().then(res => {
-          this.isLoading = false;
-          if (this.$route.params.projectId != null) {
-            for (var i = 0; i < this.projects.length; i++) {
-              if (this.$route.params.projectId == this.projects[i]._id) {
-                this.activeProject = i;
-              }
-            }
-          }
-        });
+        // this.getProjects().then(res => {
+        //   this.isLoading = false;
+        //   if (this.$route.params.projectId != null) {
+        //     for (var i = 0; i < this.projects.length; i++) {
+        //       if (this.$route.params.projectId == this.projects[i]._id) {
+        //         this.activeProject = i;
+        //       }
+        //     }
+        //   }
+        // });
       }
     },
     projects(val) {
@@ -105,11 +112,11 @@ export default {
     },
     projectId(val, oldVal) {
       if (val == null) {
-        this.getProjects();
+        // this.refreshProjects();
         this.activeProject = -1;
       }
       if (val != oldVal) {
-        this.getProjects();
+        // this.refreshProjects();
       }
     }
   },

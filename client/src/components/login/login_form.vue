@@ -18,22 +18,31 @@
     
     <div class="modal-btn-container">
         <div @click="toggleVisible" class="modal-btn cancel">Cancel</div>
-    <button class="modal-btn confirm" type="submit">Login</button>
-    <div v-if="hasError" class="alert-danger animated fadeIn" style="color:#ff0000">{{errorMessage}}</div>
+    <button class="modal-btn confirm" type="submit"><span v-if="!isLoading">Login</span> <img v-if="isLoading" style="width:25px" src="../../img/spinner_white.svg"/></button>
+    
     </div>
+    <div v-if="hasError" class="alert-danger animated fadeIn" style="color:#ff0000; text-align:center; clear:both">{{errorMessage}}</div>
     <div class="forgot-password">Forgot Password?</div>
     </form>
     </div>
     </div>
 </template>
 <script>
+import axios from "axios";
+import auth from "../../auth";
 export default {
   name: "login_form",
   props: ["hide", "login"],
   data() {
     return {
-      visible: true
+      visible: true,
+      hasError: false,
+      isLoading: false,
+      errorMessage: ""
     };
+  },
+  $_veeValidate: {
+    validator: "new" // give me a new validator each time.
   },
   methods: {
     toggleVisible() {
@@ -42,6 +51,38 @@ export default {
       setTimeout(function() {
         that.hide();
       }, 300);
+    },
+    submitForm() {
+      this.isLoading = true;
+      var form = event.target;
+      var data = new FormData(form);
+      data = data.entries();
+      var obj = data.next();
+      var retrieved = {};
+
+      while (undefined !== obj.value) {
+        retrieved[obj.value[0]] = obj.value[1];
+        obj = data.next();
+      }
+      this.$validator.validateAll().then(result => {
+        if (!result) {
+          this.isLoading = false;
+          return;
+        }
+        if (!this.errors.any()) {
+          axios.post("/api/auth", retrieved).then(
+            res => {
+              auth.login(retrieved);
+            },
+            err => {
+              this.isLoading = false;
+              //console.log(err.response);
+              this.hasError = true;
+              this.errorMessage = err.response.data.error;
+            }
+          );
+        }
+      });
     }
   }
 };

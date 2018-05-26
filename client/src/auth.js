@@ -15,6 +15,7 @@ export default {
           this.user.authenticated = true;
           router.push("/projects");
           var decoded = jwt_decode(res.data.token);
+          store.dispatch("setUser", decoded);
           resolve(decoded);
         },
         err => {

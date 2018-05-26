@@ -1,6 +1,7 @@
 <template>
   <div style="overflow:hidden">
     <LearnMore v-if="learnMore" :hide="toggleLearnMore"/>
+    <UserLogin :hide="toggleUserLogin" v-if="userLogin"/>
     <div class="main-container">
       <div class="web-top-bar">
         <img  src="../../img/brain_white.svg"/>
@@ -10,7 +11,7 @@
             <li>Home</li>
             <li>About</li>
             <li>Services</li>
-            <li>Company</li>
+            <li @click="toggleUserLogin">User Login</li>
             <li><div @click="toggleLearnMore" class="get-started">Get Started</div></li>
           </ul>
         </div>
@@ -198,6 +199,7 @@
 <script>
 import StandardInput from "../form_elements/standard_input";
 import LearnMore from "./learn_more";
+import UserLogin from "./login_form";
 import { mapActions } from "vuex";
 export default {
   name: "login",
@@ -208,7 +210,8 @@ export default {
       errorMessage: "",
       mobile: false,
       headerScroll: false,
-      learnMore: false
+      learnMore: false,
+      userLogin: false
     };
   },
 
@@ -229,6 +232,9 @@ export default {
   },
   methods: {
     ...mapActions(["setUser"]),
+    toggleUserLogin() {
+      this.userLogin = !this.userLogin;
+    },
     toggleLearnMore() {
       this.learnMore = !this.learnMore;
     },
@@ -248,7 +254,8 @@ export default {
   },
   components: {
     StandardInput,
-    LearnMore
+    LearnMore,
+    UserLogin
   }
 };
 </script>

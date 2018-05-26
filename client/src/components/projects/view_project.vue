@@ -50,7 +50,6 @@ export default {
       optionsDropdown: false,
       projectName: "",
       isLoading: false,
-      filesLoading: true,
       confirmDelete: false
     };
   },
@@ -73,7 +72,6 @@ export default {
     },
     uploaded() {
       this.fileUpload = false;
-      this.filesLoading = true;
       this.getFiles({
         userId: this.$store.state.user.id,
         projectId: this.project._id
@@ -137,17 +135,13 @@ export default {
       return time + " " + monthNames[monthIndex] + " " + day + " " + year;
     }
   },
-  mounted() {
-    if (this.files.length > 0) {
-      this.filesLoading = false;
-    }
-    if (this.project != null) {
-      this.projectName = this.project.project_name;
-    }
-  },
+  mounted() {},
   computed: {
     files() {
       return this.$store.state.fileStore.files;
+    },
+    filesLoading() {
+      return this.$store.state.fileStore.filesLoading;
     },
     project() {
       var id = this.$route.params.projectId;
@@ -156,6 +150,7 @@ export default {
       );
       for (var i = 0; i < projects.length; i++) {
         if (id == projects[i]._id) {
+          this.projectName = projects[i].project_name;
           return projects[i];
         }
       }
@@ -165,25 +160,17 @@ export default {
     }
   },
   watch: {
-    projectId(val, oldVal) {
+    projectId(val, oldVal) {},
+    files(val, oldVal) {
       if (val != oldVal) {
-        this.filesLoading = true;
+        this.projectName = this.project.project_name;
       }
     },
-    files(val) {
-      if (val != null) {
-        this.filesLoading = false;
-      }
-    },
-    project(val) {
-      if (val != null) {
+    project(val, oldVal) {
+      if (val != oldVal) {
         this.projectName = val.project_name;
         if (this.projectName != "") {
           this.isLoading = false;
-          this.getFiles({
-            userId: this.$store.state.user.id,
-            projectId: this.project._id
-          });
         }
       }
     }
