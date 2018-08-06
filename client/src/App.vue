@@ -11,21 +11,29 @@
 
 <script>
 import { mapActions } from "vuex";
-import decode from "jwt-decode";
+
 export default {
   name: "App",
 
   methods: {
     ...mapActions(["setToken", "setUser"])
   },
-  mounted() {
+  created() {
     const token = localStorage.getItem("token");
     if (token) {
-      // this.setToken(token);
-      // this.setUser(decode(token));
+      this.setToken(token);
     } else {
       this.$router.push("/");
     }
+  },
+  mounted() {
+    // const token = localStorage.getItem("token");
+    // if (token) {
+    //   // this.setToken(token);
+    //   // this.setUser(decode(token));
+    // } else {
+    //   this.$router.push("/");
+    // }
   }
 };
 </script>

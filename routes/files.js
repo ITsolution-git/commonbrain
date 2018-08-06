@@ -78,6 +78,55 @@ router.get("/:userId/:projectId/:fileId", (req, res, next) => {
 });
 
 //--------------------------------
+// Download File
+//--------------------------------
+
+router.get("/download/:userId/:projectId/:fileId", (req, res, next) => {
+  const userId = req.params.userId;
+  const projectId = req.params.projectId;
+  const fileId = req.params.fileId;
+  MongoClient.connect(URL, function(err, db) {
+    if (err) throw err;
+    var collection = db.collection("files");
+    collection
+      .find({ _id: ObjectId(fileId) })
+      .toArray()
+      .then(result => {
+        res.download('./uploads/' + result[0].user_id + '/' + result[0].project_id + '/' + result[0].filename)
+      });
+  });
+});
+
+//--------------------------------
+// Delete File
+//--------------------------------
+
+router.delete("/:userId/:projectId/:fileId", (req, res, next) => {
+  const userId = req.params.userId;
+  const projectId = req.params.projectId;
+  const fileId = req.params.fileId;
+  // console.log('Deleteing')
+  MongoClient.connect(URL, function(err, db) {
+    if (err) throw err;
+    var collection = db.collection("files");
+    collection
+      .find({ _id: ObjectId(fileId) })
+      .toArray()
+      .then(result => {
+        
+        fs.unlink('./uploads/' + result[0].user_id + '/' + result[0].project_id + '/' + result[0].filename)
+        fs.unlink('./uploads/' + result[0].user_id + '/' + result[0].project_id + '/' + result[0]._id + '.jpg')
+        MongoClient.connect(URL, function(err, db) {
+          if (err) throw err;
+          var fileCollection = db.collection("files");
+          fileCollection.deleteOne({ _id: ObjectId(fileId) });
+          res.status(200).send('Deleted Successfully')
+        })
+      });
+  });
+});
+
+//--------------------------------
 // Upload File Image
 //--------------------------------
 
@@ -224,6 +273,128 @@ router.post("/:projectId/add", (req, res, next) => {
   });
 });
 
+//--------------------------------
+// Replace File
+//--------------------------------
+
+router.post("/replace/:userId/:projectId/:fileId", (req, res, next) => {
+  var fileId = req.params.fileId;
+  MongoClient.connect(URL, function(err, db) {
+    if (err) throw err;
+    var collection = db.collection("files");
+    collection
+      .find({ _id: ObjectId(fileId) })
+      .toArray()
+      .then(result => {
+        upload(req, res, function(err) {
+          var projectId = req.params.projectId;
+          var userId = req.body.userId;
+          var fileName = result[0].filename;
+          mkdirp("./uploads/test", function(err) {
+            var dir = "/uploads/" + userId + "/" + projectId;
+            var filename = req.file.filename;
+            fs.move("./tmp/" + filename, "./" + dir + "/" + result[0].filename, { overwrite: true }, function(err) {
+              if (err) {
+                console.log(err);
+                fs.remove("./tmp/" + filename);
+                res.status(401).json({
+                  errors: {
+                    form: "File Exists"
+                  }
+                });
+              } else {
+                var workbook = XLSX.readFile("./" + dir + "/" + result[0].filename);
+                var sheet = JSON.parse(CircularJSON.stringify(workbook));
+                var cb = sheet.Sheets.CommonBrain;
+                var sheetNames = [];
+                var rows = {};
+                var title;
+                for (var i = 0; i < Object.keys(cb).length; i++) {
+                  if (i == Object.keys(cb).length / 2) {
+                  }
+                  var key = Object.keys(cb)[i];
+                  var letter = key.charAt(0);
+                  var number = key.substr(1);
+                  if (letter == "A" && number == 1) {
+                    title = cb[Object.keys(cb)[i]].v;
+                  }
+                  if (letter.match(/[a-z]/i)) {
+                    var row = {};
+      
+                    if (number > 2) {
+                      number = parseInt(number);
+                      if (Object.keys(cb[Object.keys(cb)[i]]).length > 0) {
+                        if (rows[number] != null) {
+                          if (letter == "A") {
+                            rows[number]["sheet_name"] = cb[Object.keys(cb)[i]].v;
+                          }
+                          if (letter == "B") {
+                            rows[number]["tab_name"] = cb[Object.keys(cb)[i]].v;
+                          }
+                          if (letter == "C") {
+                            rows[number]["major_category"] = cb[Object.keys(cb)[i]].v;
+                          }
+                          if (letter == "D") {
+                            rows[number]["spec_category"] = cb[Object.keys(cb)[i]].v;
+                          }
+                          if (letter == "E") {
+                            rows[number]["value"] = cb[Object.keys(cb)[i]].v;
+                          }
+                          if (letter == "F") {
+                            rows[number]["hover"] = cb[Object.keys(cb)[i]].v;
+                          }
+                          if (letter == "G") {
+                            rows[number]["source"] = cb[Object.keys(cb)[i]].v;
+                          }
+                        } else {
+                          if (letter == "A") {
+                            rows[number] = {};
+                            rows[number]["sheet_name"] = cb[Object.keys(cb)[i]].v;
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+      
+                MongoClient.connect(URL, function(err, db) {
+                  if (err) throw err;
+                  var collection = db.collection("files");
+                  collection
+                    .replaceOne({ _id: ObjectId(fileId) },{
+                      name: filename.substring(0, filename.length - 5),
+                      filename: fileName,
+                      file_uploaded: new Date(),
+                      file_updated: new Date(),
+                      user_id: userId,
+                      project_id: projectId,
+                      rows: rows,
+                      title: title
+                    })
+                    .then(
+                      result => {
+                        res.status(200).json({
+                          message: "Upload Successful"
+                        });
+                      },
+                      err => {
+                        res.status(401).send({ error: err });
+                      }
+                    );
+                });
+              }
+            });
+          });
+        });
+        
+        
+        
+      });
+  });
+
+  
+});
+
 async function fake_background_job(pusher_channel) {
   pusher.trigger(pusher_channel, "upload", {
     message: "Starting provisioning your account #{name}",
@@ -355,49 +526,6 @@ router.post("/test", (req, res, next) => {
     });
   });
 });
-router.post("/signup", (req, res, next) => {
-  const { username, password, email } = req.body;
-  var passwordHash = crypto
-    .createHash("md5")
-    .update(password)
-    .digest("hex");
-  MongoClient.connect(URL, function(err, db) {
-    if (err) throw err;
-    var collection = db.collection("users");
-    collection.findOne({ username: username }).then(result => {
-      if (result == null) {
-        collection
-          .insert({
-            username: username,
-            password: passwordHash,
-            email: email
-          })
-          .then(result => {
-            res.send({
-              userId: result.ops[0]["_id"],
-              message: "Created Succesfully"
-            });
-          });
-      } else {
-        res.status(401).send({ error: "Username Exists" });
-      }
-    });
-  });
-});
-router.get("/me", function(req, res) {
-  var token = req.headers["authorization"];
-  token = token.split(" ");
-  if (!token[1])
-    return res.status(401).send({ auth: false, message: "No token provided." });
 
-  jwt.verify(token[1], config.secret, function(err, decoded) {
-    if (err)
-      return res
-        .status(500)
-        .send({ auth: false, message: "Failed to authenticate token." });
-
-    res.status(200).send(decoded);
-  });
-});
 
 module.exports = router;

@@ -17,7 +17,7 @@
         <div v-if="!isLoading" class="project-list animated-fast fadeInLeft">
             <div v-for="(project, i) in projects" :key="i" v-on:mouseover="mouseOver(i)" v-on:mouseout="mouseOver(-1)" class="project-item" :class="{'active':(activeProject == i)}" @click="activateProject(i, project._id)">
                 <i class="fa fa-folder-o"></i> 
-                <div class="project-item-title">{{project.project_name}} <br> <span class="animated-fast fadeInDown" v-if="hovered == i || activeProject == i">Updated Feb 12</span></div>
+                <div class="project-item-title">{{project.project_name}} <br> <span class="animated-fast fadeInDown" v-if="hovered == i || activeProject == i">Created {{formatDate(project.project_create_date)}}</span></div>
                 <!-- <div v-if="hovered == i" class="project-item-options animated-fast fadeInRight"><i class="fa fa-ellipsis-h"></i></div> -->
             </div>
             
@@ -41,6 +41,29 @@ export default {
   },
   methods: {
     ...mapActions(["getProjects", "getFiles"]),
+    formatDate(date2) {
+      var date = new Date(date2);
+      var monthNames = [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sept",
+        "Oct",
+        "Nov",
+        "Dec"
+      ];
+
+      var day = date.getDate();
+      var monthIndex = date.getMonth();
+      var year = date.getFullYear();
+
+      return monthNames[monthIndex] + " " + day + " " + year;
+    },
     toggleAddProject() {
       this.addProjectOpen = !this.addProjectOpen;
     },
@@ -82,6 +105,7 @@ export default {
     }
   },
   mounted() {
+    this.getProjects();
     if (this.$route.params.projectId != null) {
       for (var i = 0; i < this.projects.length; i++) {
         if (this.$route.params.projectId == this.projects[i]._id) {

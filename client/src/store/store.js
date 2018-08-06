@@ -3,7 +3,7 @@ import Vuex from "vuex";
 import jwt_decode from "jwt-decode";
 import projectStore from "./projects";
 import fileStore from "./files";
-import createPersistedState from "vuex-persistedstate";
+// import createPersistedState from "vuex-persistedstate";
 
 Vue.use(Vuex);
 
@@ -12,7 +12,7 @@ export const store = new Vuex.Store({
     projectStore,
     fileStore
   },
-  plugins: [createPersistedState()],
+  // plugins: [createPersistedState()],
   state: {
     user: {}
   },

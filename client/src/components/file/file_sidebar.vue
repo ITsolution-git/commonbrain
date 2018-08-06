@@ -1,10 +1,22 @@
 <template>
 <div>
   <Cropper :upload="toggleCropper"  :hide="toggleCropper" v-if="cropper"></Cropper>
+  <ReplaceFile :hide="toggleReplaceFile" :uploaded="submitReplaceFile" v-if="replaceFile" />
     <div class="sidebar-container">
         <div @click="$router.go(-1)" class="standard-btn back"><i class="fa fa-angle-left"></i> Back</div>
         <div class="sidebar-title">
-            
+          {{file[0].name}}
+            <div class="left-sub-sidebar-options">
+            <div @click.stop="toggleOptionsDropdown" class="add-project-btn dropdown-btn"><i class="fa fa-ellipsis-h" />
+                <div v-click-outside="toggleOptionsDropdown"  v-if="optionsDropdown" class="basic-dropdown add-project-btn-dropdown animated-fast fadeInDown">
+                  <ul>
+                    <li @click="deleteFile">Delete File</li>
+                    <li @click="downloadFile">Download File</li>
+                    <li @click="toggleReplaceFile">Replace File</li>
+                  </ul>
+                </div>
+            </div>
+          </div>
         </div>
         <div @click="toggleCropper" class="file-logo">
           <div v-if="!hasImage" style="padding:15px">
@@ -27,6 +39,11 @@
 </template>
 <script>
 import Cropper from "./cropper";
+import { deleteRequest } from "../helpers/api_helper";
+import { mapActions } from "vuex";
+import axios from "axios";
+import ReplaceFile from "./replace_file";
+
 export default {
   name: "file-sidebar",
   props: ["sheets", "activate"],
@@ -37,11 +54,14 @@ export default {
       activeNav: 0,
       cropper: false,
       hasImage: false,
-      imagePath: ""
+      imagePath: "",
+      optionsDropdown: false,
+      replaceFile: false
     };
   },
   components: {
-    Cropper
+    Cropper,
+    ReplaceFile
   },
   mounted() {
     var that = this;
@@ -53,6 +73,17 @@ export default {
     }, 10);
   },
   methods: {
+    ...mapActions(["getFiles"]),
+    submitReplaceFile() {
+      this.replaceFile = !this.replaceFile;
+      window.location.reload();
+    },
+    toggleReplaceFile() {
+      this.replaceFile = !this.replaceFile;
+    },
+    toggleOptionsDropdown() {
+      this.optionsDropdown = !this.optionsDropdown;
+    },
     toggleCropper: function() {
       this.cropper = !this.cropper;
     },
@@ -65,6 +96,39 @@ export default {
     activateSheet(i, sheet) {
       this.activeNav = i;
       this.activate(sheet);
+    },
+    deleteFile() {
+      deleteRequest(
+        "/api/files/" +
+          this.$store.state.user.id +
+          "/" +
+          this.$route.params.projectId +
+          "/" +
+          this.$route.params.fileId
+      ).then(() => {
+        this.getFiles({ project_id: this.$route.params.projectId });
+        this.$router.go(-1);
+      });
+    },
+    downloadFile() {
+      axios
+        .get(
+          "/api/files/download/" +
+            this.$store.state.user.id +
+            "/" +
+            this.$route.params.projectId +
+            "/" +
+            this.$route.params.fileId,
+          { responseType: "arraybuffer" }
+        )
+        .then(res => {
+          const url = window.URL.createObjectURL(new Blob([res.data]));
+          const link = document.createElement("a");
+          link.href = url;
+          link.setAttribute("download", this.file[0].name + ".xlsx");
+          document.body.appendChild(link);
+          link.click();
+        });
     },
     getImage() {
       this.imagePath =

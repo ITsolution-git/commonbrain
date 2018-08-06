@@ -1,4 +1,3 @@
 {
-  "api": "http://localhost:3000",
-  "api2": "https://api.datacloud.rocks/v1"
+  "api": "http://localhost:3000"
 }

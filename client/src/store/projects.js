@@ -28,7 +28,7 @@ export default {
           });
       });
     },
-    getProjects({ state, commit, rootState }) {
+    getProjects({ commit, rootState }) {
       return new Promise(function(resolve, reject) {
         axios.get("/api/projects/" + rootState.user.id).then(res => {
           commit("GET_PROJECTS", res.data);

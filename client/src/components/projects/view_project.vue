@@ -14,7 +14,6 @@
                   <ul>
                     <li @click.stop="toggleFileUpload">Add New File</li>
                     <li @click.stop="toggleConfirmDelete">Delete Project</li>
-                    
                   </ul>
                 </div>
             </div>
@@ -29,7 +28,7 @@
             <tr><th>File Name</th><th>Date Uploaded</th><th>Date Last Modified</th></tr>
             <tr v-if="filesLoading" class="animated flash infinite"><td colspan="3" style="text-align:left; background:#f8fafb"><i class="fa fa-folder-o"></i> <img class="spinner"  src="../../img/spinner.svg" alt=""></td></tr>
             <tr v-if="!filesLoading" v-for="(file,i)  in files" :key="i"><td><div  @click="$router.push($route.params.projectId + '/file/'+file._id)" class="project-name"><i class="fa fa-folder-o"></i> <span>{{file.name}}<br><span style="font-size:9pt; color:#66d0f7">New</span></span></div></td><td>{{formatDateTime(file.file_uploaded)}}</td><td>{{formatDateTime(file.file_updated)}}</td></tr>
-            
+            <tr v-if="files.length < 1"><td style="background:#fff; border-bottom:solid 1px #eaeaea; height:100px; text-align:left;" colspan="3">No Files</td></tr>
           </tbody>
         </table>
         
@@ -135,7 +134,9 @@ export default {
       return time + " " + monthNames[monthIndex] + " " + day + " " + year;
     }
   },
-  mounted() {},
+  mounted() {
+    this.getFiles({ projectId: this.$route.params.projectId });
+  },
   computed: {
     files() {
       return this.$store.state.fileStore.files;
@@ -144,13 +145,14 @@ export default {
       return this.$store.state.fileStore.filesLoading;
     },
     project() {
+      var that = this;
       var id = this.$route.params.projectId;
       var projects = JSON.parse(
         JSON.stringify(this.$store.state.projectStore.projects)
       );
       for (var i = 0; i < projects.length; i++) {
         if (id == projects[i]._id) {
-          this.projectName = projects[i].project_name;
+          that.projectName = projects[i].project_name;
           return projects[i];
         }
       }

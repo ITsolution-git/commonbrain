@@ -8,12 +8,7 @@
               </div>
               <form @submit.prevent="confirmUpload">
               <div class="modal-inner">
-                  <StandardInput
-                  field="File Name"
-                  name="file_name"
-                  width="100%"
-                  require="true"
-                  />
+                 
                   <div class="modal-sub-inner" >
                     <div v-if="imageName != 'No Image'" class="image-preview-item"><i class="fa fa-file"></i> {{imageName}} <img @click="removeFile" class="image-preview-delete" src="../../img/close.svg" alt=""></div>
                     
@@ -39,7 +34,7 @@ import StandardSelect from "../form_elements/custom_select";
 import axios from "axios";
 import auth from "../../auth.js";
 export default {
-  name: "add_project",
+  name: "replace_file",
   data() {
     return {
       hidden: false,
@@ -80,7 +75,6 @@ export default {
 
       var formData = new FormData();
       formData.append("file", retrieved.file);
-      formData.append("fileName", retrieved.file_name);
       formData.append("userId", this.userId);
       formData.append("projectId", this.$route.params.id);
       var channel = this.$pusher.subscribe("file");
@@ -89,14 +83,23 @@ export default {
       });
 
       axios
-        .post("/api/files/" + this.$route.params.projectId + "/add", formData, {
-          headers: auth.getHeaders(),
-          onUploadProgress: function(progressEvent) {
-            console.log(
-              Math.round(progressEvent.loaded * 100 / progressEvent.total)
-            );
+        .post(
+          "/api/files/replace/" +
+            this.$store.state.user.id +
+            "/" +
+            this.$route.params.projectId +
+            "/" +
+            this.$route.params.fileId,
+          formData,
+          {
+            headers: auth.getHeaders(),
+            onUploadProgress: function(progressEvent) {
+              console.log(
+                Math.round(progressEvent.loaded * 100 / progressEvent.total)
+              );
+            }
           }
-        })
+        )
         .then(
           res => {
             if (res.data.message == "Upload Successful") {
