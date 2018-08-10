@@ -28,7 +28,7 @@
             <tr><th>File Name</th><th>Date Uploaded</th><th>Date Last Modified</th></tr>
             <tr v-if="filesLoading" class="animated flash infinite"><td colspan="3" style="text-align:left; background:#f8fafb"><i class="fa fa-folder-o"></i> <img class="spinner"  src="../../img/spinner.svg" alt=""></td></tr>
             <tr v-if="!filesLoading" v-for="(file,i)  in files" :key="i"><td><div  @click="$router.push($route.params.projectId + '/file/'+file._id)" class="project-name"><i class="fa fa-folder-o"></i> <span>{{file.name}}<br><span style="font-size:9pt; color:#66d0f7">New</span></span></div></td><td>{{formatDateTime(file.file_uploaded)}}</td><td>{{formatDateTime(file.file_updated)}}</td></tr>
-            <tr v-if="files.length < 1"><td style="background:#fff; border-bottom:solid 1px #eaeaea; height:100px; text-align:left;" colspan="3">No Files</td></tr>
+            <tr v-if="files.length < 1 && !filesLoading"><td style="background:#fff; border-bottom:solid 1px #eaeaea; height:100px; text-align:left;" colspan="3">No Files</td></tr>
           </tbody>
         </table>
         

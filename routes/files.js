@@ -330,6 +330,9 @@ router.post("/replace/:userId/:projectId/:fileId", (req, res, next) => {
                       if (Object.keys(cb[Object.keys(cb)[i]]).length > 0) {
                         if (rows[number] != null) {
                           if (letter == "A") {
+                            if(cb[Object.keys(cb)[i]].v == ''){
+                              continue;
+                            }
                             rows[number]["sheet_name"] = cb[Object.keys(cb)[i]].v;
                           }
                           if (letter == "B") {
@@ -343,6 +346,8 @@ router.post("/replace/:userId/:projectId/:fileId", (req, res, next) => {
                           }
                           if (letter == "E") {
                             rows[number]["value"] = cb[Object.keys(cb)[i]].v;
+                            rows[number]["type"] = cb[Object.keys(cb)[i]].t;
+                            rows[number]["formatted"] = cb[Object.keys(cb)[i]].w
                           }
                           if (letter == "F") {
                             rows[number]["hover"] = cb[Object.keys(cb)[i]].v;
