@@ -18,8 +18,8 @@
                 <div class="data-elements ">
                       <div v-for="(dat,i2) in data[Object.keys(data)[0]].data" :key="i2" class="data-item-item animated-fast fadeIn">
                         <div class="data-item-title">{{dat.title}}</div>
-                        <div v-if="(dat.source == undefined)" class="data-item-value animated-fast fadeInUp" v-tooltip="{ content:dat.hover  , placement:'top'}">{{dat.value}}</div>
-                        <div v-if="(dat.source != undefined)" class="data-item-value animated-fast fadeInUp" v-tooltip="{ content:dat.hover  , placement:'top'}"><a :href="makeLink(dat.source)">{{round(dat.value)}}</a></div>
+                        <div v-if="(dat.source == undefined)" class="data-item-value animated-fast fadeInUp" v-tooltip="{ content:dat.hover  , placement:'top'}">{{dat.formatted}}</div>
+                        <div v-if="(dat.source != undefined)" class="data-item-value animated-fast fadeInUp" v-tooltip="{ content:dat.hover  , placement:'top'}"><a :href="makeLink(dat.source)">{{dat.formatted}}</a></div>
                       </div>
                 </div>
                  
@@ -45,7 +45,6 @@ export default {
       activeSheet: "",
       activeTab: "",
       isLoading: true,
-
       activeRows: [],
       activeData: [],
       activeSubData: []
@@ -66,6 +65,16 @@ export default {
         return "http://" + link;
       } else {
         return link;
+      }
+    },
+    numberWithCommas(x) {
+      return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    },
+    format(value) {
+      if (typeof value == "number") {
+        return this.numberWithCommas(value);
+      } else {
+        return value;
       }
     },
     getRows() {
@@ -126,6 +135,7 @@ export default {
               {
                 title: this.activeRows[i].spec_category,
                 value: this.activeRows[i].value,
+                formatted: this.activeRows[i].formatted,
                 hover: this.activeRows[i].hover,
                 source: this.activeRows[i].source
               }
@@ -139,6 +149,7 @@ export default {
             ]["data"].push({
               title: this.rows[i].spec_category,
               value: this.rows[i].value,
+              formatted: this.rows[i].formatted,
               hover: this.rows[i].hover,
               source: this.rows[i].source
             });

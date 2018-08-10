@@ -190,6 +190,7 @@ router.post("/:projectId/add", (req, res, next) => {
         } else {
           var workbook = XLSX.readFile("./" + dir + "/" + filename);
           var sheet = JSON.parse(CircularJSON.stringify(workbook));
+          
           var cb = sheet.Sheets.CommonBrain;
           var sheetNames = [];
           var rows = {};
@@ -224,6 +225,8 @@ router.post("/:projectId/add", (req, res, next) => {
                     }
                     if (letter == "E") {
                       rows[number]["value"] = cb[Object.keys(cb)[i]].v;
+                      rows[number]["type"] = cb[Object.keys(cb)[i]].t;
+                      rows[number]["formatted"] = cb[Object.keys(cb)[i]].w
                     }
                     if (letter == "F") {
                       rows[number]["hover"] = cb[Object.keys(cb)[i]].v;
@@ -241,6 +244,7 @@ router.post("/:projectId/add", (req, res, next) => {
               }
             }
           }
+          // res.status(200).send(sheet);
 
           MongoClient.connect(URL, function(err, db) {
             if (err) throw err;
