@@ -13,6 +13,7 @@
                     <li @click="deleteFile">Delete File</li>
                     <li @click="downloadFile">Download File</li>
                     <li @click="toggleReplaceFile">Replace File</li>
+                    <li @click="$router.push('/projects/'+projectId + '/rawfile/'+fileId)">Edit Charts</li>
                   </ul>
                 </div>
             </div>
@@ -144,6 +145,12 @@ export default {
   computed: {
     file() {
       return this.$store.state.fileStore.file;
+    },
+    fileId() {
+      return this.$route.params.fileId;
+    },
+    projectId() {
+      return this.$route.params.projectId;
     }
   },
   watch: {

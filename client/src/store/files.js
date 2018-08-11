@@ -52,7 +52,7 @@ export default {
           .then(res => {
             //console.log(res.data);
             commit("SET_FILE", res.data);
-            resolve();
+            resolve(res.data);
           });
       });
     }
