@@ -16,7 +16,7 @@
                       <div class="data-title">{{ Object.keys(data)[0] }}</div>
                   </div>
                 <div class="data-elements ">
-                      <div v-for="(dat,i2) in data[Object.keys(data)[0]].data" :key="i2" class="data-item-item animated-fast fadeIn">
+                      <div v-for="(dat,i2) in data[Object.keys(data)[0]].data" :key="i2" class="data-item-item animated-fast fadeIn"  :class="{'left' : (dat.just == 'L'), 'right' : (dat.just == 'R')} ">
                         <div class="data-item-title">{{dat.title}}</div>
                         <div v-if="(dat.source == undefined)" class="data-item-value animated-fast fadeInUp" v-tooltip="{ content:dat.hover  , placement:'top'}">{{dat.formatted}}</div>
                         <div v-if="(dat.source != undefined)" class="data-item-value animated-fast fadeInUp" v-tooltip="{ content:dat.hover  , placement:'top'}"><a :href="makeLink(dat.source)">{{dat.formatted}}</a></div>
@@ -137,7 +137,8 @@ export default {
                 value: this.activeRows[i].value,
                 formatted: this.activeRows[i].formatted,
                 hover: this.activeRows[i].hover,
-                source: this.activeRows[i].source
+                source: this.activeRows[i].source,
+                just: this.activeRows[i].justification
               }
             ]
           };
@@ -151,7 +152,8 @@ export default {
               value: this.rows[i].value,
               formatted: this.rows[i].formatted,
               hover: this.rows[i].hover,
-              source: this.rows[i].source
+              source: this.rows[i].source,
+              just: this.rows[i].justification
             });
           }
         }
@@ -256,7 +258,6 @@ export default {
   display: flex;
   flex-wrap: wrap;
   min-width: 250px;
-  flex-grow: 1;
   border-bottom: solid 1px #eaeaea;
   margin: 10px;
   background: #fff;
@@ -284,5 +285,11 @@ export default {
   overflow: auto;
 }
 .data-container {
+}
+.left {
+  margin-right: 50%;
+}
+.right {
+  margin-left: 50%;
 }
 </style>

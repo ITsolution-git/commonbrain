@@ -195,6 +195,14 @@ router.post("/:projectId/add", (req, res, next) => {
           var sheetNames = [];
           var rows = {};
           var title;
+          var names = sheet.Workbook.Names;
+          
+          var namedRanges = {};
+          for(var n = 1; n < names.length; n++){
+              var name1 = names[n].Ref;
+              var arr = name1.split('$');
+              namedRanges[names[n].Name] = arr[1]
+          }
           for (var i = 0; i < Object.keys(cb).length; i++) {
             if (i == Object.keys(cb).length / 2) {
             }
@@ -211,31 +219,34 @@ router.post("/:projectId/add", (req, res, next) => {
                 number = parseInt(number);
                 if (Object.keys(cb[Object.keys(cb)[i]]).length > 0) {
                   if (rows[number] != null) {
-                    if (letter == "A") {
+                    if (letter == namedRanges['CBrainSheet']) {
                       rows[number]["sheet_name"] = cb[Object.keys(cb)[i]].v;
                     }
-                    if (letter == "B") {
+                    if (letter == namedRanges['CBrainTab']) {
                       rows[number]["tab_name"] = cb[Object.keys(cb)[i]].v;
                     }
-                    if (letter == "C") {
+                    if (letter == namedRanges['CBrainMajor']) {
                       rows[number]["major_category"] = cb[Object.keys(cb)[i]].v;
                     }
-                    if (letter == "D") {
+                    if (letter == namedRanges['CBrainSpecific']) {
                       rows[number]["spec_category"] = cb[Object.keys(cb)[i]].v;
                     }
-                    if (letter == "E") {
+                    if (letter == namedRanges['CBrainValue']) {
                       rows[number]["value"] = cb[Object.keys(cb)[i]].v;
                       rows[number]["type"] = cb[Object.keys(cb)[i]].t;
                       rows[number]["formatted"] = cb[Object.keys(cb)[i]].w
                     }
-                    if (letter == "F") {
+                    if (letter == namedRanges['CBrainJustification']) {
+                      rows[number]["justification"] = cb[Object.keys(cb)[i]].v;
+                    }
+                    if (letter == namedRanges['CBrainHover']) {
                       rows[number]["hover"] = cb[Object.keys(cb)[i]].v;
                     }
-                    if (letter == "G") {
+                    if (letter == namedRanges['CBrainSource']) {
                       rows[number]["source"] = cb[Object.keys(cb)[i]].v;
                     }
                   } else {
-                    if (letter == "A") {
+                    if (letter == namedRanges['CBrainSheet']) {
                       rows[number] = {};
                       rows[number]["sheet_name"] = cb[Object.keys(cb)[i]].v;
                     }
@@ -314,6 +325,13 @@ router.post("/replace/:userId/:projectId/:fileId", (req, res, next) => {
                 var sheetNames = [];
                 var rows = {};
                 var title;
+                var names = sheet.Workbook.Names;
+                var namedRanges = {};
+                for(var n = 1; n < names.length; n++){
+                    var name1 = names[n].Ref;
+                    var arr = name1.split('$');
+                    namedRanges[names[n].Name] = arr[1]
+                }
                 for (var i = 0; i < Object.keys(cb).length; i++) {
                   if (i == Object.keys(cb).length / 2) {
                   }
@@ -330,34 +348,34 @@ router.post("/replace/:userId/:projectId/:fileId", (req, res, next) => {
                       number = parseInt(number);
                       if (Object.keys(cb[Object.keys(cb)[i]]).length > 0) {
                         if (rows[number] != null) {
-                          if (letter == "A") {
-                            if(cb[Object.keys(cb)[i]].v == ''){
-                              continue;
-                            }
+                          if (letter == namedRanges['CBrainSheet']) {
                             rows[number]["sheet_name"] = cb[Object.keys(cb)[i]].v;
                           }
-                          if (letter == "B") {
+                          if (letter == namedRanges['CBrainTab']) {
                             rows[number]["tab_name"] = cb[Object.keys(cb)[i]].v;
                           }
-                          if (letter == "C") {
+                          if (letter == namedRanges['CBrainMajor']) {
                             rows[number]["major_category"] = cb[Object.keys(cb)[i]].v;
                           }
-                          if (letter == "D") {
+                          if (letter == namedRanges['CBrainSpecific']) {
                             rows[number]["spec_category"] = cb[Object.keys(cb)[i]].v;
                           }
-                          if (letter == "E") {
+                          if (letter == namedRanges['CBrainValue']) {
                             rows[number]["value"] = cb[Object.keys(cb)[i]].v;
                             rows[number]["type"] = cb[Object.keys(cb)[i]].t;
                             rows[number]["formatted"] = cb[Object.keys(cb)[i]].w
                           }
-                          if (letter == "F") {
+                          if (letter == namedRanges['CBrainJustification']) {
+                            rows[number]["justification"] = cb[Object.keys(cb)[i]].v;
+                          }
+                          if (letter == namedRanges['CBrainHover']) {
                             rows[number]["hover"] = cb[Object.keys(cb)[i]].v;
                           }
-                          if (letter == "G") {
+                          if (letter == namedRanges['CBrainSource']) {
                             rows[number]["source"] = cb[Object.keys(cb)[i]].v;
                           }
                         } else {
-                          if (letter == "A") {
+                          if (letter == namedRanges['CBrainSheet']) {
                             rows[number] = {};
                             rows[number]["sheet_name"] = cb[Object.keys(cb)[i]].v;
                           }
