@@ -16,7 +16,7 @@
                       <div class="data-title">{{ Object.keys(data)[0] }}</div>
                   </div>
                 <div class="data-elements ">
-                      <div v-for="(dat,i2) in data[Object.keys(data)[0]].data" :key="i2" class="data-item-item animated-fast fadeIn"  :class="{'left' : (dat.just == 'L'), 'right' : (dat.just == 'R')} ">
+                      <div v-for="(dat,i2) in data[Object.keys(data)[0]].data" :key="i2" class="data-item-item animated-fast fadeIn"  :class="{'left' : (dat.just != undefined && dat.just.charAt(0).toLowerCase() == 'l'), 'right' : (dat.just != undefined && dat.just.charAt(0).toLowerCase() == 'r'), 'center' : (dat.just != undefined && dat.just.charAt(0).toLowerCase() == 'c')} ">
                         <div class="data-item-title">{{dat.title}}</div>
                         <div v-if="(dat.source == undefined)" class="data-item-value animated-fast fadeInUp" v-tooltip="{ content:dat.hover  , placement:'top'}">{{dat.formatted}}</div>
                         <div v-if="(dat.source != undefined)" class="data-item-value animated-fast fadeInUp" v-tooltip="{ content:dat.hover  , placement:'top'}"><a :href="makeLink(dat.source)">{{dat.formatted}}</a></div>
@@ -127,6 +127,7 @@ export default {
       this.mainData = {};
       for (let i = 0; i < this.activeRows.length; i++) {
         if (this.activeRows[i].tab_name == tab) {
+          console.log(this.activeRows[i]);
           this.activeData[i] = this.activeRows[i];
           var obj = {};
           obj[this.activeData[i].major_category] = {
@@ -137,23 +138,26 @@ export default {
                 value: this.activeRows[i].value,
                 formatted: this.activeRows[i].formatted,
                 hover: this.activeRows[i].hover,
+                maj: this.activeRows[i].major_category,
                 source: this.activeRows[i].source,
                 just: this.activeRows[i].justification
               }
             ]
           };
+          // console.log(this.mainData[this.activeData[i].major_category]);
           if (this.mainData[this.activeData[i].major_category] == null) {
             this.mainData[this.activeData[i].major_category] = obj;
           } else {
             this.mainData[this.activeRows[i].major_category][
               this.activeRows[i].major_category
             ]["data"].push({
-              title: this.rows[i].spec_category,
-              value: this.rows[i].value,
-              formatted: this.rows[i].formatted,
-              hover: this.rows[i].hover,
-              source: this.rows[i].source,
-              just: this.rows[i].justification
+              title: this.activeRows[i].spec_category,
+              value: this.activeRows[i].value,
+              formatted: this.activeRows[i].formatted,
+              hover: this.activeRows[i].hover,
+              maj: this.activeRows[i].major_category,
+              source: this.activeRows[i].source,
+              just: this.activeRows[i].justification
             });
           }
         }
@@ -291,5 +295,9 @@ export default {
 }
 .right {
   margin-left: 50%;
+}
+.center {
+  flex: auto;
+  width: 100%;
 }
 </style>
