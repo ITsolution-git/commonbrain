@@ -22,7 +22,7 @@
             <input v-validate="'required'" type="password" id="password" name="password" placeholder="Password" class="css-login-input-input" />
             
         </div>
-        <span v-show="errors.has('password')" class="help is-danger">{{ errors.first('password') }}</span>
+        <span v-show="errors.has('password')" class="help is-danger signup-error">{{ errors.first('password') }}</span>
     
     <div class="modal-btn-container">
         <div @click="toggleVisible" class="modal-btn cancel">Cancel</div>
@@ -97,3 +97,8 @@ export default {
   }
 };
 </script>
+<style>
+.signup-error{
+  margin-bottom:10px;
+}
+</style>

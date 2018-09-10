@@ -127,7 +127,7 @@ export default {
       this.mainData = {};
       for (let i = 0; i < this.activeRows.length; i++) {
         if (this.activeRows[i].tab_name == tab) {
-          console.log(this.activeRows[i]);
+          // console.log(this.activeRows[i]);
           this.activeData[i] = this.activeRows[i];
           var obj = {};
           obj[this.activeData[i].major_category] = {
@@ -219,7 +219,9 @@ export default {
   border-top-right-radius: 3px;
   border-top-left-radius: 3px;
   border: solid 1px #eaeaea;
-  height: 40px;
+  height: 50px;
+  font-size: 10pt;
+  padding: 10px;
   flex: 1;
   max-width: 200px;
   width: 100%;

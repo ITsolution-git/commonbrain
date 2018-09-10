@@ -21,7 +21,7 @@
         </div>
         <div @click="toggleCropper" class="file-logo">
           <div v-if="!hasImage" style="padding:15px">
-            <i class="fa fa-camera"></i>
+            <i class="fa fa-camera" style=" margin-right:10px;"></i>
             Add Image
             </div>
             <img v-if="hasImage" :src="imagePath" alt="">

@@ -10,7 +10,7 @@
         <div v-click-outside="toggleUserDropdown" v-if="userDropdown" class="simple-dropdown animated-fast fadeInDown">
           <ul>
             <li @click="logout">Sign Out</li>
-            <li @click="$router.push('/profile')">Profile</li>
+            <!-- <li @click="$router.push('/profile')">Profile</li> -->
           </ul>
         </div>
       </div>
