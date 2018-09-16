@@ -21,5 +21,5 @@ const server = http.createServer(app);
 //   encrypted: true
 // });
 
-console.log("running on http://localhost/" + port);
+console.log("running on http://localhost:" + port);
 server.listen(port);
