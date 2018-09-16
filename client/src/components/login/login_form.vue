@@ -28,7 +28,6 @@
     </div>
 </template>
 <script>
-import axios from "axios";
 import auth from "../../auth";
 export default {
   name: "login_form",
@@ -70,17 +69,13 @@ export default {
           return;
         }
         if (!this.errors.any()) {
-          axios.post("/api/auth", retrieved).then(
-            res => {
-              auth.login(retrieved);
-            },
-            err => {
-              this.isLoading = false;
-              //console.log(err.response);
-              this.hasError = true;
-              this.errorMessage = err.response.data.error;
-            }
-          );
+          auth.login(retrieved).then(() => {
+
+          }).catch(err => {
+            this.isLoading = false;
+            this.hasError = true;
+            this.errorMessage = err.response.data.error;
+          });
         }
       });
     }

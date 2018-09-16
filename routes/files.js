@@ -19,8 +19,8 @@ var pusher = new Pusher({
   cluster: "us2",
   encrypted: true
 });
-var URL =
-  "mongodb://dexhonsa:Awesomeo21!@cluster0-shard-00-00-puscy.mongodb.net:27017,cluster0-shard-00-01-puscy.mongodb.net:27017,cluster0-shard-00-02-puscy.mongodb.net:27017/test?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin";
+var URL = process.env.MONGO_URL;
+
 var storage = multer.diskStorage({
   destination: function(req, file, cb) {
     cb(null, "./tmp/");
@@ -171,8 +171,10 @@ router.post("/:userId/:projectId/:fileId/image", (req, res, next) => {
 
 router.post("/:projectId/add", (req, res, next) => {
   fake_background_job("file");
-
   upload(req, res, function(err) {
+    if (err) {
+      res.status(401).send({ error: err });
+    }
     var projectId = req.params.projectId;
     var userId = req.body.userId;
     var fileName = req.body.fileName;
@@ -212,7 +214,7 @@ router.post("/:projectId/add", (req, res, next) => {
             if (letter == "A" && number == 1) {
               title = cb[Object.keys(cb)[i]].v;
             }
-            if (letter.match(/[a-z]/i)) {
+            if (letter.match(/[a-z]/i) || letter.match(/[A-z]/i)) {
               var row = {};
 
               if (number > 2) {
@@ -310,105 +312,114 @@ router.post("/replace/:userId/:projectId/:fileId", (req, res, next) => {
             var dir = "/uploads/" + userId + "/" + projectId;
             var filename = req.file.filename;
             fs.move("./tmp/" + filename, "./" + dir + "/" + result[0].filename, { overwrite: true }, function(err) {
-              if (err) {
-                console.log(err);
-                fs.remove("./tmp/" + filename);
-                res.status(401).json({
-                  errors: {
-                    form: "File Exists"
+              try {
+                if (err) {
+                  console.log(err);
+                  fs.remove("./tmp/" + filename);
+                  res.status(401).json({
+                    errors: {
+                      form: "File Exists"
+                    }
+                  });
+                } else {
+                  var workbook = XLSX.readFile("./" + dir + "/" + result[0].filename);
+                  var sheet = JSON.parse(CircularJSON.stringify(workbook));
+                  var cb = sheet.Sheets.CommonBrain;
+                  var sheetNames = [];
+                  var rows = {};
+                  var title;
+                  var names = sheet.Workbook.Names;
+                  var namedRanges = {};
+                  for(var n = 1; n < names.length; n++){
+                      var name1 = names[n].Ref;
+                      var arr = name1.split('$');
+                      namedRanges[names[n].Name] = arr[1]
                   }
-                });
-              } else {
-                var workbook = XLSX.readFile("./" + dir + "/" + result[0].filename);
-                var sheet = JSON.parse(CircularJSON.stringify(workbook));
-                var cb = sheet.Sheets.CommonBrain;
-                var sheetNames = [];
-                var rows = {};
-                var title;
-                var names = sheet.Workbook.Names;
-                var namedRanges = {};
-                for(var n = 1; n < names.length; n++){
-                    var name1 = names[n].Ref;
-                    var arr = name1.split('$');
-                    namedRanges[names[n].Name] = arr[1]
-                }
-                for (var i = 0; i < Object.keys(cb).length; i++) {
-                  if (i == Object.keys(cb).length / 2) {
-                  }
-                  var key = Object.keys(cb)[i];
-                  var letter = key.charAt(0);
-                  var number = key.substr(1);
-                  if (letter == "A" && number == 1) {
-                    title = cb[Object.keys(cb)[i]].v;
-                  }
-                  if (letter.match(/[a-z]/i)) {
-                    var row = {};
-      
-                    if (number > 2) {
-                      number = parseInt(number);
-                      if (Object.keys(cb[Object.keys(cb)[i]]).length > 0) {
-                        if (rows[number] != null) {
-                          if (letter == namedRanges['CBrainSheet']) {
-                            rows[number]["sheet_name"] = cb[Object.keys(cb)[i]].v;
-                          }
-                          if (letter == namedRanges['CBrainTab']) {
-                            rows[number]["tab_name"] = cb[Object.keys(cb)[i]].v;
-                          }
-                          if (letter == namedRanges['CBrainMajor']) {
-                            rows[number]["major_category"] = cb[Object.keys(cb)[i]].v;
-                          }
-                          if (letter == namedRanges['CBrainSpecific']) {
-                            rows[number]["spec_category"] = cb[Object.keys(cb)[i]].v;
-                          }
-                          if (letter == namedRanges['CBrainValue']) {
-                            rows[number]["value"] = cb[Object.keys(cb)[i]].v;
-                            rows[number]["type"] = cb[Object.keys(cb)[i]].t;
-                            rows[number]["formatted"] = cb[Object.keys(cb)[i]].w
-                          }
-                          if (letter == namedRanges['CBrainJustification']) {
-                            rows[number]["justification"] = cb[Object.keys(cb)[i]].v;
-                          }
-                          if (letter == namedRanges['CBrainHover']) {
-                            rows[number]["hover"] = cb[Object.keys(cb)[i]].v;
-                          }
-                          if (letter == namedRanges['CBrainSource']) {
-                            rows[number]["source"] = cb[Object.keys(cb)[i]].v;
-                          }
-                        } else {
-                          if (letter == namedRanges['CBrainSheet']) {
-                            rows[number] = {};
-                            rows[number]["sheet_name"] = cb[Object.keys(cb)[i]].v;
+                  for (var i = 0; i < Object.keys(cb).length; i++) {
+                    if (i == Object.keys(cb).length / 2) {
+                    }
+                    var key = Object.keys(cb)[i];
+                    var letter = key.charAt(0);
+                    var number = key.substr(1);
+                    if (letter == "A" && number == 1) {
+                      title = cb[Object.keys(cb)[i]].v;
+                    }
+                    if (letter.match(/[a-z]/i)) {
+                      var row = {};
+        
+                      if (number > 2) {
+                        number = parseInt(number);
+                        if (Object.keys(cb[Object.keys(cb)[i]]).length > 0) {
+                          if (rows[number] != null) {
+                            if (letter == namedRanges['CBrainSheet']) {
+                              rows[number]["sheet_name"] = cb[Object.keys(cb)[i]].v;
+                            }
+                            if (letter == namedRanges['CBrainTab']) {
+                              rows[number]["tab_name"] = cb[Object.keys(cb)[i]].v;
+                            }
+                            if (letter == namedRanges['CBrainMajor']) {
+                              rows[number]["major_category"] = cb[Object.keys(cb)[i]].v;
+                            }
+                            if (letter == namedRanges['CBrainSpecific']) {
+                              rows[number]["spec_category"] = cb[Object.keys(cb)[i]].v;
+                            }
+                            if (letter == namedRanges['CBrainValue']) {
+                              rows[number]["value"] = cb[Object.keys(cb)[i]].v;
+                              rows[number]["type"] = cb[Object.keys(cb)[i]].t;
+                              rows[number]["formatted"] = cb[Object.keys(cb)[i]].w
+                            }
+                            if (letter == namedRanges['CBrainJustification']) {
+                              rows[number]["justification"] = cb[Object.keys(cb)[i]].v;
+                            }
+                            if (letter == namedRanges['CBrainHover']) {
+                              rows[number]["hover"] = cb[Object.keys(cb)[i]].v;
+                            }
+                            if (letter == namedRanges['CBrainSource']) {
+                              rows[number]["source"] = cb[Object.keys(cb)[i]].v;
+                            }
+                          } else {
+                            if (letter == namedRanges['CBrainSheet']) {
+                              rows[number] = {};
+                              rows[number]["sheet_name"] = cb[Object.keys(cb)[i]].v;
+                            }
                           }
                         }
                       }
                     }
                   }
+        
+                  MongoClient.connect(URL, function(err, db) {
+                    if (err) throw err;
+                    var collection = db.collection("files");
+                    collection
+                      .replaceOne({ _id: ObjectId(fileId) },{
+                        name: filename.substring(0, filename.length - 5),
+                        filename: fileName,
+                        file_uploaded: new Date(),
+                        file_updated: new Date(),
+                        user_id: userId,
+                        project_id: projectId,
+                        rows: rows,
+                        title: title
+                      })
+                      .then(
+                        result => {
+                          res.status(200).json({
+                            message: "Upload Successful"
+                          });
+                        },
+                        err => {
+                          res.status(401).send({ error: err });
+                        }
+                      );
+                  });
                 }
-      
-                MongoClient.connect(URL, function(err, db) {
-                  if (err) throw err;
-                  var collection = db.collection("files");
-                  collection
-                    .replaceOne({ _id: ObjectId(fileId) },{
-                      name: filename.substring(0, filename.length - 5),
-                      filename: fileName,
-                      file_uploaded: new Date(),
-                      file_updated: new Date(),
-                      user_id: userId,
-                      project_id: projectId,
-                      rows: rows,
-                      title: title
-                    })
-                    .then(
-                      result => {
-                        res.status(200).json({
-                          message: "Upload Successful"
-                        });
-                      },
-                      err => {
-                        res.status(401).send({ error: err });
-                      }
-                    );
+              } catch (err) {
+
+                res.status(401).json({
+                  errors: {
+                    form: "Somethng went wrong."
+                  }
                 });
               }
             });

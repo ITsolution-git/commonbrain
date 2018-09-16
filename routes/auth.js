@@ -8,9 +8,7 @@ var crypto = require("crypto");
 var jwt = require("jsonwebtoken");
 var config = require("../config");
 
-var URL =
-  "mongodb://dexhonsa:Awesomeo21!@cluster0-shard-00-00-puscy.mongodb.net:27017,cluster0-shard-00-01-puscy.mongodb.net:27017,cluster0-shard-00-02-puscy.mongodb.net:27017/test?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin";
-
+var URL = process.env.MONGO_URL;
 router.post("/", (req, res, next) => {
   const { username, password } = req.body;
   var passwordHash = crypto
@@ -56,9 +54,15 @@ router.post("/signup", (req, res, next) => {
             email: email
           })
           .then(result => {
+
+            var token = jwt.sign({ id: result.ops[0]["_id"] }, config.secret, {
+              expiresIn: 86400 // expires in 24 hours
+            });
+
             res.send({
               userId: result.ops[0]["_id"],
-              message: "Created Succesfully"
+              message: "Created Succesfully",
+              token: token
             });
           });
       } else {
@@ -73,7 +77,7 @@ router.get("/me", function(req, res) {
   if (!token[1])
     return res.status(401).send({ auth: false, message: "No token provided." });
 
-  jwt.verify(token[1], config.secret, function(err, decoded) {
+    jwt.verify(token[1], config.secret, function(err, decoded) {
     if (err)
       return res
         .status(500)

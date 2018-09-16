@@ -1,4 +1,4 @@
-import axios from "axios";
+import ApiWrapper from '@/shared/utils/ApiWrapper';
 var initialState = {
   files: [],
   file: {}
@@ -29,7 +29,7 @@ export default {
     getFiles({ state, commit, rootState }, payload) {
       commit("loadingFiles");
       return new Promise(function(resolve, reject) {
-        axios
+        ApiWrapper
           .get("/api/files/" + rootState.user.id + "/" + payload.projectId)
           .then(res => {
             //console.log(res.data);
@@ -40,7 +40,7 @@ export default {
     },
     getFile({ state, commit, rootState }, payload) {
       return new Promise(function(resolve, reject) {
-        axios
+        ApiWrapper
           .get(
             "/api/files/" +
               payload.userId +

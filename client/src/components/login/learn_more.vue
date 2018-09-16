@@ -28,7 +28,7 @@
     </div>
 </template>
 <script>
-import axios from "axios";
+import ApiWrapper from '@/shared/utils/ApiWrapper';
 export default {
   name: "learn_more",
   props: ["hide", "del"],
@@ -66,7 +66,7 @@ export default {
           return;
         }
         if (!this.errors.any()) {
-          axios.post("/api/learnmore", retrieved).then(res => {
+          ApiWrapper.post("/api/learnmore", retrieved).then(res => {
             this.toggleVisible();
           });
         }

@@ -1,4 +1,4 @@
-import axios from "axios";
+import ApiWrapper from '@/shared/utils/ApiWrapper';
 import router from "./router";
 //import config from "./config.json";
 import jwt_decode from "jwt-decode";
@@ -9,7 +9,7 @@ export default {
   },
   login(creds) {
     return new Promise((resolve, reject) => {
-      axios.post("/api/auth", creds).then(
+      ApiWrapper.post("/api/auth", creds).then(
         res => {
           localStorage.setItem("token", res.data.token);
           this.user.authenticated = true;
@@ -24,6 +24,24 @@ export default {
       );
     });
   },
+  signup(creds) {
+    return new Promise((resolve, reject) => {
+      ApiWrapper.post("/api/auth/signup", creds).then(
+        res => {
+          localStorage.setItem("token", res.data.token);
+          this.user.authenticated = true;
+          router.push("/projects");
+          var decoded = jwt_decode(res.data.token);
+          store.dispatch("setUser", decoded);
+          resolve(decoded);
+        },
+        err => {
+          reject(err);
+        }
+      );
+    });
+  },
+
   getHeaders() {
     var token = localStorage.getItem("token");
     var headers = {

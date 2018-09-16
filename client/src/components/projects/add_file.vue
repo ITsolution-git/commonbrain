@@ -36,8 +36,7 @@
 <script>
 import StandardInput from "../form_elements/standard_input";
 import StandardSelect from "../form_elements/custom_select";
-import axios from "axios";
-import auth from "../../auth.js";
+import ApiWrapper from '@/shared/utils/ApiWrapper';
 export default {
   name: "add_project",
   data() {
@@ -88,9 +87,8 @@ export default {
         console.log(data);
       });
 
-      axios
+      ApiWrapper
         .post("/api/files/" + this.$route.params.projectId + "/add", formData, {
-          headers: auth.getHeaders(),
           onUploadProgress: function(progressEvent) {
             console.log(
               Math.round(progressEvent.loaded * 100 / progressEvent.total)

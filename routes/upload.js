@@ -6,8 +6,7 @@ var mkdirp = require("mkdirp");
 var fs = require("fs-extra");
 var XLSX = require("xlsx");
 const MongoClient = require("mongodb").MongoClient;
-var URL =
-  "mongodb://dexhonsa:Awesomeo21!@cluster0-shard-00-00-puscy.mongodb.net:27017,cluster0-shard-00-01-puscy.mongodb.net:27017,cluster0-shard-00-02-puscy.mongodb.net:27017/test?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin";
+var URL = process.env.MONGO_URL;
 const dbName = "test";
 
 var storage = multer.diskStorage({

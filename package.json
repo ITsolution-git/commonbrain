@@ -14,6 +14,7 @@
     "circular-json": "^0.5.1",
     "concurrently": "^3.5.1",
     "crypto": "^1.0.1",
+    "dotenv": "^6.0.0",
     "express": "*",
     "fs-extra": "^5.0.0",
     "jsonwebtoken": "^8.2.0",

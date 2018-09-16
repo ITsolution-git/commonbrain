@@ -6,8 +6,7 @@ var CircularJSON = require("circular-json");
 var ObjectId = require("mongodb").ObjectId;
 var crypto = require("crypto");
 
-var URL =
-  "mongodb://dexhonsa:Awesomeo21!@cluster0-shard-00-00-puscy.mongodb.net:27017,cluster0-shard-00-01-puscy.mongodb.net:27017,cluster0-shard-00-02-puscy.mongodb.net:27017/test?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin";
+var URL = process.env.MONGO_URL;
 
 router.get("/", (req, res, next) => {
   var token = req.headers["authorization"];

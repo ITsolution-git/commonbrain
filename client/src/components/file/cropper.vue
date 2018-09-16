@@ -29,7 +29,7 @@
 </template>
 
 <script>
-import axios from "axios";
+import ApiWrapper from '@/shared/utils/ApiWrapper';
 //import auth from "../../auth";
 export default {
   props: ["hide", "upload"],
@@ -83,7 +83,7 @@ export default {
         var file = this.dataURLtoFile(this.cropped, "file.jpg");
         var formData = new FormData();
         formData.append("file", file);
-        axios
+        ApiWrapper
           .post(
             "/api/files/" +
               this.userId +

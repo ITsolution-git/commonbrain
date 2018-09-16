@@ -4,7 +4,7 @@
   <ReplaceFile :hide="toggleReplaceFile" :uploaded="submitReplaceFile" v-if="replaceFile" />
     <div class="sidebar-container">
         <div @click="$router.go(-1)" class="standard-btn back"><i class="fa fa-angle-left"></i> Back</div>
-        <div class="sidebar-title">
+        <div class="sidebar-title" v-if="file[0]">
           {{file[0].name}}
             <div class="left-sub-sidebar-options">
             <div @click.stop="toggleOptionsDropdown" class="add-project-btn dropdown-btn"><i class="fa fa-ellipsis-h" />
@@ -42,7 +42,7 @@
 import Cropper from "./cropper";
 import { deleteRequest } from "../helpers/api_helper";
 import { mapActions } from "vuex";
-import axios from "axios";
+import ApiWrapper from '@/shared/utils/ApiWrapper';
 import ReplaceFile from "./replace_file";
 
 export default {
@@ -68,7 +68,7 @@ export default {
     var that = this;
     setTimeout(function() {
       that.getImage();
-      if (that.file[0].image) {
+      if (that.file && that.file.length > 0) {
         this.hasImage = true;
       }
     }, 10);
@@ -112,7 +112,7 @@ export default {
       });
     },
     downloadFile() {
-      axios
+      ApiWrapper
         .get(
           "/api/files/download/" +
             this.$store.state.user.id +

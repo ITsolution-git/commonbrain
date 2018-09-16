@@ -35,7 +35,7 @@ import { mapActions } from "vuex";
 import Bar from "./bar_chart";
 import StandardSelect from "../form_elements/custom_select";
 import LineChart from "./line_chart";
-import axios from "axios";
+import ApiWrapper from '@/shared/utils/ApiWrapper';
 export default {
   name: "raw_file",
   components: {
@@ -60,7 +60,7 @@ export default {
     ...mapActions(["getFile"]),
     createChart() {
       this.saving = true;
-      axios
+      ApiWrapper
         .put(
           "/api/files/update/" +
             this.userId +

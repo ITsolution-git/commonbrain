@@ -36,8 +36,7 @@
     </div>
 </template>
 <script>
-import axios from "axios";
-
+import auth from "../../auth";
 export default {
   name: "signup_form",
   props: ["hide", "login"],
@@ -79,18 +78,13 @@ export default {
         }
 
         if (!this.errors.any()) {
-          axios.post("/api/auth/signup", retrieved).then(
-            res => {
-              // auth.login(retrieved);
-              console.log(res.data);
-            },
-            err => {
-              this.isLoading = false;
-              //console.log(err.response);
-              this.hasError = true;
-              this.errorMessage = err.response.data.error;
-            }
-          );
+          auth.signup(retrieved).then((res) => {
+            console.log(res.data);
+          }).catch(err => {
+            this.isLoading = false;
+            this.hasError = true;
+            this.errorMessage = err.response.data.error;
+          });
         }
       });
     }

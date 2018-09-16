@@ -29,7 +29,7 @@
 <script>
 import StandardInput from "../form_elements/standard_input";
 import StandardSelect from "../form_elements/custom_select";
-import axios from "axios";
+import ApiWrapper from '@/shared/utils/ApiWrapper';
 import auth from "../../auth.js";
 import { mapActions } from "vuex";
 export default {
@@ -83,7 +83,7 @@ export default {
 
         if (!this.errors.any()) {
           this.isLoading = false;
-          axios
+          ApiWrapper
             .post("/api/projects/" + this.userId + "/add", retrieved, {
               headers: auth.getHeaders()
             })

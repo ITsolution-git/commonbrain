@@ -31,7 +31,7 @@
 <script>
 import StandardInput from "../form_elements/standard_input";
 import StandardSelect from "../form_elements/custom_select";
-import axios from "axios";
+import ApiWrapper from '@/shared/utils/ApiWrapper';
 import auth from "../../auth.js";
 export default {
   name: "replace_file",
@@ -82,7 +82,7 @@ export default {
         console.log(data);
       });
 
-      axios
+      ApiWrapper
         .post(
           "/api/files/replace/" +
             this.$store.state.user.id +

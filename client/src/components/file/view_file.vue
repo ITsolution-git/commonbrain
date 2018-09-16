@@ -1,34 +1,34 @@
 <template>
   <div>
-      <FileSidebar :sheets="sheets" :activate="activateSheet" />
-      
-      <div class="projects-container">
-              <div class="tab-container">
-                  <div v-for="(tab,i) in tabs" :class="{'active':(activeTab == tab)}" :key="i" @click="activateTab(i,tab)" class="tab">{{tab}}</div>
-              </div>
-              <div v-if="isLoading"  style="display:flex; align-items:center; justify-content:center;width:100%; height:100%;">
-              <img class="spinner-big" src="../../img/spinner.svg" alt="">
-              </div>
-              <div v-if="!isLoading" class="main-data-container animated-fast fadeInUp">
-
-              <div v-for="(data,i) in mainData" :key="i" class="data-container">
-                  <div class="data-item">
-                      <div class="data-title">{{ Object.keys(data)[0] }}</div>
-                  </div>
-                <div class="data-elements ">
-                      <div v-for="(dat,i2) in data[Object.keys(data)[0]].data" :key="i2" class="data-item-item animated-fast fadeIn"  :class="{'left' : (dat.just != undefined && dat.just.charAt(0).toLowerCase() == 'l'), 'right' : (dat.just != undefined && dat.just.charAt(0).toLowerCase() == 'r'), 'center' : (dat.just != undefined && dat.just.charAt(0).toLowerCase() == 'c')} ">
-                        <div class="data-item-title">{{dat.title}}</div>
-                        <div v-if="(dat.source == undefined)" class="data-item-value animated-fast fadeInUp" v-tooltip="{ content:dat.hover  , placement:'top'}">{{dat.formatted}}</div>
-                        <div v-if="(dat.source != undefined)" class="data-item-value animated-fast fadeInUp" v-tooltip="{ content:dat.hover  , placement:'top'}"><a :href="makeLink(dat.source)">{{dat.formatted}}</a></div>
-                      </div>
-                </div>
-                 
-              </div>
-
-              </div>
-          
-      
+    <FileSidebar :sheets="sheets" :activate="activateSheet" />
+    
+    <div class="projects-container">
+      <div class="tab-container">
+        <div v-for="(tab,i) in tabs" :class="{'active':(activeTab == tab)}" :key="i" @click="activateTab(i,tab)" class="tab">{{tab}}</div>
       </div>
+      <div v-if="isLoading"  style="display:flex; align-items:center; justify-content:center;width:100%; height:100%;">
+      <img class="spinner-big" src="../../img/spinner.svg" alt="">
+      </div>
+      <div v-if="!isLoading" class="main-data-container animated-fast fadeInUp">
+
+        <div v-for="(data,i) in mainData" :key="i" class="data-container">
+          <div class="data-item">
+            <div class="data-title">{{ Object.keys(data)[0] }}</div>
+          </div>
+          <div class="data-elements ">
+            <div v-for="(dat,i2) in data[Object.keys(data)[0]].data" :key="i2" class="data-item-item animated-fast fadeIn"  :class="{'left' : (dat.just != undefined && dat.just.charAt(0).toLowerCase() == 'l'), 'right' : (dat.just != undefined && dat.just.charAt(0).toLowerCase() == 'r'), 'center' : (dat.just != undefined && dat.just.charAt(0).toLowerCase() == 'c')} ">
+              <div class="data-item-title">{{dat.title}}</div>
+              <div v-if="(dat.source == undefined)" class="data-item-value animated-fast fadeInUp" v-tooltip="{ content:dat.hover  , placement:'top'}">{{dat.formatted}}</div>
+              <div v-if="(dat.source != undefined)" class="data-item-value animated-fast fadeInUp" v-tooltip="{ content:dat.hover  , placement:'top'}"><a :href="makeLink(dat.source)">{{dat.formatted}}</a></div>
+            </div>
+          </div>
+           
+        </div>
+
+      </div>
+    
+
+    </div>
   </div>
 </template>
 <script>
@@ -81,8 +81,10 @@ export default {
       for (var i = 0; i < Object.keys(this.file.rows).length; i++) {
         this.rows.push(this.file.rows[Object.keys(this.file.rows)[i]]);
       }
-      this.activeSheet = this.rows[0].sheet_name;
-      this.activateSheet(this.activeSheet);
+      if (this.rows.length > 0) {
+        this.activeSheet = this.rows[0].sheet_name;
+        this.activateSheet(this.activeSheet);
+      }
       this.isLoading = false;
     },
     activateSheet(sheet) {

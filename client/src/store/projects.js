@@ -1,4 +1,4 @@
-import axios from "axios";
+import ApiWrapper from '@/shared/utils/ApiWrapper';
 var initialState = {
   projects: []
 };
@@ -19,7 +19,7 @@ export default {
   actions: {
     deleteProject({ dispatch, commit, rootState }, payload) {
       return new Promise(function(resolve, reject) {
-        axios
+        ApiWrapper
           .delete("/api/projects/" + payload.userId + "/" + payload.projectId)
           .then(res => {
             dispatch("getProjects").then(res2 => {
@@ -30,7 +30,7 @@ export default {
     },
     getProjects({ commit, rootState }) {
       return new Promise(function(resolve, reject) {
-        axios.get("/api/projects/" + rootState.user.id).then(res => {
+        ApiWrapper.get("/api/projects/" + rootState.user.id).then(res => {
           commit("GET_PROJECTS", res.data);
           resolve();
         });
