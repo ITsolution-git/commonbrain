@@ -1,5 +1,6 @@
 <template>
 <div>
+  <ExportPdf :hide="toggleExportPdf" v-if="exportPdf" />
   <Cropper :upload="toggleCropper"  :hide="toggleCropper" v-if="cropper"></Cropper>
   <ReplaceFile :hide="toggleReplaceFile" :uploaded="submitReplaceFile" v-if="replaceFile" />
     <div class="sidebar-container">
@@ -13,6 +14,7 @@
                     <li @click="deleteFile">Delete File</li>
                     <li @click="downloadFile">Download File</li>
                     <li @click="toggleReplaceFile">Replace File</li>
+                    <li @click="toggleExportPdf">Export PDF</li>
                     <li @click="$router.push('/projects/'+projectId + '/rawfile/'+fileId)">Edit Charts</li>
                   </ul>
                 </div>
@@ -44,6 +46,7 @@ import { deleteRequest } from "../helpers/api_helper";
 import { mapActions } from "vuex";
 import axios from "axios";
 import ReplaceFile from "./replace_file";
+import ExportPdf from "./export_pdf";
 
 export default {
   name: "file-sidebar",
@@ -57,12 +60,14 @@ export default {
       hasImage: false,
       imagePath: "",
       optionsDropdown: false,
-      replaceFile: false
+      replaceFile: false,
+      exportPdf: false
     };
   },
   components: {
     Cropper,
-    ReplaceFile
+    ReplaceFile,
+    ExportPdf
   },
   mounted() {
     var that = this;
@@ -75,6 +80,9 @@ export default {
   },
   methods: {
     ...mapActions(["getFiles"]),
+    toggleExportPdf() {
+      this.exportPdf = !this.exportPdf;
+    },
     submitReplaceFile() {
       this.replaceFile = !this.replaceFile;
       window.location.reload();
