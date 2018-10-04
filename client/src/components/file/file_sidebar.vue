@@ -121,7 +121,7 @@ export default {
     },
     downloadFile() {
       ApiWrapper
-        .get(
+        .download(
           "/api/files/download/" +
             this.$store.state.user.id +
             "/" +
@@ -131,6 +131,7 @@ export default {
           { responseType: "arraybuffer" }
         )
         .then(res => {
+          debugger
           const url = window.URL.createObjectURL(new Blob([res.data]));
           const link = document.createElement("a");
           link.href = url;

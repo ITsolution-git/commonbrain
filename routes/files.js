@@ -92,6 +92,7 @@ router.get("/download/:userId/:projectId/:fileId", (req, res, next) => {
       .find({ _id: ObjectId(fileId) })
       .toArray()
       .then(result => {
+        debugger
         res.download('./uploads/' + result[0].user_id + '/' + result[0].project_id + '/' + result[0].filename)
       });
   });
