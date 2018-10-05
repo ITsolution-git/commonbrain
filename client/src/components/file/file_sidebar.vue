@@ -131,11 +131,10 @@ export default {
           { responseType: "arraybuffer" }
         )
         .then(res => {
-          debugger
           const url = window.URL.createObjectURL(new Blob([res.data]));
           const link = document.createElement("a");
           link.href = url;
-          link.setAttribute("download", this.file[0].name + ".xlsx");
+          link.setAttribute("download", this.file[0].filename);
           document.body.appendChild(link);
           link.click();
         });
