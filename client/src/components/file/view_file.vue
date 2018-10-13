@@ -103,6 +103,11 @@ export default {
       searchMainDataKey: ""
     };
   },
+  watch: {
+    searchMainDataKey(val) {
+      this.toggleCollapseAll(true);
+    }
+  },
   methods: {
     ...mapActions(["getFile"]),
 
@@ -291,7 +296,7 @@ export default {
       });
     },
 
-    toggleCollapseAll(force) {  
+    toggleCollapseAll(force) {
       let toToggle = true;
       if (typeof force == 'boolean')
         toToggle = force;
@@ -356,7 +361,6 @@ export default {
       if (!this.searchMainDataKey)
         return this.mainData;
 
-      this.toggleCollapseAll(true);
       let that = this;
       return this.mainData.map(item=>{
         if (item.title.toLowerCase().indexOf(that.searchMainDataKey.toLowerCase()) != -1)
