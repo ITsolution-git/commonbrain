@@ -1,32 +1,31 @@
 <template>
   <div>
-      <div class="overlay animated-fast" :class="{'fadeIn': !hidden,'fadeOut':hidden}">
-          <div class="modal-1 animated-fast zoomIn" :class="{'zoomIn': !hidden,'zoomOut':hidden}">
-              <div class="modal-top">
-                  <div class="modal-title">Add File</div>
-                  <div class="modal-close"><i @click="hideThis" class="fa fa-close"></i></div>
-              </div>
-              <form @submit.prevent="confirmUpload">
-              <div class="modal-inner">
-                 
-                  <div class="modal-sub-inner" >
-                    <div v-if="imageName != 'No Image'" class="image-preview-item"><i class="fa fa-file"></i> {{imageName}} <img @click="removeFile" class="image-preview-delete" src="../../img/close.svg" alt=""></div>
-                    
-                    <div :class="{'hide-me': !(imageName == 'No Image'),'upload-file-btn' : (imageName == 'No Image')}" class="cancel modal-btn">
-                        <input @change="uploadImage" name="file" style="opacity:0; width:100%; height:100%; position:absolute;top:0;left:0" type="file">
-                      Upload Template</div>
-                  </div>
-              </div>
-              <div v-if="hasError" class="alert-danger animated fadeIn" style="color:#ff0000; margin:15px;">{{errorMessage}}</div>
-              <div class="modal-buttons">
-                  <div @click="hideThis" class="modal-btn cancel">Cancel</div>
-                  <button class="modal-btn confirm" type="submit"><span v-if="!isLoading">Upload</span> <img v-if="isLoading" style="width:25px" src="../../img/spinner_white.svg"/></button>
-              </div>
-              </form>
+    <div class="overlay animated-fast" :class="{'fadeIn': !hidden,'fadeOut':hidden}">
+      <div class="modal-1 animated-fast zoomIn" :class="{'zoomIn': !hidden,'zoomOut':hidden}">
+          <div class="modal-top">
+              <div class="modal-title">Replace File</div>
+              <div class="modal-close"><i @click="hideThis" class="fa fa-close"></i></div>
+          </div>
+          <form @submit.prevent="confirmUpload">
+          <div class="modal-inner">
+             
+              <div class="modal-sub-inner" >
+                <div v-if="imageName != 'No Image'" class="image-preview-item"><i class="fa fa-file"></i> {{imageName}} <img @click="removeFile" class="image-preview-delete" src="../../img/close.svg" alt=""></div>
+                
+                <div :class="{'hide-me': !(imageName == 'No Image'),'upload-file-btn' : (imageName == 'No Image')}" class="cancel modal-btn">
+                    <input @change="uploadImage" name="file" style="opacity:0; width:100%; height:100%; position:absolute;top:0;left:0" type="file">
+                  Upload Template</div>
               </div>
           </div>
+          <div v-if="hasError" class="alert-danger animated fadeIn" style="color:#ff0000; margin:15px;">{{errorMessage}}</div>
+          <div class="modal-buttons">
+              <div @click="hideThis" class="modal-btn cancel">Cancel</div>
+              <button class="modal-btn confirm" type="submit"><span v-if="!isLoading">Upload</span> <img v-if="isLoading" style="width:25px" src="../../img/spinner_white.svg"/></button>
+          </div>
+          </form>
+          </div>
       </div>
-  
+  </div>
 </template>
 <script>
 import StandardInput from "../form_elements/standard_input";

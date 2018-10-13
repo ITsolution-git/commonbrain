@@ -5,8 +5,8 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "concurrently \"nodemon server.js\" \"cd client && yarn start\"",
-    "server": "nodemon server.js"
+    "start": "concurrently \"nodemon index.js\" \"cd client && yarn start\"",
+    "index": "nodemon index.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

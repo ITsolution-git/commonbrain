@@ -31,6 +31,9 @@
         <!-- <div class="file-image">
             
         </div> -->
+        <div class="dash-nav" ngIf="activeDash" @click="showSelectDash(true)">
+          {{activeDash.dashName}}
+        </div>
         <div class="file-nav">
             <ul>
                 <li v-for="(sheet,i) in sheets" :key="i" :class="{'active':(activeNav == i)}" @click="activateSheet(i,sheet)">{{sheet}}</li>
@@ -50,7 +53,7 @@ import ExportPdf from "./export_pdf";
 
 export default {
   name: "file-sidebar",
-  props: ["sheets", "activate"],
+  props: ["sheets", "activate", "dashes", "activeDash", "showSelectDash"],
   data() {
     return {
       hovered: 0,
@@ -104,6 +107,7 @@ export default {
     },
     activateSheet(i, sheet) {
       this.activeNav = i;
+      this.showSelectDash(false);
       this.activate(sheet);
     },
     deleteFile() {
@@ -174,10 +178,11 @@ export default {
 </script>
 <style>
 .file-nav {
-  margin-top: 15px;
+  margin-top: 10px;
 }
 .file-nav li {
-  padding: 15px;
+  padding: 10px 20px;
+  font-size: 17px;
 }
 .file-nav li:hover {
   color: #66d0f7;
@@ -206,6 +211,17 @@ export default {
   cursor: pointer;
   background: #e2e5e7;
 }
+
+.dash-nav{
+  margin-top: 30px;
+  padding: 0px 15px;
+  font-size: 20px;
+  cursor: pointer;
+}
+.dash-nav:hover{
+  color: #66d0f7;
+}
+
 .standard-btn.back {
   display: inline-flex;
   position: relative;

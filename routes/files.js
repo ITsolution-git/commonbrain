@@ -11,6 +11,7 @@ var crypto = require("crypto");
 var jwt = require("jsonwebtoken");
 var config = require("../config");
 var Pusher = require("pusher");
+var xlxsUtil = require('../utils/xlxs');
 
 var pusher = new Pusher({
   appId: "528462",
@@ -191,74 +192,7 @@ router.post("/:projectId/add", (req, res, next) => {
             }
           });
         } else {
-          var workbook = XLSX.readFile("./" + dir + "/" + filename);
-          var sheet = JSON.parse(CircularJSON.stringify(workbook));
-          
-          var cb = sheet.Sheets.CommonBrain;
-          var sheetNames = [];
-          var rows = {};
-          var title;
-          var names = sheet.Workbook.Names;
-          
-          var namedRanges = {};
-          for(var n = 1; n < names.length; n++){
-              var name1 = names[n].Ref;
-              var arr = name1.split('$');
-              namedRanges[names[n].Name] = arr[1]
-          }
-          for (var i = 0; i < Object.keys(cb).length; i++) {
-            if (i == Object.keys(cb).length / 2) {
-            }
-            var key = Object.keys(cb)[i];
-            var letter = key.charAt(0);
-            var number = key.substr(1);
-            if (letter == "A" && number == 1) {
-              title = cb[Object.keys(cb)[i]].v;
-            }
-            if (letter.match(/[a-z]/i) || letter.match(/[A-z]/i)) {
-              var row = {};
-
-              if (number > 2) {
-                number = parseInt(number);
-                if (Object.keys(cb[Object.keys(cb)[i]]).length > 0) {
-                  if (rows[number] != null) {
-                    if (letter == namedRanges['CBrainSheet']) {
-                      rows[number]["sheet_name"] = cb[Object.keys(cb)[i]].v;
-                    }
-                    if (letter == namedRanges['CBrainTab']) {
-                      rows[number]["tab_name"] = cb[Object.keys(cb)[i]].v;
-                    }
-                    if (letter == namedRanges['CBrainMajor']) {
-                      rows[number]["major_category"] = cb[Object.keys(cb)[i]].v;
-                    }
-                    if (letter == namedRanges['CBrainSpecific']) {
-                      rows[number]["spec_category"] = cb[Object.keys(cb)[i]].v;
-                    }
-                    if (letter == namedRanges['CBrainValue']) {
-                      rows[number]["value"] = cb[Object.keys(cb)[i]].v;
-                      rows[number]["type"] = cb[Object.keys(cb)[i]].t;
-                      rows[number]["formatted"] = cb[Object.keys(cb)[i]].w
-                    }
-                    if (letter == namedRanges['CBrainJustification']) {
-                      rows[number]["justification"] = cb[Object.keys(cb)[i]].v;
-                    }
-                    if (letter == namedRanges['CBrainHover']) {
-                      rows[number]["hover"] = cb[Object.keys(cb)[i]].v;
-                    }
-                    if (letter == namedRanges['CBrainSource']) {
-                      rows[number]["source"] = cb[Object.keys(cb)[i]].v;
-                    }
-                  } else {
-                    if (letter == namedRanges['CBrainSheet']) {
-                      rows[number] = {};
-                      rows[number]["sheet_name"] = cb[Object.keys(cb)[i]].v;
-                    }
-                  }
-                }
-              }
-            }
-          }
-          // res.status(200).send(sheet);
+          let obj = xlxsUtil.parseSheet("./" + dir + "/" + filename)
 
           MongoClient.connect(URL, function(err, db) {
             if (err) throw err;
@@ -271,9 +205,10 @@ router.post("/:projectId/add", (req, res, next) => {
                 file_updated: new Date(),
                 user_id: userId,
                 project_id: projectId,
-                rows: rows,
-                sheet:sheet,
-                title: title
+                rows: obj.rows,
+                sheet: obj.sheet,
+                title: obj.title,
+                dashes: obj.dashes
               })
               .then(
                 result => {
@@ -282,6 +217,7 @@ router.post("/:projectId/add", (req, res, next) => {
                   });
                 },
                 err => {
+                  fs.remove("./" + dir + "/" + filename);
                   res.status(401).send({ error: err });
                 }
               );
@@ -323,85 +259,24 @@ router.post("/replace/:userId/:projectId/:fileId", (req, res, next) => {
                     }
                   });
                 } else {
-                  var workbook = XLSX.readFile("./" + dir + "/" + result[0].filename);
-                  var sheet = JSON.parse(CircularJSON.stringify(workbook));
-                  var cb = sheet.Sheets.CommonBrain;
-                  var sheetNames = [];
-                  var rows = {};
-                  var title;
-                  var names = sheet.Workbook.Names;
-                  var namedRanges = {};
-                  for(var n = 1; n < names.length; n++){
-                      var name1 = names[n].Ref;
-                      var arr = name1.split('$');
-                      namedRanges[names[n].Name] = arr[1]
-                  }
-                  for (var i = 0; i < Object.keys(cb).length; i++) {
-                    if (i == Object.keys(cb).length / 2) {
-                    }
-                    var key = Object.keys(cb)[i];
-                    var letter = key.charAt(0);
-                    var number = key.substr(1);
-                    if (letter == "A" && number == 1) {
-                      title = cb[Object.keys(cb)[i]].v;
-                    }
-                    if (letter.match(/[a-z]/i)) {
-                      var row = {};
-        
-                      if (number > 2) {
-                        number = parseInt(number);
-                        if (Object.keys(cb[Object.keys(cb)[i]]).length > 0) {
-                          if (rows[number] != null) {
-                            if (letter == namedRanges['CBrainSheet']) {
-                              rows[number]["sheet_name"] = cb[Object.keys(cb)[i]].v;
-                            }
-                            if (letter == namedRanges['CBrainTab']) {
-                              rows[number]["tab_name"] = cb[Object.keys(cb)[i]].v;
-                            }
-                            if (letter == namedRanges['CBrainMajor']) {
-                              rows[number]["major_category"] = cb[Object.keys(cb)[i]].v;
-                            }
-                            if (letter == namedRanges['CBrainSpecific']) {
-                              rows[number]["spec_category"] = cb[Object.keys(cb)[i]].v;
-                            }
-                            if (letter == namedRanges['CBrainValue']) {
-                              rows[number]["value"] = cb[Object.keys(cb)[i]].v;
-                              rows[number]["type"] = cb[Object.keys(cb)[i]].t;
-                              rows[number]["formatted"] = cb[Object.keys(cb)[i]].w
-                            }
-                            if (letter == namedRanges['CBrainJustification']) {
-                              rows[number]["justification"] = cb[Object.keys(cb)[i]].v;
-                            }
-                            if (letter == namedRanges['CBrainHover']) {
-                              rows[number]["hover"] = cb[Object.keys(cb)[i]].v;
-                            }
-                            if (letter == namedRanges['CBrainSource']) {
-                              rows[number]["source"] = cb[Object.keys(cb)[i]].v;
-                            }
-                          } else {
-                            if (letter == namedRanges['CBrainSheet']) {
-                              rows[number] = {};
-                              rows[number]["sheet_name"] = cb[Object.keys(cb)[i]].v;
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-        
+                  let obj = xlxsUtil.parseSheet("./" + dir + "/" + filename);
+                  debugger
                   MongoClient.connect(URL, function(err, db) {
                     if (err) throw err;
                     var collection = db.collection("files");
+                    
                     collection
                       .replaceOne({ _id: ObjectId(fileId) },{
                         name: filename.substring(0, filename.length - 5),
-                        filename: fileName,
+                        filename: filename,
                         file_uploaded: new Date(),
                         file_updated: new Date(),
                         user_id: userId,
                         project_id: projectId,
-                        rows: rows,
-                        title: title
+                        rows: obj.rows,
+                        sheet: obj.sheet,
+                        title: obj.title,
+                        dashes: obj.dashes
                       })
                       .then(
                         result => {
@@ -410,6 +285,7 @@ router.post("/replace/:userId/:projectId/:fileId", (req, res, next) => {
                           });
                         },
                         err => {
+                          
                           res.status(401).send({ error: err });
                         }
                       );

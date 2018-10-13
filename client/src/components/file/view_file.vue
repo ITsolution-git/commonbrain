@@ -1,8 +1,45 @@
 <template>
   <div>
-    <FileSidebar :sheets="sheets" :activate="activateSheet" />
+    <FileSidebar :sheets="sheets" :activate="activateSheet" :dashes="dashes" :showSelectDash="showSelectDash" :activeDash="activeDash"/>
     
-    <div class="projects-container">
+    <div class="projects-container" v-if="selectDashScreen" style="padding: 30px;overflow-y: auto;">
+      
+      <!-- <StandardInput
+        field="Search Entity"
+        v-model="searchEntityKey"
+        width="100%"
+      /> -->
+      <table class="standard-table">
+        <tbody>
+          <tr><th>Entity Name</th><th>Name2</th><th>Status</th><th>Geography</th><th>Other</th></tr>
+          <tr v-for="(dash,i)  in filteredDashes" :key="i">
+            <td @click="activateDash(dash)">
+              <div  class="project-name">
+                <i class="fa fa-building-o"></i> 
+                <span>{{dash.dashName}}</span>
+              </div>
+            </td>
+            <td><span>{{dash.name2}}</span></td>
+            <td><span>{{dash.status}}</span></td>
+            <td><span>{{dash.geography}}</span></td>
+            <td><span>{{dash.other}}</span></td>
+          </tr>
+          <tr v-if="filteredDashes.length == 0">
+            <td style="text-align: center" colspan="6">None</td>
+          </tr>
+          
+        </tbody>
+      </table>
+    </div>
+
+    <div class="projects-container" v-else>
+      <div style="margin: 10px">
+        <StandardInput
+          v-model="searchMainDataKey"
+          width="100%"
+          placeholder="Search..."
+        />
+      </div>
       <div class="tab-container">
         <div v-for="(tab,i) in tabs" :class="{'active':(activeTab == tab)}" :key="i" @click="activateTab(i,tab)" class="tab">{{tab}}</div>
       </div>
@@ -10,19 +47,24 @@
       <img class="spinner-big" src="../../img/spinner.svg" alt="">
       </div>
       <div v-if="!isLoading" class="main-data-container animated-fast fadeInUp">
+        <div style="margin: 0px 10px; text-align: end;">
+          <button @click="toggleCollapseAll" class="modal-btn btn-white" type="submit">Toggle Collapse</button>
+        </div>
+        <div v-for="(data,i) in filteredMainData" :key="i" class="data-container">
 
-        <div v-for="(data,i) in mainData" :key="i" class="data-container">
-          <div class="data-item">
-            <div class="data-title">{{ Object.keys(data)[0] }}</div>
+          <div class="data-item" @click="toggleDropdown(i)">
+            <div class="data-title" v-html="formatWithSearch(data.title)"></div>
+            <i class="fa fa-angle-up" v-if="data.show"></i>
+            <i class="fa fa-angle-down" v-if="!data.show"></i>
           </div>
-          <div class="data-elements ">
-            <div v-for="(dat,i2) in data[Object.keys(data)[0]].data" :key="i2" class="data-item-item animated-fast fadeIn"  :class="{'left' : (dat.just != undefined && dat.just.charAt(0).toLowerCase() == 'l'), 'right' : (dat.just != undefined && dat.just.charAt(0).toLowerCase() == 'r'), 'center' : (dat.just != undefined && dat.just.charAt(0).toLowerCase() == 'c')} ">
-              <div class="data-item-title">{{dat.title}}</div>
-              <div v-if="(dat.source == undefined)" class="data-item-value animated-fast fadeInUp" v-tooltip="{ content:dat.hover  , placement:'top'}">{{dat.formatted}}</div>
-              <div v-if="(dat.source != undefined)" class="data-item-value animated-fast fadeInUp" v-tooltip="{ content:dat.hover  , placement:'top'}"><a :href="makeLink(dat.source)">{{dat.formatted}}</a></div>
+
+          <div class="data-elements" v-if="data.show">
+            <div v-for="(dat,i2) in data.data" :key="i2" class="data-item-item animated-fast fadeIn"  :class="{'left' : (dat.just != undefined && dat.just.charAt(0).toLowerCase() == 'l'), 'right' : (dat.just != undefined && dat.just.charAt(0).toLowerCase() == 'r'), 'center' : (dat.just != undefined && dat.just.charAt(0).toLowerCase() == 'c')} ">
+              <div class="data-item-title"  v-html="formatWithSearch(dat.title)"></div>
+              <div v-if="(dat.source == undefined)" class="data-item-value animated-fast fadeInUp" v-tooltip="{ content:dat.hover  , placement:'top'}"  v-html="formatWithSearch(dat.formatted)"></div>
+              <div v-if="(dat.source != undefined)" class="data-item-value animated-fast fadeInUp" v-tooltip="{ content:dat.hover  , placement:'top'}"><a :href="makeLink(dat.source)"  v-html="formatWithSearch(dat.formatted)"></a></div>
             </div>
           </div>
-           
         </div>
 
       </div>
@@ -34,20 +76,31 @@
 <script>
 import FileSidebar from "./file_sidebar";
 import { mapActions } from "vuex";
+import StandardInput from "../form_elements/standard_input";
 
 export default {
   name: "view_file",
   data() {
     return {
+      dashes: [],
       tabs: [],
       rows: [],
+      dashRows: [],
       mainData: {},
+
       activeSheet: "",
       activeTab: "",
+      activeDash: "",
+
       isLoading: true,
       activeRows: [],
       activeData: [],
-      activeSubData: []
+      activeSubData: [],
+
+      selectDashScreen: false,
+
+      searchEntityKey: "",
+      searchMainDataKey: ""
     };
   },
   methods: {
@@ -78,14 +131,43 @@ export default {
       }
     },
     getRows() {
+      if (this.file.dashes) {
+        for (let key in this.file.dashes) {
+          this.dashes.push(this.file.dashes[key]);
+        }
+      }
+
       for (var i = 0; i < Object.keys(this.file.rows).length; i++) {
         this.rows.push(this.file.rows[Object.keys(this.file.rows)[i]]);
       }
-      if (this.rows.length > 0) {
-        this.activeSheet = this.rows[0].sheet_name;
-        this.activateSheet(this.activeSheet);
+
+      if (this.dashes.length > 0) {
+        this.activateDash(this.dashes[0]);
+      } else {
+        this.dashRows = this.rows;
+        if (this.dashRows.length > 0) {
+          this.activeSheet = this.dashRows[0].sheet_name;
+          this.activateSheet(this.activeSheet);
+        }
       }
       this.isLoading = false;
+    },
+    activateDash(dash) {
+      this.activeDash = dash;
+      this.dashRows = this.rows.filter(row=>row.dash_name == dash.dashName);
+      if (this.dashRows.length > 0) {
+        this.activeSheet = this.dashRows[0].sheet_name;
+        this.activateSheet(this.activeSheet);
+
+      } else {
+
+        this.activeSheet = "";
+        this.activeRows = [];
+        this.activeData = [];
+        this.tabs = [];
+        this.mainData = [];
+      }
+      this.showSelectDash(false);
     },
     activateSheet(sheet) {
       var that = this;
@@ -107,16 +189,19 @@ export default {
       this.mainData = {};
       this.getData(tab);
     },
+    showSelectDash (val) {
+      this.selectDashScreen = val;
+    },
     getTabs(sheet) {
       this.activeData = [];
       var that = this;
       return new Promise(function(resolve, reject) {
         var tabs = [];
-        for (var i = 0; i < that.rows.length; i++) {
-          if (that.rows[i].sheet_name == sheet) {
-            that.activeRows.push(that.rows[i]);
-            if (tabs.indexOf(that.rows[i].tab_name) < 0) {
-              tabs.push(that.rows[i].tab_name);
+        for (var i = 0; i < that.dashRows.length; i++) {
+          if (that.dashRows[i].sheet_name == sheet) {
+            that.activeRows.push(that.dashRows[i]);
+            if (tabs.indexOf(that.dashRows[i].tab_name) < 0) {
+              tabs.push(that.dashRows[i].tab_name);
             }
           }
         }
@@ -126,46 +211,112 @@ export default {
       });
     },
     getData(tab) {
-      this.mainData = {};
+      this.mainData = [];
+      let mainData = {};
       for (let i = 0; i < this.activeRows.length; i++) {
         if (this.activeRows[i].tab_name == tab) {
-          // console.log(this.activeRows[i]);
+          
           this.activeData[i] = this.activeRows[i];
+          let majorCat = this.activeData[i].major_category
           var obj = {};
-          obj[this.activeData[i].major_category] = {
-            title: this.activeData[i].major_category,
-            data: [
-              {
-                title: this.activeRows[i].spec_category,
-                value: this.activeRows[i].value,
-                formatted: this.activeRows[i].formatted,
-                hover: this.activeRows[i].hover,
-                maj: this.activeRows[i].major_category,
-                source: this.activeRows[i].source,
-                just: this.activeRows[i].justification
-              }
-            ]
-          };
-          // console.log(this.mainData[this.activeData[i].major_category]);
-          if (this.mainData[this.activeData[i].major_category] == null) {
-            this.mainData[this.activeData[i].major_category] = obj;
-          } else {
-            this.mainData[this.activeRows[i].major_category][
-              this.activeRows[i].major_category
-            ]["data"].push({
-              title: this.activeRows[i].spec_category,
-              value: this.activeRows[i].value,
-              formatted: this.activeRows[i].formatted,
-              hover: this.activeRows[i].hover,
-              maj: this.activeRows[i].major_category,
-              source: this.activeRows[i].source,
-              just: this.activeRows[i].justification
-            });
+          if (!mainData[majorCat]) {
+            mainData[majorCat] = {
+              title: majorCat,
+              data: []
+            }
           }
+
+          mainData[majorCat].data.push({
+            title: this.activeRows[i].spec_category,
+            value: this.activeRows[i].value,
+            formatted: this.activeRows[i].formatted,
+            hover: this.activeRows[i].hover,
+            maj: this.activeRows[i].major_category,
+            source: this.activeRows[i].source,
+            just: this.activeRows[i].justification
+          });
+
         }
       }
       this.isLoading = false;
-      this.mainData = this.mainData;
+      // this.mainData = mainData;
+      for(let key in mainData) {
+        this.mainData.push({
+          title: mainData[key].title,
+          data: this.sortDataByJust(mainData[key].data)
+        });
+      }
+
+    },
+
+    //sorting by just
+    sortDataByJust(data) {
+      let target = [];
+      while(data.length > 0) {
+        let item = data.splice(0,1)[0];
+        if (item.just && item.just.charAt(0).toLowerCase() == 'r') {
+          let lastel = target[target.length - 1];
+          if (lastel && (
+            !lastel.just || (lastel.just && lastel.just.charAt(0).toLowerCase() == 'l'))) { // if prev is left
+
+            target[target.length - 1].just = '';
+            target.push({...item, just: ''});
+          } else {
+            target.push(item);
+          }
+        } else {
+          target.push(item);
+        }
+        //   let len = target.length;
+        //   if (len % 2 == 0) { //find left
+        //     for (var i = 0; i < data.length; i++) {
+        //       data[i]
+        //     }
+        //   }
+        // } else {
+        //   target.push(data.unshift());
+        // }
+        
+      }
+      return target;
+    },
+    toggleDropdown (i) {
+      this.mainData = this.mainData.map((item, index)=>{
+        if (index == i)
+          return {
+            ...item,
+            show: !item.show
+          };
+        else return item;
+      });
+    },
+
+    toggleCollapseAll(force) {  
+      let toToggle = true;
+      if (typeof force == 'boolean')
+        toToggle = force;
+      else {
+        this.mainData.map((item, index)=>{
+          if (item.show)
+            toToggle = false;
+        });
+      }
+
+      this.mainData = this.mainData.map((item, index)=>{
+        
+        return {
+          ...item,
+          show: toToggle
+        };
+      });
+    },
+    formatWithSearch(str) {
+      if (!this.searchMainDataKey)
+        return str;
+      else {
+        let match = new RegExp("(" + this.searchMainDataKey + ")","gi"); 
+        return str.replace(match, "<span style='background-color: #FFFF00'>$1</span>")
+      }
     }
   },
   computed: {
@@ -174,9 +325,9 @@ export default {
     },
     sheets() {
       var sheetArr = [];
-      for (var i = 0; i < this.rows.length; i++) {
-        if (sheetArr.indexOf(this.rows[i].sheet_name) < 0) {
-          sheetArr.push(this.rows[i].sheet_name);
+      for (var i = 0; i < this.dashRows.length; i++) {
+        if (sheetArr.indexOf(this.dashRows[i].sheet_name) < 0) {
+          sheetArr.push(this.dashRows[i].sheet_name);
         }
       }
       return sheetArr;
@@ -189,7 +340,39 @@ export default {
     },
     userId() {
       return this.$store.state.user.id;
-    }
+    },
+
+    filteredDashes() {
+      if (!this.searchEntityKey)
+        return this.dashes;
+      return this.dashes.filter(dash=>{
+        let str = dash.dashName + ' ' + dash.name2 + ' ' + dash.status + ' ' + dash.geography + ' ' + dash.other;
+        if (str.toLowerCase().indexOf(this.searchEntityKey.toLowerCase()) != -1)
+          return true;
+        return false;
+      })
+    },
+    filteredMainData() {
+      if (!this.searchMainDataKey)
+        return this.mainData;
+
+      this.toggleCollapseAll(true);
+      let that = this;
+      return this.mainData.map(item=>{
+        if (item.title.toLowerCase().indexOf(that.searchMainDataKey.toLowerCase()) != -1)
+          return item;
+        return {
+          ...item,
+          data: item.data.filter(dat=>{
+
+            let str = dat.formatted + ' ' + dat.title + ' ' + dat.hover;
+            if (str.toLowerCase().indexOf(that.searchMainDataKey.toLowerCase()) != -1)
+              return true;
+            return false;   
+          })
+        }
+      })
+    },
   },
   mounted() {
     this.getFile({
@@ -201,7 +384,8 @@ export default {
     });
   },
   components: {
-    FileSidebar
+    FileSidebar,
+    StandardInput
   }
 };
 </script>
@@ -210,7 +394,7 @@ export default {
   width: 100%;
   display: flex;
   align-items: center;
-  padding-top: 50px;
+  padding-top: 10px;
   border-bottom: solid 1px #eaeaea;
   box-shadow: inset -9px -18px 10px -20px rgba(0, 0, 0, 0.2);
   padding-left: 15px;
@@ -255,22 +439,32 @@ export default {
 .data-title {
   font-size: 15pt;
   color: #000;
-  margin-bottom: solid 1px #eaeaea;
-  border-bottom: solid 2px #000;
 }
 .data-elements {
+  margin-top: 10px;
   display: flex;
   flex-wrap: wrap;
+}
+
+
+.data-item {
+  flex-direction: row;
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  border-bottom: solid 2px #000;
+  cursor: pointer;
+  align-self: center;
 }
 .data-item-item {
   display: flex;
   flex-wrap: wrap;
   min-width: 250px;
-  border-bottom: solid 1px #eaeaea;
   margin: 10px;
   background: #fff;
   flex-basis: calc(50% - 30px);
-  height: 30px;
+  min-height: 30px;
+  border-bottom: solid 1px #eaeaea;
 }
 /* .data-item-item:nth-child(odd) {
   margin-right: 15px;
@@ -286,7 +480,7 @@ export default {
 }
 .main-data-container {
   /* display: flex; */
-  max-width: 1200px;
+  /*max-width: 1200px;*/
   flex-wrap: wrap;
   margin-top: 25px;
   height: calc(100vh - 180px);
@@ -303,5 +497,19 @@ export default {
 .center {
   flex: auto;
   width: 100%;
+  padding: 0px 25%;
+}
+.center .data-item-title {
+
+}
+
+.btn-white {
+  background: #fff;
+  color: #66d0f7;
+  padding: 5px, 10px;
+}
+.btn-white:hover {
+  color: #fff;
+  background: #66d0f7;
 }
 </style>
