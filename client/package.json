@@ -36,6 +36,7 @@
     "vue-socket.io": "^2.1.1-b",
     "vue-spinner": "^1.0.3",
     "vuejs-datepicker": "^0.9.26",
+    "vuetify": "^1.2.9",
     "vuex": "^3.0.1",
     "vuex-persistedstate": "^2.5.4",
     "yarn": "^1.5.1"

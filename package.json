@@ -29,6 +29,7 @@
     "pusher": "^2.0.0",
     "sheetjs": "^1.0.21",
     "socket.io": "^2.1.1",
+    "vuetify": "^1.2.9",
     "vuex-persistedstate": "^2.5.4",
     "xlsx": "^0.12.12"
   },

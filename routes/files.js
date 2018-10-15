@@ -50,7 +50,7 @@ router.get("/:userId/:projectId", (req, res, next) => {
     if (err) throw err;
     var collection = db.collection("files");
     collection
-      .find({ project_id: projectId })
+      .find({ project_id: projectId }, { sheet: 0 })
       .toArray()
       .then(result => {
         res.status(200).send(result);
@@ -70,7 +70,7 @@ router.get("/:userId/:projectId/:fileId", (req, res, next) => {
     if (err) throw err;
     var collection = db.collection("files");
     collection
-      .find({ _id: ObjectId(fileId) })
+      .find({ _id: ObjectId(fileId) }, { sheet: 0 })
       .toArray()
       .then(result => {
         res.status(200).send(result);
@@ -90,7 +90,7 @@ router.get("/download/:userId/:projectId/:fileId", (req, res, next) => {
     if (err) throw err;
     var collection = db.collection("files");
     collection
-      .find({ _id: ObjectId(fileId) })
+      .find({ _id: ObjectId(fileId) }, { sheet: 0 })
       .toArray()
       .then(result => {
         debugger
@@ -112,7 +112,7 @@ router.delete("/:userId/:projectId/:fileId", (req, res, next) => {
     if (err) throw err;
     var collection = db.collection("files");
     collection
-      .find({ _id: ObjectId(fileId) })
+      .find({ _id: ObjectId(fileId) }, { sheet: 0 })
       .toArray()
       .then(result => {
         
@@ -147,7 +147,7 @@ router.post("/:userId/:projectId/:fileId/image", (req, res, next) => {
         MongoClient.connect(URL, function(err, db) {
           if (err) throw err;
           var collection = db.collection("files");
-          collection.findOne({ _id: ObjectId(fileId) }).then(result => {
+          collection.findOne({ _id: ObjectId(fileId) }, { sheet: 0 }).then(result => {
             if (result != null) {
               collection
                 .update({ _id: ObjectId(fileId) },{$set : {"image":true}})
@@ -238,7 +238,7 @@ router.post("/replace/:userId/:projectId/:fileId", (req, res, next) => {
     if (err) throw err;
     var collection = db.collection("files");
     collection
-      .find({ _id: ObjectId(fileId) })
+      .find({ _id: ObjectId(fileId) }, { sheet: 0 })
       .toArray()
       .then(result => {
         upload(req, res, function(err) {

@@ -31,8 +31,9 @@
         <!-- <div class="file-image">
             
         </div> -->
-        <div class="dash-nav" ngIf="activeDash" @click="showSelectDash(true)">
-          {{activeDash.dashName}}
+        <div class="dash-nav" v-if="activeDash" @click="showSelectDash(true)">
+          <span>{{activeDash.dashName}}</span>
+          <i class="fa fa-angle-right" ></i>
         </div>
         <div class="file-nav">
             <ul>
@@ -217,9 +218,20 @@ export default {
   padding: 0px 15px;
   font-size: 20px;
   cursor: pointer;
+  justify-content: space-between;
+  flex-direction: row;
+  display: flex;
 }
 .dash-nav:hover{
   color: #66d0f7;
+}
+.dash-nav i {
+  transition: all 0.5s;
+  margin-right: 10px;
+
+}
+.dash-nav:hover i {
+  margin-right: 0px;
 }
 
 .standard-btn.back {

@@ -4,11 +4,13 @@
     
     <div class="projects-container" v-if="selectDashScreen" style="padding: 30px;overflow-y: auto;">
       
-      <!-- <StandardInput
-        field="Search Entity"
-        v-model="searchEntityKey"
-        width="100%"
-      /> -->
+      <div>
+        <StandardInput
+          field="Search Entity"
+          v-model="searchEntityKey"
+          width="100%"
+        />
+      </div>
       <table class="standard-table">
         <tbody>
           <tr><th>Entity Name</th><th>Name2</th><th>Status</th><th>Geography</th><th>Other</th></tr>
@@ -33,12 +35,17 @@
     </div>
 
     <div class="projects-container" v-else>
-      <div style="margin: 10px">
+      <div class="top-toolbar">
         <StandardInput
           v-model="searchMainDataKey"
-          width="100%"
           placeholder="Search..."
         />
+
+        <div style="margin: 0px 10px; text-align: end;">
+          <button @click="toggleCollapseAll" class="modal-btn btn-white" type="submit">
+            {{collapseStatus  == 'collapse' ? 'Expand All' : 'Collapse All'}}
+          </button>
+        </div>
       </div>
       <div class="tab-container">
         <div v-for="(tab,i) in tabs" :class="{'active':(activeTab == tab)}" :key="i" @click="activateTab(i,tab)" class="tab">{{tab}}</div>
@@ -47,15 +54,12 @@
       <img class="spinner-big" src="../../img/spinner.svg" alt="">
       </div>
       <div v-if="!isLoading" class="main-data-container animated-fast fadeInUp">
-        <div style="margin: 0px 10px; text-align: end;">
-          <button @click="toggleCollapseAll" class="modal-btn btn-white" type="submit">Toggle Collapse</button>
-        </div>
         <div v-for="(data,i) in filteredMainData" :key="i" class="data-container">
 
           <div class="data-item" @click="toggleDropdown(i)">
+            <i class="fa fa-minus" v-if="data.show"></i>
+            <i class="fa fa-plus" v-if="!data.show"></i>
             <div class="data-title" v-html="formatWithSearch(data.title)"></div>
-            <i class="fa fa-angle-up" v-if="data.show"></i>
-            <i class="fa fa-angle-down" v-if="!data.show"></i>
           </div>
 
           <div class="data-elements" v-if="data.show">
@@ -100,7 +104,9 @@ export default {
       selectDashScreen: false,
 
       searchEntityKey: "",
-      searchMainDataKey: ""
+      searchMainDataKey: "",
+
+      collapseStatus: 'collapse'
     };
   },
   watch: {
@@ -148,6 +154,7 @@ export default {
 
       if (this.dashes.length > 0) {
         this.activateDash(this.dashes[0]);
+        this.showSelectDash(true);
       } else {
         this.dashRows = this.rows;
         if (this.dashRows.length > 0) {
@@ -294,6 +301,10 @@ export default {
           };
         else return item;
       });
+      if (this.mainData.map(item=>item.show).indexOf(true) == -1)
+        this.collapseStatus = 'collapse';
+      else
+        this.collapseStatus = 'expand';
     },
 
     toggleCollapseAll(force) {
@@ -314,6 +325,10 @@ export default {
           show: toToggle
         };
       });
+      if (this.mainData.map(item=>item.show).indexOf(true) == -1)
+        this.collapseStatus = 'collapse';
+      else
+        this.collapseStatus = 'expand';
     },
     formatWithSearch(str) {
       if (!this.searchMainDataKey)
@@ -358,6 +373,8 @@ export default {
       })
     },
     filteredMainData() {
+      return this.mainData;
+      //Removed for now to show all search result, and just highlights
       if (!this.searchMainDataKey)
         return this.mainData;
 
@@ -443,6 +460,7 @@ export default {
 .data-title {
   font-size: 15pt;
   color: #000;
+  margin-left: 20px;
 }
 .data-elements {
   margin-top: 10px;
@@ -455,10 +473,10 @@ export default {
   flex-direction: row;
   display: flex;
   width: 100%;
-  justify-content: space-between;
-  border-bottom: solid 2px #000;
+  justify-content: flex-start;
+  border-bottom: solid 1px #eaeaea;
   cursor: pointer;
-  align-self: center;
+  align-items: center;
 }
 .data-item-item {
   display: flex;
@@ -515,5 +533,12 @@ export default {
 .btn-white:hover {
   color: #fff;
   background: #66d0f7;
+}
+.top-toolbar {
+  margin: 10px;
+  flex-direction: row;
+  display: flex;
+  justify-content: space-between;
+  align-items: center
 }
 </style>
