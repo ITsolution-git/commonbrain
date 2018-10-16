@@ -216,22 +216,23 @@ router.post("/:projectId/add", (req, res, next) => {
             } else {
               let obj = xlxsUtil.parseSheet("./" + dir + "/" + filepath)
 
+              let fileSave = {
+                name: filename,
+                filename: filename,
+                filepath: filepath,
+                file_uploaded: new Date(),
+                file_updated: new Date(),
+                user_id: userId,
+                project_id: projectId,
+                rows: obj.rows,
+                // sheet: obj.sheet,
+                title: obj.title,
+                dashes: obj.dashes
+              };
               MongoClient.connect(URL, function(err, db) {
                 if (err) throw err;
                 collection
-                  .insert({
-                    name: filename,
-                    filename: filename,
-                    filepath: filepath,
-                    file_uploaded: new Date(),
-                    file_updated: new Date(),
-                    user_id: userId,
-                    project_id: projectId,
-                    rows: obj.rows,
-                    // sheet: obj.sheet,
-                    title: obj.title,
-                    dashes: obj.dashes
-                  })
+                  .insert(fileSave)
                   .then(
                     result => {
                       let id = result.insertedIds[0].toString();
@@ -241,6 +242,7 @@ router.post("/:projectId/add", (req, res, next) => {
                         } else {
                           collection
                           .replaceOne({ _id: ObjectId(id) },{
+                            ...fileSave,
                             filepath: newpath
                           }).then(result=>{
 
