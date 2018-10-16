@@ -8,12 +8,12 @@
               </div>
               <form @submit.prevent="confirmUpload">
               <div class="modal-inner">
-                  <StandardInput
+                  <!-- <StandardInput
                   field="File Name"
                   name="file_name"
                   width="100%"
                   require="true"
-                  />
+                  /> -->
                   <div class="modal-sub-inner" >
                     <div v-if="imageName != 'No Image'" class="image-preview-item"><i class="fa fa-file"></i> {{imageName}} <img @click="removeFile" class="image-preview-delete" src="../../img/close.svg" alt=""></div>
                     
@@ -25,7 +25,8 @@
               <div v-if="hasError" class="alert-danger animated fadeIn" style="color:#ff0000; margin:15px;">{{errorMessage}}</div>
               <div class="modal-buttons">
                   <div @click="hideThis" class="modal-btn cancel">Cancel</div>
-                  <button class="modal-btn confirm" type="submit"><span v-if="!isLoading">Upload</span> <img v-if="isLoading" style="width:25px" src="../../img/spinner_white.svg"/></button>
+                  <button class="modal-btn confirm" type="submit" v-if="!replaceFile"><span v-if="!isLoading">Upload</span> <img v-if="isLoading" style="width:25px" src="../../img/spinner_white.svg"/></button>
+                  <button class="modal-btn confirm" type="submit" v-if="replaceFile"><span v-if="!isLoading">Replace</span> <img v-if="isLoading" style="width:25px" src="../../img/spinner_white.svg"/></button>
               </div>
               </form>
               </div>
@@ -45,7 +46,10 @@ export default {
       imageName: "No Image",
       hasError: false,
       errorMessage: "",
-      isLoading: false
+      isLoading: false,
+
+      replaceFile: false,
+      conflictFile: null
     };
   },
   props: ["hide", "uploaded"],
@@ -87,15 +91,24 @@ export default {
         console.log(data);
       });
 
-      ApiWrapper
-        .post("/api/files/" + this.$route.params.projectId + "/add", formData, {
-          onUploadProgress: function(progressEvent) {
-            console.log(
-              Math.round(progressEvent.loaded * 100 / progressEvent.total)
-            );
-          }
-        })
-        .then(
+      new Promise((resolve)=>{
+        if (!this.replaceFile)
+          resolve(ApiWrapper.post("/api/files/" + this.$route.params.projectId + "/add", formData, {
+            onUploadProgress: function(progressEvent) {
+              console.log(
+                Math.round(progressEvent.loaded * 100 / progressEvent.total)
+              );
+            }
+          }))
+        else 
+          resolve(ApiWrapper.post("/api/files/replace/" + this.$route.params.projectId + "/" + this.conflictFile._id, formData, {
+            onUploadProgress: function(progressEvent) {
+              console.log(
+                Math.round(progressEvent.loaded * 100 / progressEvent.total)
+              );
+            }
+          }))
+      }).then(
           res => {
             if (res.data.message == "Upload Successful") {
               this.uploaded();
@@ -105,7 +118,17 @@ export default {
           err => {
             this.hasError = true;
             this.isLoading = false;
-            this.errorMessage = err.response.data.errors.form;
+            if (err.response && err.response.data.errors)
+              this.errorMessage = err.response.data.errors.form;
+            else if(err.response && err.response.data.error)
+              this.errorMessage = err.response.data.errors.message;
+            else
+              this.errorMessage = 'Something went wrong';
+            if (err.response && err.response.data  && err.response.data.type === 'filename_exist') {
+              this.errorMessage = 'File with same filename exists in this project. Do you want to replace?';
+              this.replaceFile = true;
+              this.conflictFile = err.response.data.file;
+            }
           }
         );
     }

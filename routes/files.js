@@ -93,8 +93,7 @@ router.get("/download/:userId/:projectId/:fileId", (req, res, next) => {
       .find({ _id: ObjectId(fileId) }, { sheet: 0 })
       .toArray()
       .then(result => {
-        debugger
-        res.download('./uploads/' + result[0].user_id + '/' + result[0].project_id + '/' + result[0].filename)
+        res.download('./uploads/' + result[0].user_id + '/' + result[0].project_id + '/' + (result[0].filepath ? result[0].filepath : result[0].filename))
       });
   });
 });
@@ -162,8 +161,6 @@ router.post("/:userId/:projectId/:fileId/image", (req, res, next) => {
         
       })
     });
-    
-    
   })
 })
 
@@ -179,51 +176,91 @@ router.post("/:projectId/add", (req, res, next) => {
     }
     var projectId = req.params.projectId;
     var userId = req.body.userId;
-    var fileName = req.body.fileName;
-    mkdirp("./uploads/test", function(err) {
-      var dir = "/uploads/" + userId + "/" + projectId;
-      var filename = req.file.filename;
-      fs.move("./tmp/" + filename, "./" + dir + "/" + filename, function(err) {
-        if (err) {
-          fs.remove("./tmp/" + filename);
-          res.status(401).json({
-            errors: {
-              form: "File Exists"
-            }
-          });
-        } else {
-          let obj = xlxsUtil.parseSheet("./" + dir + "/" + filename)
-
-          MongoClient.connect(URL, function(err, db) {
-            if (err) throw err;
-            var collection = db.collection("files");
-            collection
-              .insert({
-                name: fileName,
-                filename: filename,
-                file_uploaded: new Date(),
-                file_updated: new Date(),
-                user_id: userId,
-                project_id: projectId,
-                rows: obj.rows,
-                sheet: obj.sheet,
-                title: obj.title,
-                dashes: obj.dashes
-              })
-              .then(
-                result => {
-                  res.status(200).json({
-                    message: "Upload Successful"
-                  });
-                },
-                err => {
-                  fs.remove("./" + dir + "/" + filename);
-                  res.status(401).send({ error: err });
-                }
-              );
-          });
+    // var fileName = req.body.fileName;
+    var dir = "/uploads/" + userId + "/" + projectId;
+    if(!req.file) {
+      res.status(401).json({
+        errors: {
+          form: 'File is required.'
         }
       });
+      return;
+    }
+    var filename = req.file.filename;
+
+    MongoClient.connect(URL, function(err, db) {
+      if (err) throw err;
+
+      var collection = db.collection("files");
+      collection
+      .find({ project_id: projectId, user_id: userId, filename: filename }, { sheet: 0 })
+      .toArray()
+      .then(result => {
+        if (result.length > 0) {
+          res.status(401).json({
+            type: 'filename_exist',
+            file: result[0]
+          });
+        } else {
+
+          let timestamp = new Date().getTime();
+          let filepath  = filename + '$$$$' + timestamp;
+          fs.move("./tmp/" + filename, "./" + dir + "/" + filepath, function(err) {
+            if (err) {
+              fs.remove("./tmp/" + filename);
+              res.status(401).json({
+                errors: {
+                  form: "File Exists"
+                }
+              });
+            } else {
+              let obj = xlxsUtil.parseSheet("./" + dir + "/" + filepath)
+
+              MongoClient.connect(URL, function(err, db) {
+                if (err) throw err;
+                collection
+                  .insert({
+                    name: filename,
+                    filename: filename,
+                    filepath: filepath,
+                    file_uploaded: new Date(),
+                    file_updated: new Date(),
+                    user_id: userId,
+                    project_id: projectId,
+                    rows: obj.rows,
+                    // sheet: obj.sheet,
+                    title: obj.title,
+                    dashes: obj.dashes
+                  })
+                  .then(
+                    result => {
+                      let id = result.insertedIds[0].toString();
+                      let newpath = filepath + '$$$' + id + '.xlsx';
+                      fs.move("./" + dir + "/" + filepath, "./" + dir + "/" + newpath, function(err) {
+                        if (err) {
+                        } else {
+                          collection
+                          .replaceOne({ _id: ObjectId(id) },{
+                            filepath: newpath
+                          }).then(result=>{
+
+                            res.status(200).json({
+                              message: "Upload Successful"
+                            });
+                          })
+                        }
+                      });
+                    },
+                    err => {
+                      fs.remove("./" + dir + "/" + filepath);
+                      res.status(401).send({ error: err });
+                    }
+                  );
+              });
+            }
+          });
+        }
+      })
     });
   });
 });
@@ -232,7 +269,7 @@ router.post("/:projectId/add", (req, res, next) => {
 // Replace File
 //--------------------------------
 
-router.post("/replace/:userId/:projectId/:fileId", (req, res, next) => {
+router.post("/replace/:projectId/:fileId", (req, res, next) => {
   var fileId = req.params.fileId;
   MongoClient.connect(URL, function(err, db) {
     if (err) throw err;
@@ -248,7 +285,9 @@ router.post("/replace/:userId/:projectId/:fileId", (req, res, next) => {
           mkdirp("./uploads/test", function(err) {
             var dir = "/uploads/" + userId + "/" + projectId;
             var filename = req.file.filename;
-            fs.move("./tmp/" + filename, "./" + dir + "/" + result[0].filename, { overwrite: true }, function(err) {
+            let timestamp = new Date().getTime();
+            let filepath  = filename + '$$$$' + timestamp + '$$$' + result[0]._id + '.xlsx';
+            fs.move("./tmp/" + filename, "./" + dir + "/" + filepath, { overwrite: true }, function(err) {
               try {
                 if (err) {
                   console.log(err);
@@ -269,12 +308,13 @@ router.post("/replace/:userId/:projectId/:fileId", (req, res, next) => {
                       .replaceOne({ _id: ObjectId(fileId) },{
                         name: filename.substring(0, filename.length - 5),
                         filename: filename,
+                        filepath: filepath,
                         file_uploaded: new Date(),
                         file_updated: new Date(),
                         user_id: userId,
                         project_id: projectId,
                         rows: obj.rows,
-                        sheet: obj.sheet,
+                        // sheet: obj.sheet,
                         title: obj.title,
                         dashes: obj.dashes
                       })

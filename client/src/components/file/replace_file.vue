@@ -84,8 +84,6 @@ export default {
       ApiWrapper
         .post(
           "/api/files/replace/" +
-            this.$store.state.user.id +
-            "/" +
             this.$route.params.projectId +
             "/" +
             this.$route.params.fileId,
@@ -109,7 +107,12 @@ export default {
           err => {
             this.hasError = true;
             this.isLoading = false;
-            this.errorMessage = err.response.data.errors.form;
+            if (err.response && err.response.data.errors)
+              this.errorMessage = err.response.data.errors.form;
+            else if(err.response && err.response.data.error)
+              this.errorMessage = err.response.data.errors.message;
+            else
+              this.errorMessage = 'Something went wrong';
           }
         );
     }
