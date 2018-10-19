@@ -8,6 +8,7 @@ var userRoutes = require("./routes/users");
 var uploadRoutes = require("./routes/upload");
 var authRoutes = require("./routes/auth");
 var projectRoutes = require("./routes/projects");
+var ofacRoutes = require("./routes/ofac");
 var fileRoutes = require("./routes/files");
 var morgan = require("morgan");
 var nodemailer = require('nodemailer');
@@ -33,23 +34,25 @@ app.use("/api/upload", uploadRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/projects", projectRoutes);
 app.use("/api/files", fileRoutes);
+app.use("/api/ofac", ofacRoutes);
 app.use('/api/static', express.static(path.join(__dirname + '/uploads')));
 
 app.post('/api/learnmore', (req,res,next)=>{
   var email = req.body.email;
 
   let transporter = nodemailer.createTransport({
-        service:'gmail',
-        secure:false,
-        port:25,
-        auth:{
-          user:'dexhonsa@gmail.com',
-          pass:'awesomeo21'
-        },
-        tls:{
-          rejectUnauthorized:false
-        }
+    service:'gmail',
+    secure:false,
+    port:25,
+    auth:{
+      user:'dexhonsa@gmail.com',
+      pass:'awesomeo21'
+    },
+    tls:{
+      rejectUnauthorized:false
+    }
   });
+
   const emailOutputToCB = `
   <div style="background:#f8f8f8; text-align: center; width:100%; padding:30px 15px;box-sizing: border-box;">
   <div style="max-width: 500px; width:100%; background:#fff; padding:15px; text-align: center;display: inline-block; border:solid 1px #eaeaea; border-radius: 3px;box-sizing: border-box;">

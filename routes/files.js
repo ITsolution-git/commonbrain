@@ -12,6 +12,8 @@ var jwt = require("jsonwebtoken");
 var config = require("../config");
 var Pusher = require("pusher");
 var xlxsUtil = require('../utils/xlxs');
+var Excel = require('exceljs');
+
 
 var pusher = new Pusher({
   appId: "528462",
@@ -40,45 +42,6 @@ var upload = multer({
 }).single("file");
 
 //--------------------------------
-// Get Files
-//--------------------------------
-
-router.get("/:userId/:projectId", (req, res, next) => {
-  const userId = req.params.userId;
-  const projectId = req.params.projectId;
-  MongoClient.connect(URL, function(err, db) {
-    if (err) throw err;
-    var collection = db.collection("files");
-    collection
-      .find({ project_id: projectId }, { sheet: 0 })
-      .toArray()
-      .then(result => {
-        res.status(200).send(result);
-      });
-  });
-});
-
-//--------------------------------
-// Get File
-//--------------------------------
-
-router.get("/:userId/:projectId/:fileId", (req, res, next) => {
-  const userId = req.params.userId;
-  const projectId = req.params.projectId;
-  const fileId = req.params.fileId;
-  MongoClient.connect(URL, function(err, db) {
-    if (err) throw err;
-    var collection = db.collection("files");
-    collection
-      .find({ _id: ObjectId(fileId) }, { sheet: 0 })
-      .toArray()
-      .then(result => {
-        res.status(200).send(result);
-      });
-  });
-});
-
-//--------------------------------
 // Download File
 //--------------------------------
 
@@ -97,6 +60,82 @@ router.get("/download/:userId/:projectId/:fileId", (req, res, next) => {
       });
   });
 });
+
+
+//--------------------------------
+// Download Excel File
+//--------------------------------
+router.get("/report/excel/:fileId", (req, res, next) => {
+
+  const fileId = req.params.fileId;
+  MongoClient.connect(URL, function(err, db) {
+    if (err) throw err;
+    var collection = db.collection("files");
+    collection
+      .find({ _id: ObjectId(fileId) }, { sheet: 0 })
+      .toArray()
+      .then(result => {
+
+        let renderData = xlxsUtil.getRenderData(result[0]);
+        var workbook = new Excel.Workbook();
+        var worksheet = workbook.addWorksheet('CommonBrain');
+
+
+        // // worksheet.mergeCells('A1:J1');
+        // let row = worksheet.addRow([`${result[0].title}`]);
+        // row.getCell(1).font = {
+        //     // name: 'Arial Black',
+        //     color: { argb: 'FF00FF00' },
+        //     // family: 2,
+        //     size: 40,
+        //     // italic: true
+        // };
+        worksheet.mergeCells('A1:B2');
+        worksheet.getCell('A1').value = 'I am merged';
+        worksheet.getCell('A1').font={
+          size:30
+        }
+        worksheet.getCell('C1').value = 'I am not';
+        worksheet.getCell('C2').value = 'Neither am I';
+
+        worksheet.getRow(2).commit(); // now rows 1 and two are committed.
+        // row.commit();
+        // renderData.map(dash=>{
+        //   html+=`<tr><td>${dash.dash.dashName} - ${dash.dash.name2}</td></tr>`;  
+        //   dash.data.map(sheet=>{
+        //     let add = '<td style="color: red"></td>';
+        //     html+=`<tr>${add}<td>${sheet.name}</td></tr>`;  
+        //     sheet.data.map(tab=>{
+
+        //       let add = '<td></td><td></td>';
+        //       html+=`<tr>${add}<td>${tab.name}</td></tr>`;  
+        //       tab.data.map(majcat=>{
+
+        //         let add = '<td></td><td></td><td></td>';
+        //         html+=`<tr>${add}<td>${majcat.name}</td></tr>`;  
+
+        //         for (let i = 0; i < majcat.data.length; i+=2) {
+        //           let add = '<td></td><td></td><td></td><td></td>';
+
+        //           if (i+1 < majcat.data.length) {
+        //             html+=`<tr>${add}<td>${majcat.data[i].spec_category}</td><td>${majcat.data[i].formatted}</td><td></td><td>${majcat.data[i+1].spec_category}</td><td>${majcat.data[i+1].formatted}</td></tr>`;  
+        //           } else {
+        //             html+=`<tr>${add}<td>${majcat.data[i].spec_category}</td><td>${majcat.data[i].formatted}</td></tr>`;  
+        //           }
+        //         }
+        //       })
+        //     })
+        //   })
+        // })
+        worksheet.getColumn(3).outlineLevel = 1;
+
+        workbook.csv.writeFile('./tmp/tmp.xlsx');
+        // res.download('./uploads/' + result[0].user_id + '/' + result[0].project_id + '/' + (result[0].filepath ? result[0].filepath : result[0].filename))
+      });
+  });
+});
+
+
 
 //--------------------------------
 // Delete File
@@ -217,7 +256,7 @@ router.post("/:projectId/add", (req, res, next) => {
               let obj = xlxsUtil.parseSheet("./" + dir + "/" + filepath)
 
               let fileSave = {
-                name: filename,
+                name: filename.substring(0, filename.length - 5),
                 filename: filename,
                 filepath: filepath,
                 file_uploaded: new Date(),
@@ -227,7 +266,9 @@ router.post("/:projectId/add", (req, res, next) => {
                 rows: obj.rows,
                 // sheet: obj.sheet,
                 title: obj.title,
-                dashes: obj.dashes
+                dashes: obj.dashes,
+                imageFrom: 'file',
+                imageFileUrl: obj.imageFileUrl
               };
               MongoClient.connect(URL, function(err, db) {
                 if (err) throw err;
@@ -241,10 +282,9 @@ router.post("/:projectId/add", (req, res, next) => {
                         if (err) {
                         } else {
                           collection
-                          .replaceOne({ _id: ObjectId(id) },{
-                            ...fileSave,
+                          .update({ _id: ObjectId(id) },{ $set: {
                             filepath: newpath
-                          }).then(result=>{
+                          }}).then(result=>{
 
                             res.status(200).json({
                               message: "Upload Successful"
@@ -300,14 +340,13 @@ router.post("/replace/:projectId/:fileId", (req, res, next) => {
                     }
                   });
                 } else {
-                  let obj = xlxsUtil.parseSheet("./" + dir + "/" + filename);
-                  debugger
+                  let obj = xlxsUtil.parseSheet("./" + dir + "/" + filepath);
                   MongoClient.connect(URL, function(err, db) {
                     if (err) throw err;
                     var collection = db.collection("files");
                     
                     collection
-                      .replaceOne({ _id: ObjectId(fileId) },{
+                      .update({ _id: ObjectId(fileId) },{ $set: {
                         name: filename.substring(0, filename.length - 5),
                         filename: filename,
                         filepath: filepath,
@@ -318,8 +357,9 @@ router.post("/replace/:projectId/:fileId", (req, res, next) => {
                         rows: obj.rows,
                         // sheet: obj.sheet,
                         title: obj.title,
-                        dashes: obj.dashes
-                      })
+                        dashes: obj.dashes,
+                        imageFileUrl: obj.imageFileUrl
+                      }})
                       .then(
                         result => {
                           res.status(200).json({
@@ -362,8 +402,9 @@ router.put("/update/:userId/:projectId/:fileId", (req, res, next) => {
   MongoClient.connect(URL, function(err, db) {
     if (err) throw err;
     var collection = db.collection("files");
+
     collection
-      .update({ _id: ObjectId(req.params.fileId) }, {$set:{chart}})
+      .update({ _id: ObjectId(req.params.fileId) }, {$set:chart})
       .then(
         result => {
           res.status(200).json({
@@ -613,6 +654,45 @@ router.post("/test", (req, res, next) => {
 
       // }
     });
+  });
+});
+
+//--------------------------------
+// Get Files
+//--------------------------------
+
+router.get("/:userId/:projectId", (req, res, next) => {
+  const userId = req.params.userId;
+  const projectId = req.params.projectId;
+  MongoClient.connect(URL, function(err, db) {
+    if (err) throw err;
+    var collection = db.collection("files");
+    collection
+      .find({ project_id: projectId }, { sheet: 0 })
+      .toArray()
+      .then(result => {
+        res.status(200).send(result);
+      });
+  });
+});
+
+//--------------------------------
+// Get File
+//--------------------------------
+
+router.get("/:userId/:projectId/:fileId", (req, res, next) => {
+  const userId = req.params.userId;
+  const projectId = req.params.projectId;
+  const fileId = req.params.fileId;
+  MongoClient.connect(URL, function(err, db) {
+    if (err) throw err;
+    var collection = db.collection("files");
+    collection
+      .find({ _id: ObjectId(fileId) }, { sheet: 0 })
+      .toArray()
+      .then(result => {
+        res.status(200).send(result);
+      });
   });
 });
 

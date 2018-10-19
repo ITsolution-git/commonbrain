@@ -3,30 +3,41 @@
   <ExportPdf :hide="toggleExportPdf" v-if="exportPdf" />
   <Cropper :upload="toggleCropper"  :hide="toggleCropper" v-if="cropper"></Cropper>
   <ReplaceFile :hide="toggleReplaceFile" :uploaded="submitReplaceFile" v-if="replaceFile" />
+
+  
     <div class="sidebar-container">
         <div @click="$router.go(-1)" class="standard-btn back"><i class="fa fa-angle-left"></i> Back</div>
-        <div class="sidebar-title" v-if="file[0]">
-          {{file[0].name}}
+        <div class="sidebar-title" v-if="file">
+          {{file.name}}
             <div class="left-sub-sidebar-options">
             <div @click.stop="toggleOptionsDropdown" class="add-project-btn dropdown-btn"><i class="fa fa-ellipsis-h" />
-                <div v-click-outside="toggleOptionsDropdown"  v-if="optionsDropdown" class="basic-dropdown add-project-btn-dropdown animated-fast fadeInDown">
+                <div v-click-outside="toggleOptionsDropdown"  v-if="optionsDropdown" class="basic-dropdown add-project-btn-dropdown animated-fast fadeInDown" >
                   <ul>
                     <li @click="deleteFile">Delete File</li>
                     <li @click="downloadFile">Download File</li>
                     <li @click="toggleReplaceFile">Replace File</li>
                     <li @click="toggleExportPdf">Export PDF</li>
+                    <li @click.stop="toggleExportExcel">Export Excel</li>
+                    <li @click.stop="toggleImageFrom" v-if="file.imageFrom=='download'">Use Image From File</li>
+                    <li @click.stop="toggleImageFrom" v-if="file.imageFrom=='file'">Use Image From Upload</li>
                     <li @click="$router.push('/projects/'+projectId + '/rawfile/'+fileId)">Edit Charts</li>
                   </ul>
                 </div>
             </div>
           </div>
         </div>
-        <div @click="toggleCropper" class="file-logo">
-          <div v-if="!hasImage" style="padding:15px">
-            <i class="fa fa-camera" style=" margin-right:10px;"></i>
-            Add Image
+        <div class="file-logo">
+          <div v-if="file.imageFrom == 'download'" @click="toggleCropper">
+            <div class="add-image" style="padding:15px">
+              <i class="fa fa-camera" style=" margin-right:10px;"></i>
+              Upload
             </div>
-            <img v-if="hasImage" :src="imagePath" alt="">
+            <img :src="imagePath" v-if="file.image"/>
+          </div>
+
+          <div v-if="file.imageFrom == 'file'">
+            <img :src="imagePath" v-if="imagePath"/>
+          </div>
         </div>
         <!-- <div class="file-image">
             
@@ -40,7 +51,6 @@
                 <li v-for="(sheet,i) in sheets" :key="i" :class="{'active':(activeNav == i)}" @click="activateSheet(i,sheet)">{{sheet}}</li>
             </ul>
         </div>
-               
     </div>
     </div>
 </template>
@@ -51,39 +61,58 @@ import { mapActions } from "vuex";
 import ApiWrapper from '@/shared/utils/ApiWrapper';
 import ReplaceFile from "./replace_file";
 import ExportPdf from "./export_pdf";
+import ToggleImageFrom from "./toggle_import_from";
 
 export default {
   name: "file-sidebar",
-  props: ["sheets", "activate", "dashes", "activeDash", "showSelectDash"],
+  props: ["sheets", "activate", "dashes", "activeDash", "showSelectDash", 'file', 'updateFile'],
   data() {
     return {
       hovered: 0,
       addProjectOpen: false,
       activeNav: 0,
       cropper: false,
-      hasImage: false,
       imagePath: "",
       optionsDropdown: false,
       replaceFile: false,
-      exportPdf: false
+      exportPdf: false,
+      imageSelect: false,
+
+      exportExcel: false,
     };
   },
   components: {
     Cropper,
     ReplaceFile,
-    ExportPdf
+    ExportPdf,
+    ToggleImageFrom
   },
   mounted() {
-    var that = this;
-    setTimeout(function() {
-      that.getImage();
-      if (that.file && that.file.length > 0) {
-        this.hasImage = true;
-      }
-    }, 10);
+    if (this.file.imageFrom == 'file') {
+      this.imagePath = this.file.imageFileUrl;
+    } else if (this.file.imageFrom == 'download') {
+      this.imagePath =
+        "/api/static/" +
+        this.$store.state.user.id +
+        "/" +
+        this.$route.params.projectId +
+        "/" +
+        this.$route.params.fileId +
+        ".jpg";
+    }
   },
   methods: {
     ...mapActions(["getFiles"]),
+    toggleExportExcel() {
+      this.$emit('exportExcel');
+    },
+    toggleImageFrom() {
+      if (this.file.imageFrom == 'file')
+        this.$emit('updateFile', {imageFrom: 'download'});
+      else if (this.file.imageFrom == 'download')
+        this.$emit('updateFile', {imageFrom: 'file'});
+      this.optionsDropdown = false;
+    },
     toggleExportPdf() {
       this.exportPdf = !this.exportPdf;
     },
@@ -96,6 +125,9 @@ export default {
     },
     toggleOptionsDropdown() {
       this.optionsDropdown = !this.optionsDropdown;
+    },
+    toggleImageFileOrUpload() {
+      this.imageSelect = !this.imageSelect;
     },
     toggleCropper: function() {
       this.cropper = !this.cropper;
@@ -144,21 +176,8 @@ export default {
           link.click();
         });
     },
-    getImage() {
-      this.imagePath =
-        "/api/static/" +
-        this.$store.state.user.id +
-        "/" +
-        this.$route.params.projectId +
-        "/" +
-        this.$route.params.fileId +
-        ".jpg";
-    }
   },
   computed: {
-    file() {
-      return this.$store.state.fileStore.file;
-    },
     fileId() {
       return this.$route.params.fileId;
     },
@@ -167,13 +186,6 @@ export default {
     }
   },
   watch: {
-    file(val, oldVal) {
-      if (val != oldVal) {
-        if (val[0].image) {
-          this.hasImage = true;
-        }
-      }
-    }
   }
 };
 </script>
@@ -201,14 +213,14 @@ export default {
   width: 100%;
 }
 .file-logo img,
-.file-logo div {
+.file-logo div.add-image {
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
   background: #eef0f2;
 }
-.file-logo div:hover {
+.file-logo div.add-image:hover {
   cursor: pointer;
   background: #e2e5e7;
 }

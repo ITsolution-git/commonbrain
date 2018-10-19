@@ -1,6 +1,6 @@
 <template>
   <div>
-    <FileSidebar :sheets="sheets" :activate="activateSheet" :dashes="dashes" :showSelectDash="showSelectDash" :activeDash="activeDash"/>
+    <FileSidebar :sheets="sheets" :activate="activateSheet" :dashes="dashes" :showSelectDash="showSelectDash" :activeDash="activeDash" :file="file" @updateFile="updateFile" @exportExcel="exportExcel"/>
     
     <div class="projects-container" v-if="selectDashScreen" style="padding: 30px;overflow-y: auto;">
       
@@ -72,8 +72,6 @@
         </div>
 
       </div>
-    
-
     </div>
   </div>
 </template>
@@ -81,6 +79,9 @@
 import FileSidebar from "./file_sidebar";
 import { mapActions } from "vuex";
 import StandardInput from "../form_elements/standard_input";
+
+import ApiWrapper from '@/shared/utils/ApiWrapper';
+var _ = require('lodash');
 
 export default {
   name: "view_file",
@@ -116,7 +117,125 @@ export default {
   },
   methods: {
     ...mapActions(["getFile"]),
+    exportExcel() {
 
+      ApiWrapper
+        .download(
+          "/api/files/report/excel/" +
+            this.$route.params.fileId,
+          { responseType: "arraybuffer" }
+        )
+        .then(res => {
+          // const url = window.URL.createObjectURL(new Blob([res.data]));
+          // const link = document.createElement("a");
+          // link.href = url;
+          // link.setAttribute("download", this.file.filename);
+          // document.body.appendChild(link);
+          // link.click();
+        });
+
+      // let html = this.generateReportTable();
+
+      // var table = document.createElement('div');
+      // table.innerHTML = html;
+      // table = table.firstChild;
+      // var ws = XLSX.utils.table_to_sheet(table);
+      // var wb = XLSX.utils.book_new();
+      // var wscols = [
+      //   {},
+      //   {wch: 230},
+      //   {},
+      //   {},
+      //   {},
+      //   {},
+      // ];
+      // ws['!cols'] = wscols;
+
+      // XLSX.utils.book_append_sheet(wb, ws, 'CommonBrain');
+
+      // XLSX.writeFile(wb, this.file.name+'-Report.xlsx');
+    },
+    getRenderData() {
+
+      let dashes = this.dashes.length == 0 ? [undefined] : this.dashes;
+      
+      let self = this;
+      let renderData = dashes.map(dash=>{
+        let dashRows = self.rows.filter(row=>row.dash_name == dash.dashName);
+        let sheets = [];
+        let sheetRows = _.groupBy(dashRows, 'sheet_name');
+
+        for (let sheetkey in sheetRows) {
+          let tabRows = _.groupBy(sheetRows[sheetkey], 'tab_name');
+          let tabs = [];
+          for (let tabkey in tabRows) {
+            let majorCatRows = _.groupBy(tabRows[tabkey], 'major_category');
+            let majorCats = [];
+            for (let catkey in majorCatRows) {
+              majorCats.push({name: catkey, data: majorCatRows[catkey]});
+            }
+            tabs.push({name: tabkey, data: majorCats});
+          }
+          sheets.push({name: sheetkey, data: tabs});
+        }
+
+        return {
+          dash: dash,
+          data: sheets
+        }
+      })
+      return renderData;
+    },
+    generateReportTable() {
+      let html = `<table><tr><td colspan=9>${this.file.title}</td></tr>`;
+      let renderData = this.getRenderData();
+      renderData.map(dash=>{
+        html+=`<tr><td>${dash.dash.dashName} - ${dash.dash.name2}</td></tr>`;  
+        dash.data.map(sheet=>{
+          let add = '<td style="color: red"></td>';
+          html+=`<tr>${add}<td>${sheet.name}</td></tr>`;  
+          sheet.data.map(tab=>{
+
+            let add = '<td></td><td></td>';
+            html+=`<tr>${add}<td>${tab.name}</td></tr>`;  
+            tab.data.map(majcat=>{
+
+              let add = '<td></td><td></td><td></td>';
+              html+=`<tr>${add}<td>${majcat.name}</td></tr>`;  
+
+              for (let i = 0; i < majcat.data.length; i+=2) {
+                let add = '<td></td><td></td><td></td><td></td>';
+
+                if (i+1 < majcat.data.length) {
+                  html+=`<tr>${add}<td>${majcat.data[i].spec_category}</td><td>${majcat.data[i].formatted}</td><td></td><td>${majcat.data[i+1].spec_category}</td><td>${majcat.data[i+1].formatted}</td></tr>`;  
+                } else {
+                  html+=`<tr>${add}<td>${majcat.data[i].spec_category}</td><td>${majcat.data[i].formatted}</td></tr>`;  
+                }
+              }
+            })
+          })
+        })
+      })
+      return html + '</table>';
+    },
+    updateFile(fields) {
+
+      ApiWrapper
+        .put(
+          "/api/files/update/" +
+            this.userId +
+            "/" +
+            this.projectId +
+            "/" +
+            this.fileId,
+          fields
+        )
+        .then(res => {
+          // this.loadFile();
+          window.location.reload();
+        });
+
+    },
     round(data) {
       if (typeof data == "number") {
         return Math.round(data);
@@ -337,6 +456,15 @@ export default {
         let match = new RegExp("(" + this.searchMainDataKey + ")","gi"); 
         return str.replace(match, "<span style='background-color: #FFFF00'>$1</span>")
       }
+    },
+    loadFile() {
+      this.getFile({
+        userId: this.userId,
+        projectId: this.projectId,
+        fileId: this.fileId
+      }).then(res => {
+        this.getRows();
+      });
     }
   },
   computed: {
@@ -396,13 +524,7 @@ export default {
     },
   },
   mounted() {
-    this.getFile({
-      userId: this.userId,
-      projectId: this.projectId,
-      fileId: this.fileId
-    }).then(res => {
-      this.getRows();
-    });
+    this.loadFile()
   },
   components: {
     FileSidebar,

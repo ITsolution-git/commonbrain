@@ -39,6 +39,7 @@
     "vuetify": "^1.2.9",
     "vuex": "^3.0.1",
     "vuex-persistedstate": "^2.5.4",
+    "xlsx": "^0.14.0",
     "yarn": "^1.5.1"
   },
   "devDependencies": {
