@@ -31,7 +31,7 @@ module.exports.scrapeOFAC = (searchObj) => {
         obj.score = tds[5].innerHTML;
         result.push(obj);
       } catch(err) {
-
+        console.log(err);
       }
     }
     return result;
