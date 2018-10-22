@@ -1,7 +1,8 @@
 <template>
   <div class="top-bar">
     <div class="nav-bar">
-      <div @click="$router.push('/projects')" class="nav-item active">Projects</div>
+      <div @click="$router.push('/projects')" :class="{'nav-item': true, active: isActive('projects')}">Projects</div>
+      <div @click="$router.push('/ofac')" :class="{'nav-item': true, active: isActive('ofac')}">OFAC</div>
       <img src="../img/brain_white.svg" alt="">
       <div class="nav-item">Templates</div>
     </div>
@@ -35,6 +36,9 @@ export default {
     logout() {
       this.resetState();
       auth.logout();
+    },
+    isActive(path) {
+      return (location.href.indexOf(path) != -1);
     }
   }
 };

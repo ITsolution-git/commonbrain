@@ -1,15 +1,15 @@
 const path = require('path');
 const Nightmare = require('nightmare');
-const nightmare = Nightmare({ 
-  show: true,
-  paths: {
-    userData: '/user/data'
-  },
-  downloads: __dirname
-})
+
 
 module.exports.scrapeOFAC = (searchObj) => {
-
+  const nightmare = Nightmare({ 
+    show: false,
+    paths: {
+      userData: '/user/data'
+    },
+    downloads: __dirname
+  })
   return nightmare
   .goto('https://sanctionssearch.ofac.treas.gov/')
   .type('input[name="ctl00$MainContent$txtLastName"]', searchObj.name)
@@ -24,6 +24,10 @@ module.exports.scrapeOFAC = (searchObj) => {
         let obj = {};
         let tds = rows[i].querySelectorAll('td');
         obj.name = tds[0].querySelector('a').innerHTML;
+        let link = tds[0].querySelector('a').href;
+        let match = link.match(/id\=(\d+)"/);
+        obj.link = match ? ('https://sanctionssearch.ofac.treas.gov/Details.aspx?id=' + match[1]) : 'https://sanctionssearch.ofac.treas.gov/';
+        
         obj.address = tds[1].innerHTML;
         obj.type = tds[2].innerHTML;
         obj.program = tds[3].innerHTML;

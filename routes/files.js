@@ -66,7 +66,7 @@ router.get("/download/:userId/:projectId/:fileId", (req, res, next) => {
 // Download Excel File
 //--------------------------------
 router.get("/report/excel/:fileId", (req, res, next) => {
-
+  
   const fileId = req.params.fileId;
   MongoClient.connect(URL, function(err, db) {
     if (err) throw err;
@@ -80,57 +80,84 @@ router.get("/report/excel/:fileId", (req, res, next) => {
         var workbook = new Excel.Workbook();
         var worksheet = workbook.addWorksheet('CommonBrain');
 
+        worksheet.columns = [
+          { header: `${result[0].title}`, key: 'A', width: 10 },
+          { header: '', key: 'B', width: 10 },
+          { header: '', key: 'C', width: 10 },
+          { header: '', key: 'D', width: 10 },
+          { header: '', key: 'E', width: 20 },
+          { header: '', key: 'F', width: 20 },
+          { header: '', key: 'G', width: 5 },
+          { header: '', key: 'H', width: 20 },
+          { header: '', key: 'I', width: 20 },
+          { header: '', key: 'J', width: 10 },
+        ];
+        worksheet.mergeCells('A1:J1');
+        worksheet.getRow(1).height = 40;
+        worksheet.getCell('A1').font = {
+            size: 40,
+            bold: true
+        };
+        let rowNum = 2;
+        let row;
+        renderData.map(dash=>{
+          
+          row = worksheet.addRow([`${dash.dash.dashName} - ${dash.dash.name2}`]);
+          row.height = 30;
+          row.getCell(1).font = {
+              size: 25,
+              bold: true
+          };
+          rowNum ++;
+          dash.data.map(sheet=>{
+            row = worksheet.addRow(['', `${sheet.name}`]);
+            row.height = 25;
+            row.getCell(1).font = {
+                size: 20,
+                bold: true
+            };
+            rowNum ++;
+            sheet.data.map(tab=>{
+              row = worksheet.addRow(['', '', `${tab.name}`]);
+              row.height = 20;
+              row.getCell(1).font = {
+                  size: 18,
+                  bold: true
+              };
+              rowNum ++;
 
-        // // worksheet.mergeCells('A1:J1');
-        // let row = worksheet.addRow([`${result[0].title}`]);
-        // row.getCell(1).font = {
-        //     // name: 'Arial Black',
-        //     color: { argb: 'FF00FF00' },
-        //     // family: 2,
-        //     size: 40,
-        //     // italic: true
-        // };
-        worksheet.mergeCells('A1:B2');
-        worksheet.getCell('A1').value = 'I am merged';
-        worksheet.getCell('A1').font={
-          size:30
-        }
-        worksheet.getCell('C1').value = 'I am not';
-        worksheet.getCell('C2').value = 'Neither am I';
+              tab.data.map(majcat=>{
+                row = worksheet.addRow(['', '', '', `${majcat.name}`]);
+                rowNum ++;
 
-        worksheet.getRow(2).commit(); // now rows 1 and two are committed.
-        // row.commit();
-        // renderData.map(dash=>{
-        //   html+=`<tr><td>${dash.dash.dashName} - ${dash.dash.name2}</td></tr>`;  
-        //   dash.data.map(sheet=>{
-        //     let add = '<td style="color: red"></td>';
-        //     html+=`<tr>${add}<td>${sheet.name}</td></tr>`;  
-        //     sheet.data.map(tab=>{
+                for (let i = 0; i < majcat.data.length; i+=2) {
+                  if (i+1 < majcat.data.length) {
+                    row = worksheet.addRow(['', '', '', '', `${majcat.data[i].spec_category}`, `${majcat.data[i].formatted}`, '', `${majcat.data[i+1].formatted}`, `${majcat.data[i+1].formatted}`]);
 
-        //       let add = '<td></td><td></td>';
-        //       html+=`<tr>${add}<td>${tab.name}</td></tr>`;  
-        //       tab.data.map(majcat=>{
+                    row.getCell(5).alignment = { wrapText: true };
+                    row.getCell(6).alignment = { wrapText: true };
+                    row.getCell(8).alignment = { wrapText: true };
+                    row.getCell(9).alignment = { wrapText: true };
+                    rowNum ++;
+                  } else {
+                    row = worksheet.addRow(['', '', '', '', `${majcat.data[i].spec_category}`, `${majcat.data[i].formatted}`]);
 
-        //         let add = '<td></td><td></td><td></td>';
-        //         html+=`<tr>${add}<td>${majcat.name}</td></tr>`;  
+                    row.getCell(5).alignment = { wrapText: true };
+                    row.getCell(6).alignment = { wrapText: true };
+                    row.getCell(8).alignment = { wrapText: true };
+                    row.getCell(9).alignment = { wrapText: true };
+                    rowNum++;
+                  }
+                }
+              })
+            })
+          })
+        })
 
-        //         for (let i = 0; i < majcat.data.length; i+=2) {
-        //           let add = '<td></td><td></td><td></td><td></td>';
-
-        //           if (i+1 < majcat.data.length) {
-        //             html+=`<tr>${add}<td>${majcat.data[i].spec_category}</td><td>${majcat.data[i].formatted}</td><td></td><td>${majcat.data[i+1].spec_category}</td><td>${majcat.data[i+1].formatted}</td></tr>`;  
-        //           } else {
-        //             html+=`<tr>${add}<td>${majcat.data[i].spec_category}</td><td>${majcat.data[i].formatted}</td></tr>`;  
-        //           }
-        //         }
-        //       })
-        //     })
-        //   })
-        // })
-        worksheet.getColumn(3).outlineLevel = 1;
-
-        workbook.csv.writeFile('./tmp/tmp.xlsx');
-        // res.download('./uploads/' + result[0].user_id + '/' + result[0].project_id + '/' + (result[0].filepath ? result[0].filepath : result[0].filename))
+        let filename = `./tmp/${new Date().getTime()}.xlsx`;
+        workbook.xlsx.writeFile(filename).then(()=>{
+          res.download(filename)
+        });
       });
   });
 });
@@ -358,6 +385,7 @@ router.post("/replace/:projectId/:fileId", (req, res, next) => {
                         // sheet: obj.sheet,
                         title: obj.title,
                         dashes: obj.dashes,
+                        imageFrom: 'file',
                         imageFileUrl: obj.imageFileUrl
                       }})
                       .then(

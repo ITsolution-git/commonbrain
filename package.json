@@ -21,6 +21,8 @@
     "jsonwebtoken": "^8.2.0",
     "jwt-decode": "^2.2.0",
     "lodash": "^4.17.11",
+    "mailcomposer": "^4.0.2",
+    "mailgun-js": "^0.21.0",
     "mkdirp": "^0.5.1",
     "mongodb": "^2.2.33",
     "mongoose": "*",

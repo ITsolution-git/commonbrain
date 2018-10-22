@@ -126,12 +126,12 @@ export default {
           { responseType: "arraybuffer" }
         )
         .then(res => {
-          // const url = window.URL.createObjectURL(new Blob([res.data]));
-          // const link = document.createElement("a");
-          // link.href = url;
-          // link.setAttribute("download", this.file.filename);
-          // document.body.appendChild(link);
-          // link.click();
+          const url = window.URL.createObjectURL(new Blob([res.data]));
+          const link = document.createElement("a");
+          link.href = url;
+          link.setAttribute("download", this.file.filename);
+          document.body.appendChild(link);
+          link.click();
         });
 
       // let html = this.generateReportTable();

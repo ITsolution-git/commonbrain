@@ -135,12 +135,15 @@ module.exports.parseSheet = function(filename) {
 
 
 module.exports.getRenderData = function(file) {
-
-  let dashes = !file.dashes ? [{dashName:undefined}] : file.dashes;
+  let dashesTemp = !file.dashes ? [{dashName:undefined}] : file.dashes;
+  let dashes = [];
+  for (let key in dashesTemp) {
+    dashes.push(dashesTemp[key]);
+  }
   let rows = [];
   for(let k in file.rows)
     rows.push(file.rows[k]);
-
+  
   let renderData = dashes.map(dash=>{
     let dashRows = rows.filter(row=>row.dash_name == dash.dashName);
     let sheets = [];

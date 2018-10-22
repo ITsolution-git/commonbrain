@@ -432,6 +432,9 @@ table td {
   left: 300px;
   z-index: -1;
 }
+.no-sidebar-container {
+  height: calc(100% - 70px);
+}
 .main-title {
   font-size: 15pt;
   padding: 15px;
