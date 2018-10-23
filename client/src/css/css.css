@@ -343,6 +343,7 @@ table td {
   box-shadow: 0px 0px 18px rgba(0, 0, 0, 0.2);
   margin-top: 70px;
   top: 0;
+  z-index: 1;
 }
 .sidebar-title {
   font-size: 13pt;
@@ -430,11 +431,9 @@ table td {
   width: calc(100% - 300px);
   height: calc(100% - 70px);
   left: 300px;
-  z-index: -1;
+  z-index: 0;
 }
-.no-sidebar-container {
-  height: calc(100% - 70px);
-}
+
 .main-title {
   font-size: 15pt;
   padding: 15px;

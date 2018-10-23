@@ -8,11 +8,15 @@ module.exports.scrapeOFAC = (searchObj) => {
     paths: {
       userData: '/user/data'
     },
-    downloads: __dirname
+    downloads: __dirname,
+
+    waitTimeout: 1000*60*2
   })
   return nightmare
   .goto('https://sanctionssearch.ofac.treas.gov/')
   .type('input[name="ctl00$MainContent$txtLastName"]', searchObj.name)
+  .type('input[name="ctl00$MainContent$Slider1_Boundcontrol"]', '')
+  .type('input[name="ctl00$MainContent$Slider1_Boundcontrol"]', searchObj.minimumScore)
   .click('input[name="ctl00$MainContent$btnSearch"]')
   .wait('#gvSearchResults')
   .wait(1000 * 5)
@@ -42,6 +46,7 @@ module.exports.scrapeOFAC = (searchObj) => {
   })
   .end()
   .then((res)=>{
+    console.log(res);
     return res;
   })
   .catch(error => {

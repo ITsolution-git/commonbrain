@@ -14,6 +14,8 @@ var morgan = require("morgan");
 var nodemailer = require('nodemailer');
 var smtpTransport = require("nodemailer-smtp-transport");
 
+global.__basedir = __dirname;
+
 app.use(morgan("dev"));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());

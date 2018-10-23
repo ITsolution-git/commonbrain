@@ -102,7 +102,7 @@ router.get("/report/excel/:fileId", (req, res, next) => {
         let row;
         renderData.map(dash=>{
           
-          row = worksheet.addRow([`${dash.dash.dashName} - ${dash.dash.name2}`]);
+          row = worksheet.addRow([`${dash.dash.dashName || ''}  ${dash.dash.name2 || ''}`]);
           row.height = 30;
           row.getCell(1).font = {
               size: 25,
@@ -110,7 +110,7 @@ router.get("/report/excel/:fileId", (req, res, next) => {
           };
           rowNum ++;
           dash.data.map(sheet=>{
-            row = worksheet.addRow(['', `${sheet.name}`]);
+            row = worksheet.addRow(['', `${sheet.name || ''}`]);
             row.height = 25;
             row.getCell(1).font = {
                 size: 20,
@@ -118,7 +118,7 @@ router.get("/report/excel/:fileId", (req, res, next) => {
             };
             rowNum ++;
             sheet.data.map(tab=>{
-              row = worksheet.addRow(['', '', `${tab.name}`]);
+              row = worksheet.addRow(['', '', `${tab.name || ''}`]);
               row.height = 20;
               row.getCell(1).font = {
                   size: 18,
@@ -127,12 +127,12 @@ router.get("/report/excel/:fileId", (req, res, next) => {
               rowNum ++;
 
               tab.data.map(majcat=>{
-                row = worksheet.addRow(['', '', '', `${majcat.name}`]);
+                row = worksheet.addRow(['', '', '', `${majcat.name || ''}`]);
                 rowNum ++;
 
                 for (let i = 0; i < majcat.data.length; i+=2) {
                   if (i+1 < majcat.data.length) {
-                    row = worksheet.addRow(['', '', '', '', `${majcat.data[i].spec_category}`, `${majcat.data[i].formatted}`, '', `${majcat.data[i+1].formatted}`, `${majcat.data[i+1].formatted}`]);
+                    row = worksheet.addRow(['', '', '', '', `${majcat.data[i].spec_category || ''}`, `${majcat.data[i].formatted || ''}`, '', `${majcat.data[i+1].spec_category || ''}`, `${majcat.data[i+1].formatted || ''}`]);
 
                     row.getCell(5).alignment = { wrapText: true };
                     row.getCell(6).alignment = { wrapText: true };
@@ -140,7 +140,7 @@ router.get("/report/excel/:fileId", (req, res, next) => {
                     row.getCell(9).alignment = { wrapText: true };
                     rowNum ++;
                   } else {
-                    row = worksheet.addRow(['', '', '', '', `${majcat.data[i].spec_category}`, `${majcat.data[i].formatted}`]);
+                    row = worksheet.addRow(['', '', '', '', `${majcat.data[i].spec_category || ''}`, `${majcat.data[i].formatted || ''}`]);
 
                     row.getCell(5).alignment = { wrapText: true };
                     row.getCell(6).alignment = { wrapText: true };

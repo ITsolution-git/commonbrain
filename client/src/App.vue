@@ -1,12 +1,12 @@
 <template>
-<div id="app">
+<v-app id="app">
   <router-view name="header"></router-view>
   <router-view name="login"></router-view>
 
   <router-view>
     
   </router-view>
-</div>
+</v-app>
 </template>
 
 <script>
