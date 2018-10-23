@@ -127,13 +127,13 @@ router.post("/scrap/", async (req, res, next) => {
 	let targetFileName = 'OFAC Search - ' + new Date().getTime() + '.xlsx';
   let writeFinished = await workbook.xlsx.writeFile('./tmp/'+targetFileName);
 
-	// Promise.all(emails.map(email=>{
-	// 	return mailer.sendMailTo(email, 'ofac-search', {
+	Promise.all(emails.map(email=>{
+		return mailer.sendMailTo(email, 'ofac-search', {
 			
-	// 	}, 'OFAC Search', [targetFileName]);	
-	// })).then(()=>{
-	// 	// fs.remove("./tmp/" + targetFileName);
-	// }).catch(console.log);
+		}, 'OFAC Search', [targetFileName]);	
+	})).then(()=>{
+		fs.remove("./tmp/" + targetFileName);
+	}).catch(console.log);
 	
 	res.json(allResults);
 
