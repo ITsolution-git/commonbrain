@@ -1,7 +1,7 @@
 <template>
 <div>
   <ExportPdf :hide="toggleExportPdf" v-if="exportPdf" />
-  <Cropper :upload="toggleCropper"  :hide="toggleCropper" v-if="cropper"></Cropper>
+  <Cropper :upload="toggleCropper"  :hide="toggleCropper" v-if="cropper" imgType="logo"></Cropper>
   <ReplaceFile :hide="toggleReplaceFile" :uploaded="submitReplaceFile" v-if="replaceFile" />
 
   
@@ -20,6 +20,8 @@
                     <li @click.stop="toggleExportExcel">Export Excel</li>
                     <li @click.stop="toggleImageFrom" v-if="file.imageFrom=='download'">Use Image From File</li>
                     <li @click.stop="toggleImageFrom" v-if="file.imageFrom=='file'">Use Image From Upload</li>
+                    <li @click.stop="toggleLogoFrom" v-if="file.logoFrom=='download'">Use Logo From File</li>
+                    <li @click.stop="toggleLogoFrom" v-if="file.logoFrom=='file'">Use Logo From Upload</li>
                     <li @click="$router.push('/projects/'+projectId + '/rawfile/'+fileId)">Edit Charts</li>
                   </ul>
                 </div>
@@ -27,21 +29,18 @@
           </div>
         </div>
         <div class="file-logo">
-          <div v-if="file.imageFrom == 'download'" @click="toggleCropper">
+          <div v-if="file.logoFrom == 'download'" @click="toggleCropper">
             <div class="add-image" style="padding:15px">
               <i class="fa fa-camera" style=" margin-right:10px;"></i>
               Upload
             </div>
-            <img :src="imagePath" v-if="file.image"/>
+            <img :src="logoPath" v-if="file.logo"/>
           </div>
 
-          <div v-if="file.imageFrom == 'file'">
-            <img :src="imagePath" v-if="imagePath"/>
+          <div v-if="file.logoFrom == 'file'">
+            <img :src="logoPath" v-if="logoPath"/>
           </div>
         </div>
-        <!-- <div class="file-image">
-            
-        </div> -->
         <div class="dash-nav" v-if="activeDash" @click="showSelectDash(true)">
           <span>{{activeDash.dashName}}</span>
           <i class="fa fa-angle-right" ></i>
@@ -72,7 +71,7 @@ export default {
       addProjectOpen: false,
       activeNav: 0,
       cropper: false,
-      imagePath: "",
+      logoPath: "",
       optionsDropdown: false,
       replaceFile: false,
       exportPdf: false,
@@ -88,17 +87,17 @@ export default {
     ToggleImageFrom
   },
   mounted() {
-    if (this.file.imageFrom == 'file') {
-      this.imagePath = this.file.imageFileUrl;
-    } else if (this.file.imageFrom == 'download') {
-      this.imagePath =
+    if (this.file.logoFrom == 'file') {
+      this.logoPath = this.file.logoFileUrl;
+    } else if (this.file.logoFrom == 'download') {
+      this.logoPath =
         "/api/static/" +
         this.$store.state.user.id +
         "/" +
         this.$route.params.projectId +
         "/" +
         this.$route.params.fileId +
-        ".jpg";
+        "_logo.jpg";
     }
   },
   methods: {
@@ -106,11 +105,11 @@ export default {
     toggleExportExcel() {
       this.$emit('exportExcel');
     },
-    toggleImageFrom() {
-      if (this.file.imageFrom == 'file')
-        this.$emit('updateFile', {imageFrom: 'download'});
-      else if (this.file.imageFrom == 'download')
-        this.$emit('updateFile', {imageFrom: 'file'});
+    toggleLogoFrom() {
+      if (this.file.logoFrom == 'file')
+        this.$emit('updateFile', {logoFrom: 'download'});
+      else if (this.file.logoFrom == 'download')
+        this.$emit('updateFile', {logoFrom: 'file'});
       this.optionsDropdown = false;
     },
     toggleExportPdf() {
@@ -157,6 +156,7 @@ export default {
       });
     },
     downloadFile() {
+      let self = this;
       ApiWrapper
         .download(
           "/api/files/download/" +
@@ -171,11 +171,19 @@ export default {
           const url = window.URL.createObjectURL(new Blob([res.data]));
           const link = document.createElement("a");
           link.href = url;
-          link.setAttribute("download", this.file[0].filename);
+          link.setAttribute("download", self.file.filename);
           document.body.appendChild(link);
           link.click();
         });
     },
+
+    toggleImageFrom() {
+      if (this.file.imageFrom == 'file')
+        this.$emit('updateFile', {imageFrom: 'download'});
+      else if (this.file.imageFrom == 'download')
+        this.$emit('updateFile', {imageFrom: 'file'});
+      this.optionsDropdown = false;
+    }
   },
   computed: {
     fileId() {
@@ -196,6 +204,7 @@ export default {
 .file-nav li {
   padding: 10px 20px;
   font-size: 17px;
+  font-weight: 600;
 }
 .file-nav li:hover {
   color: #66d0f7;

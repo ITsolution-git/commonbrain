@@ -36,6 +36,11 @@ module.exports.parseSheet = function(filename) {
         imageFileUrl = cb[Object.keys(cb)[i]].v;
       }
     }
+    if (namedRanges['CBrainLogo'] && namedRanges['CBrainLogo'].split('$').length > 2) {
+      if (letter == namedRanges['CBrainLogo'].split('$')[1] && number == namedRanges['CBrainLogo'].split('$')[2]) {
+        logoFileUrl = cb[Object.keys(cb)[i]].v;
+      }
+    }
     if (letter.match(/[a-z]/i) || letter.match(/[A-z]/i)) {
       var row = {};
 
@@ -129,7 +134,7 @@ module.exports.parseSheet = function(filename) {
     }
   }
   return {
-  	rows, sheet, title, dashes, imageFileUrl
+  	rows, sheet, title, dashes, imageFileUrl, logoFileUrl
   }
 }
 

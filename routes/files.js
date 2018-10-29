@@ -208,7 +208,7 @@ router.post("/:userId/:projectId/:fileId/image", (req, res, next) => {
     var extension = req.file.filename.substr(-4);
     var fileName = req.params.fileId;
     fs.rename('./tmp/' + req.file.filename, './tmp/'+ fileName + extension).then(res1=>{
-      fs.move('./tmp/' + fileName + extension, './uploads/'+userId+'/'+projectId+'/' + fileName + extension, { overwrite: true }).then(result=>{
+      fs.move('./tmp/' + fileName + extension, './uploads/'+userId+'/'+projectId+'/' + fileName + '_image' + extension, { overwrite: true }).then(result=>{
         MongoClient.connect(URL, function(err, db) {
           if (err) throw err;
           var collection = db.collection("files");
@@ -230,6 +230,42 @@ router.post("/:userId/:projectId/:fileId/image", (req, res, next) => {
   })
 })
 
+//--------------------------------
+// Upload File Logo
+//--------------------------------
+
+router.post("/:userId/:projectId/:fileId/logo", (req, res, next) => {
+  upload(req, res, function(err) {
+    var userId = req.params.userId;
+    var projectId = req.params.projectId;
+    var fileId = req.params.fileId;
+    if(err){
+      console.log(err)
+    }
+    var extension = req.file.filename.substr(-4);
+    var fileName = req.params.fileId;
+    fs.rename('./tmp/' + req.file.filename, './tmp/'+ fileName + extension).then(res1=>{
+      fs.move('./tmp/' + fileName + extension, './uploads/'+userId+'/'+projectId+'/' + fileName + '_logo' + extension, { overwrite: true }).then(result=>{
+        MongoClient.connect(URL, function(err, db) {
+          if (err) throw err;
+          var collection = db.collection("files");
+          collection.findOne({ _id: ObjectId(fileId) }, { sheet: 0 }).then(result => {
+            if (result != null) {
+              collection
+                .update({ _id: ObjectId(fileId) },{$set : {"logo":true}})
+                .then(result => {
+                  res.status(200).send({message:'uploaded'})
+                });
+            } else {
+              res.status(401).send({ error: err });
+            }
+          });
+        });
+        
+      })
+    });
+  })
+})
 //--------------------------------
 // Upload File
 //--------------------------------
@@ -295,7 +331,9 @@ router.post("/:projectId/add", (req, res, next) => {
                 title: obj.title,
                 dashes: obj.dashes,
                 imageFrom: 'file',
-                imageFileUrl: obj.imageFileUrl
+                imageFileUrl: obj.imageFileUrl,
+                logoFrom: 'file',
+                logoFileUrl: obj.logoFileUrl
               };
               MongoClient.connect(URL, function(err, db) {
                 if (err) throw err;
@@ -386,7 +424,9 @@ router.post("/replace/:projectId/:fileId", (req, res, next) => {
                         title: obj.title,
                         dashes: obj.dashes,
                         imageFrom: 'file',
-                        imageFileUrl: obj.imageFileUrl
+                        imageFileUrl: obj.imageFileUrl,
+                        logoFrom: 'file',
+                        logoFileUrl: obj.logoFileUrl
                       }})
                       .then(
                         result => {

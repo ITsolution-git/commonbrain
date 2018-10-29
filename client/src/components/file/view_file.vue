@@ -2,6 +2,7 @@
   <div>
     <FileSidebar :sheets="sheets" :activate="activateSheet" :dashes="dashes" :showSelectDash="showSelectDash" :activeDash="activeDash" :file="file" @updateFile="updateFile" @exportExcel="exportExcel"/>
     
+    <Cropper :upload="toggleCropper"  :hide="toggleCropper" v-if="cropper" imgType="image"></Cropper>
     <div class="projects-container" v-if="selectDashScreen" style="padding: 30px;overflow-y: auto;">
       
       <div>
@@ -47,6 +48,21 @@
           </button>
         </div>
       </div>
+
+      <div class="file-logo">
+        <div v-if="file.imageFrom == 'download'" @click="toggleCropper">
+          <div class="add-image" style="padding:15px">
+            <i class="fa fa-camera" style=" margin-right:10px;"></i>
+            Upload
+          </div>
+          <img :src="imagePath" v-if="file.image"/>
+        </div>
+
+        <div v-if="file.imageFrom == 'file'">
+          <img :src="imagePath" v-if="imagePath"/>
+        </div>
+      </div>
+
       <div class="tab-container">
         <div v-for="(tab,i) in tabs" :class="{'active':(activeTab == tab)}" :key="i" @click="activateTab(i,tab)" class="tab">{{tab}}</div>
       </div>
@@ -76,6 +92,7 @@
   </div>
 </template>
 <script>
+import Cropper from "./cropper";
 import FileSidebar from "./file_sidebar";
 import { mapActions } from "vuex";
 import StandardInput from "../form_elements/standard_input";
@@ -107,7 +124,9 @@ export default {
       searchEntityKey: "",
       searchMainDataKey: "",
 
-      collapseStatus: 'collapse'
+      collapseStatus: 'collapse',
+      imagePath: '',
+      cropper: false
     };
   },
   watch: {
@@ -464,12 +483,28 @@ export default {
         fileId: this.fileId
       }).then(res => {
         this.getRows();
+
+        if (this.file.imageFrom == 'file') {
+          this.imagePath = this.file.imageFileUrl;
+        } else if (this.file.imageFrom == 'download') {
+          this.imagePath =
+            "/api/static/" +
+            this.$store.state.user.id +
+            "/" +
+            this.$route.params.projectId +
+            "/" +
+            this.$route.params.fileId +
+            "_image.jpg";
+        }
       });
-    }
+    },
+    toggleCropper() {
+      this.cropper = !this.cropper;
+    },
   },
   computed: {
     file() {
-      return JSON.parse(JSON.stringify(this.$store.state.fileStore.file[0]));
+      return this.$store.state.fileStore.file[0] ? Object.assign({}, this.$store.state.fileStore.file[0]) : {}; 
     },
     sheets() {
       var sheetArr = [];
@@ -528,7 +563,8 @@ export default {
   },
   components: {
     FileSidebar,
-    StandardInput
+    StandardInput,
+    Cropper
   }
 };
 </script>

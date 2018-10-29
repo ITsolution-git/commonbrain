@@ -432,6 +432,7 @@ table td {
   height: calc(100% - 70px);
   left: 300px;
   z-index: 0;
+  overflow-y: auto;
 }
 
 .main-title {

@@ -32,7 +32,7 @@
 import ApiWrapper from '@/shared/utils/ApiWrapper';
 //import auth from "../../auth";
 export default {
-  props: ["hide", "upload"],
+  props: ["hide", "upload", "imgType"],
   data() {
     return {
       cropped: null,
@@ -91,7 +91,7 @@ export default {
               this.projectId +
               "/" +
               this.fileId +
-              "/image",
+              "/" + this.imgType,
             formData
           )
           .then(res => {
