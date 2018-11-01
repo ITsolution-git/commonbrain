@@ -13,6 +13,7 @@ module.exports.parseSheet = function(filename) {
   var rows = {};
   var title;
   var imageFileUrl;
+  var logoFileUrl;
   var names = sheet.Workbook.Names;
   
   var namedRanges = {};
