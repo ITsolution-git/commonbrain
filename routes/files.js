@@ -333,7 +333,9 @@ router.post("/:projectId/add", (req, res, next) => {
                 imageFrom: 'file',
                 imageFileUrl: obj.imageFileUrl,
                 logoFrom: 'file',
-                logoFileUrl: obj.logoFileUrl
+                logoFileUrl: obj.logoFileUrl,
+                rootImages: obj.rootImages,
+                majorImages: obj.majorImages
               };
               MongoClient.connect(URL, function(err, db) {
                 if (err) throw err;
@@ -426,7 +428,9 @@ router.post("/replace/:projectId/:fileId", (req, res, next) => {
                         imageFrom: 'file',
                         imageFileUrl: obj.imageFileUrl,
                         logoFrom: 'file',
-                        logoFileUrl: obj.logoFileUrl
+                        logoFileUrl: obj.logoFileUrl,
+                        rootImages: obj.rootImages,
+                        majorImages: obj.majorImages
                       }})
                       .then(
                         result => {

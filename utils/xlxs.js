@@ -8,6 +8,7 @@ module.exports.parseSheet = function(filename) {
   
   var cb = sheet.Sheets.CommonBrain;
   var cbd = sheet.Sheets.CommonBrainDash;
+  var cbimages = sheet.Sheets.CommonBrainImages;
 
   var sheetNames = [];
   var rows = {};
@@ -32,16 +33,17 @@ module.exports.parseSheet = function(filename) {
         title = cb[Object.keys(cb)[i]].v;
       }
     }
-    if (namedRanges['CBrainImage'] && namedRanges['CBrainImage'].split('$').length > 2) {
-      if (letter == namedRanges['CBrainImage'].split('$')[1] && number == namedRanges['CBrainImage'].split('$')[2]) {
-        imageFileUrl = cb[Object.keys(cb)[i]].v;
-      }
-    }
     if (namedRanges['CBrainLogo'] && namedRanges['CBrainLogo'].split('$').length > 2) {
       if (letter == namedRanges['CBrainLogo'].split('$')[1] && number == namedRanges['CBrainLogo'].split('$')[2]) {
         logoFileUrl = cb[Object.keys(cb)[i]].v;
       }
     }
+    if (namedRanges['CBrainImage'] && namedRanges['CBrainImage'].split('$').length > 2) {
+      if (letter == namedRanges['CBrainImage'].split('$')[1] && number == namedRanges['CBrainImage'].split('$')[2]) {
+        imageFileUrl = cb[Object.keys(cb)[i]].v;
+      }
+    }
+
     if (letter.match(/[a-z]/i) || letter.match(/[A-z]/i)) {
       var row = {};
 
@@ -104,7 +106,7 @@ module.exports.parseSheet = function(filename) {
       var number = key.substr(1);
       if (letter.match(/[a-z]/i) || letter.match(/[A-z]/i)) {
         
-        if (number > 1) {
+        if (number > 2) {
           number = parseInt(number);
           if (cbd[key] && Object.keys(cbd[key]).length > 0) {
             if (!dashes[number]) {
@@ -134,8 +136,67 @@ module.exports.parseSheet = function(filename) {
       }
     }
   }
+
+  var rootImages = null;
+  var majorImages = null;
+  var images = null;
+  if (cbimages) {
+    images = {};
+    for (let key in cbimages) {
+      var letter = key.charAt(0);
+      var number = key.substr(1);
+      if (letter.match(/[a-z]/i) || letter.match(/[A-z]/i)) {
+        
+        if (number > 2) {
+          number = parseInt(number);
+          if (cbimages[key] && Object.keys(cbimages[key]).length > 0) {
+            if (!images[number]) {
+              images[number] = {};
+            }
+
+            // CBDashItem
+            if (letter == namedRanges['CBImageType'].split('$')[1]) {
+              images[number].type = cbimages[key].v;
+            }
+            if (letter == namedRanges['CBImageLink'].split('$')[1]) {
+              images[number].link = cbimages[key].v;
+            }
+            if (letter == namedRanges['CBImageJustification'].split('$')[1]) {
+              images[number].just = cbimages[key].v;
+            }
+            if (letter == namedRanges['CBImagePosition'].split('$')[1]) {
+              images[number].position = cbimages[key].v;
+            }
+            if (letter == namedRanges['CBImageDashItem'].split('$')[1]) {
+              images[number].dashItem = cbimages[key].v;
+            }
+            if (letter == namedRanges['CBImageSheetName'].split('$')[1]) {
+              images[number].sheetName = cbimages[key].v;
+            }
+            if (letter == namedRanges['CBImageTabName'].split('$')[1]) {
+              images[number].tabName = cbimages[key].v;
+            }
+            if (letter == namedRanges['CBImageMajorCategory'].split('$')[1]) {
+              images[number].majorCategory = cbimages[key].v;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  rootImages = [];
+  majorImages = [];
+  for (let key in images) {
+    if (images[key].type == 'default')
+      rootImages.push(images[key]);
+    if (images[key].type == 'embed')
+      majorImages.push(images[key]);
+  }
+  imageFileUrl = ''; //ignore this one for now
+
   return {
-  	rows, sheet, title, dashes, imageFileUrl, logoFileUrl
+  	rows, sheet, title, dashes, imageFileUrl, logoFileUrl, rootImages, majorImages
   }
 }
 

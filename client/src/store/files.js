@@ -30,7 +30,7 @@ export default {
       commit("loadingFiles");
       return new Promise(function(resolve, reject) {
         ApiWrapper
-          .get("/api/files/" + rootState.user.id + "/" + payload.projectId)
+          .get("/api/files/" + rootState.user._id + "/" + payload.projectId)
           .then(res => {
             //console.log(res.data);
             commit("SET_FILES", res.data);

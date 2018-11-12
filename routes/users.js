@@ -8,6 +8,27 @@ var crypto = require("crypto");
 
 var URL = process.env.MONGO_URL;
 
+
+router.get("/:userId", (req, res, next) => {
+  var token = req.headers["authorization"];
+  if (token == null) {
+    res.status(500).send({ auth: false, message: "No token provided." });
+  }
+  MongoClient.connect(URL, function(err, db) {
+    if (err) throw err;
+    var collection = db.collection("users");
+    var users = collection
+      .find({ _id: ObjectId(req.params.userId) })
+      .toArray()
+      .then(result => {
+        if (result.length == 1)
+          res.json(result[0]);
+        else
+          res.status(404).json({ message: 'User Not Found', status: 0 });
+      });
+  });
+});
+
 router.get("/", (req, res, next) => {
   var token = req.headers["authorization"];
   if (token == null) {
@@ -50,16 +71,17 @@ router.post("/", (req, res, next) => {
       });
   });
 });
-router.patch("/:id", (req, res, next) => {
+router.put("/:id", (req, res, next) => {
   var token = req.headers["authorization"];
   token = token.split(" ");
   if (!token[1])
     return res.status(401).send({ auth: false, message: "No token provided." });
   const id = req.params.id;
-  const { username, password, email } = req.body;
+  const param = req.body;
+  delete param._id;
   var passwordHash = crypto
     .createHash("md5")
-    .update(password)
+    .update(param.password)
     .digest("hex");
 
   MongoClient.connect(URL, function(err, db) {
@@ -68,7 +90,7 @@ router.patch("/:id", (req, res, next) => {
     collection
       .update(
         { _id: ObjectId(id) },
-        { username: username, password: passwordHash, email: email }
+        { password: passwordHash, ...param }
       )
 
       .then(result => {

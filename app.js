@@ -10,6 +10,8 @@ var authRoutes = require("./routes/auth");
 var projectRoutes = require("./routes/projects");
 var ofacRoutes = require("./routes/ofac");
 var fileRoutes = require("./routes/files");
+var templateRoutes = require("./routes/templates");
+
 var morgan = require("morgan");
 var nodemailer = require('nodemailer');
 var smtpTransport = require("nodemailer-smtp-transport");
@@ -36,6 +38,7 @@ app.use("/api/upload", uploadRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/projects", projectRoutes);
 app.use("/api/files", fileRoutes);
+app.use("/api/templates", templateRoutes);
 app.use("/api/ofac", ofacRoutes);
 app.use('/api/static', express.static(path.join(__dirname + '/uploads')));
 

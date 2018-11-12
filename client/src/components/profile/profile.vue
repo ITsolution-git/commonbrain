@@ -1,7 +1,7 @@
 <template>
     <div>
-        <Sidebar />
-        <div class="profile-container">
+        <Sidebar :activeNav="activeNav" @activateNav="activateNav"/>
+        <div class="profile-container" v-if="activeNav == 0">
             <div class="main-title">User Profile</div>
             <div class="profile-top-row">
               <div class="profile-image">
@@ -22,13 +22,13 @@
                   <div class="profile-detail-value">Swanylopez@gmail.com</div>
                   <div class="profile-detail-change-btn"><i class="fa fa-pencil"></i></div>
                 </div>
-                <div class="profile-detail-item">
+                <!-- <div class="profile-detail-item">
                   <div class="profile-detail-title">Other Detail</div>
                   <div class="profile-detail-value">Subscriptions</div>
                   <div class="profile-detail-change-btn"><i class="fa fa-pencil"></i></div>
-                </div>
+                </div> -->
               </div>
-              <div class="profile-other">
+              <!-- <div class="profile-other">
                 <div class="profile-detail-item">
                   <div class="profile-detail-title">Member Since</div>
                   <div class="profile-detail-value">12/01/2017</div>
@@ -40,30 +40,81 @@
                   
                 </div>
                 
-              </div>
+              </div> -->
             </div>
+        </div>
+        <div class="profile-container" v-if="activeNav == 1">
+          <div class="main-title">Settings</div>
+          <div class="setting-top-row" v-if="wipUser">
+            <div>
+              <v-flex style="display: flex" xs6 align-center flex-row flex pa-3>
+                <v-flex xs12 sm6> <span>Theme</span></v-flex>
+                <v-flex xs12 sm6 d-flex align-center>
+                  <select v-model="wipUser.theme">
+                    <option :value="theme.value" v-for="theme in themes" :key="theme.value">{{theme.text}}</option>
+                  </select>
+                </v-flex>
+              </v-flex>
+            </div>
+            <div>
+              <button @click="save()" :class="'modal-btn btn-' + user.theme" type="submit">
+                Save
+              </button>
+            </div>
+          </div>
         </div>
     </div>
 </template>
 <script>
 import Sidebar from "./sidebar";
+import { mapGetters, mapActions } from 'vuex';
+import ApiWrapper from '@/shared/utils/ApiWrapper';
 export default {
   name: "profile",
   data() {
     return {
-      imageHovered: false
+      imageHovered: false,
+      activeNav: 1,
+      themes: [{
+        value: 'blue',
+        text: 'Blue',
+      },{
+        value: 'orange',
+        text: 'Orange',
+      }],
+
+      wipUser: null
     };
+  },
+  watch: {
+    user (newVal) {
+      console.log(newVal);
+    },
   },
   components: {
     Sidebar
   },
-  mouted() {},
+  mounted() {
+    this.wipUser = Object.assign({ theme: 'blue'}, this.$store.state.user);
+  },
   methods: {
+    activateNav(nav) {
+      this.activeNav = nav;
+    },
     imageHover() {
       this.imageHovered = !this.imageHovered;
+    },
+
+    save() {
+      this.$store.dispatch('updateUser', this.wipUser);
     }
   },
-  computed: {}
+  computed: {
+    ...mapGetters({
+      user: 'user',
+    }),
+
+  }
 };
 </script>
 <style>
@@ -72,6 +123,12 @@ export default {
   height: 300px;
   position: relative;
   align-items: center;
+  background-image: url(../../img/neural_net2.jpg);
+  background-size: cover;
+  background-position: center;
+}
+.setting-top-row {
+  height: 300px;
   background-image: url(../../img/neural_net2.jpg);
   background-size: cover;
   background-position: center;
@@ -172,11 +229,6 @@ export default {
   color: #66d0f7;
 }
 .profile-other {
-  margin-left: auto;
-  display: flex;
-  align-items: start;
-  flex-direction: column;
-  padding: 55px;
 }
 .profile-detail-title {
   font-weight: 500;

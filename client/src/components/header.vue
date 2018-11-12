@@ -2,16 +2,16 @@
   <div class="top-bar">
     <div class="nav-bar">
       <div @click="$router.push('/projects')" :class="{'nav-item': true, active: currentPath.indexOf('projects')!=-1}">Projects</div>
+      <img @click="$router.push('/templates')" src="../img/brain_white.svg" alt="" >
       <div @click="$router.push('/ofac')" :class="{'nav-item': true, active: currentPath.indexOf('ofac')!=-1}">OFAC</div>
-      <img src="../img/brain_white.svg" alt="">
-      <div class="nav-item">Templates</div>
+      <!-- <div @click="$router.push('/templates')" :class="{'nav-item': true, active: currentPath.indexOf('templates')!=-1}">Templates</div> -->
     </div>
     <div class="user-nav">
       <div @click="toggleUserDropdown" class="nav-item"><i class="fa fa-user-circle-o"></i>
         <div v-click-outside="toggleUserDropdown" v-if="userDropdown" class="simple-dropdown animated-fast fadeInDown">
           <ul>
+            <li @click="$router.push('/profile')">Profile</li>
             <li @click="logout">Sign Out</li>
-            <!-- <li @click="$router.push('/profile')">Profile</li> -->
           </ul>
         </div>
       </div>
@@ -26,7 +26,7 @@ export default {
   data() {
     return {
       userDropdown: false,
-      currentPath: '',
+      currentPath: window.location.href,
     };
   },
   watch:{

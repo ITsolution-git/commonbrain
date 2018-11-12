@@ -21,7 +21,7 @@ router.post("/", (req, res, next) => {
     collection.findOne({ username: username, password: passwordHash }).then(
       result => {
         if (result != null) {
-          var token = jwt.sign({ id: result._id }, config.secret, {
+          var token = jwt.sign({ _id: result._id }, config.secret, {
             expiresIn: 86400 // expires in 24 hours
           });
 
@@ -51,11 +51,12 @@ router.post("/signup", (req, res, next) => {
           .insert({
             username: username,
             password: passwordHash,
-            email: email
+            email: email,
+            theme: 'blue'
           })
           .then(result => {
 
-            var token = jwt.sign({ id: result.ops[0]["_id"] }, config.secret, {
+            var token = jwt.sign({ _id: result.ops[0]["_id"] }, config.secret, {
               expiresIn: 86400 // expires in 24 hours
             });
 

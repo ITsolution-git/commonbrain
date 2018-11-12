@@ -62,7 +62,11 @@
           <img :src="imagePath" v-if="imagePath" style="height: 200px; margin: 0 auto; width: auto"/>
         </div>
       </div>
-
+      <div class="root-images">
+        <div class="root-image-item" v-for="(img,index) in file.rootImages" :key="index">
+          <img :src="img.link" />
+        </div>
+      </div>
       <div class="tab-container">
         <div v-for="(tab,i) in tabs" :class="{'active':(activeTab == tab)}" :key="i" @click="activateTab(i,tab)" class="tab">{{tab}}</div>
       </div>
@@ -71,15 +75,27 @@
       </div>
       <div v-if="!isLoading" class="main-data-container animated-fast fadeInUp">
         <div v-for="(data,i) in filteredMainData" :key="i" class="data-container">
-
+          
           <div class="data-item" @click="toggleDropdown(i)">
-            <i class="fa fa-minus" v-if="data.show"></i>
-            <i class="fa fa-plus" v-if="!data.show"></i>
-            <div class="data-title" v-html="formatWithSearch(data.title)"></div>
+            <div style="display: flex; flex-direction: row; align-items: center">
+              <i class="fa fa-minus" v-if="data.show"></i>
+              <i class="fa fa-plus" v-if="!data.show"></i>
+              <div class="data-title" v-html="formatWithSearch(data.title)"></div>
+            </div>
+            <div class="major-images">
+              <div class="major-image-item" v-for="(img,index) in data.images" :key="index">
+                <img :src="img.link" />
+              </div>
+            </div>
           </div>
 
-          <div class="data-elements" v-if="data.show">
-            <div v-for="(dat,i2) in data.data" :key="i2" class="data-item-item animated-fast fadeIn"  :class="{'left' : (dat.just != undefined && dat.just.charAt(0).toLowerCase() == 'l'), 'right' : (dat.just != undefined && dat.just.charAt(0).toLowerCase() == 'r'), 'center' : (dat.just != undefined && dat.just.charAt(0).toLowerCase() == 'c')} ">
+          <div class="data-elements" v-if="data.show"  :style="{'background': ((data.images && data.images.length > 0 && data.images[0].position && data.images[0].position.charAt(0).toLowerCase() == 's') ? ('url('+ data.images[0].link + ')  no-repeat center center fixed') : 'transparent')}">
+            <div class="major-images" v-if="data.images && data.images.length > 0 && data.images[0].position && data.images[0].position.charAt(0).toLowerCase() == 't'">
+              <div class="major-image-item" v-for="(img,index) in data.images" :key="index">
+                <img :src="img.link"  style="height: 100px"/>
+              </div>
+            </div>
+            <div v-for="(dat,i2) in data.data" :key="i2" class="data-item-item animated-fast fadeIn"  :class="{'left' : (dat.just != undefined && dat.just.charAt(0).toLowerCase() == 'l'), 'right' : (dat.just != undefined && dat.just.charAt(0).toLowerCase() == 'r'), 'center' : (dat.just != undefined && dat.just.charAt(0).toLowerCase() == 'c')}">
               <div class="data-item-title"  v-html="formatWithSearch(dat.title)"></div>
               <div v-if="(!dat.source)" class="data-item-value animated-fast fadeInUp" v-tooltip="{ content:dat.hover  , placement:'top'}"  v-html="formatWithSearch(dat.formatted)"></div>
               <div v-if="(dat.source)" class="data-item-value animated-fast fadeInUp" v-tooltip="{ content:dat.hover  , placement:'top'}"><a :href="makeLink(dat.source)"  v-html="formatWithSearch(dat.formatted)"></a></div>
@@ -126,7 +142,9 @@ export default {
 
       collapseStatus: 'collapse',
       imagePath: '',
-      cropper: false
+      cropper: false,
+
+      dashImages: []
     };
   },
   watch: {
@@ -295,6 +313,7 @@ export default {
         this.showSelectDash(true);
       } else {
         this.dashRows = this.rows;
+        this.dashImages = this.file.majorImages;  //Load all major images to this dashitem
         if (this.dashRows.length > 0) {
           this.activeSheet = this.dashRows[0].sheet_name;
           this.activateSheet(this.activeSheet);
@@ -309,6 +328,7 @@ export default {
         this.activeSheet = this.dashRows[0].sheet_name;
         this.activateSheet(this.activeSheet);
 
+        this.dashImages = this.file.majorImages.filter(row=>row.dashItem == dash.dashName);
       } else {
 
         this.activeSheet = "";
@@ -372,7 +392,10 @@ export default {
           if (!mainData[majorCat]) {
             mainData[majorCat] = {
               title: majorCat,
-              data: []
+              data: [],
+              images: this.dashImages.filter(img=>{
+                return ((img.sheetName == this.activeSheet) && (img.tabName == tab) && (img.majorCategory == majorCat))
+              })
             }
           }
 
@@ -393,7 +416,8 @@ export default {
       for(let key in mainData) {
         this.mainData.push({
           title: mainData[key].title,
-          data: this.sortDataByJust(mainData[key].data)
+          data: this.sortDataByJust(mainData[key].data),
+          images: mainData[key].images,
         });
       }
 
@@ -624,6 +648,11 @@ export default {
   margin-top: 10px;
   display: flex;
   flex-wrap: wrap;
+  
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover !important;
 }
 
 
@@ -631,7 +660,7 @@ export default {
   flex-direction: row;
   display: flex;
   width: 100%;
-  justify-content: flex-start;
+  justify-content: space-between;
   border-bottom: solid 1px #eaeaea;
   cursor: pointer;
   align-items: center;
@@ -641,10 +670,9 @@ export default {
   flex-wrap: wrap;
   min-width: 250px;
   margin: 10px;
-  background: #fff;
+  background: transparent;
   flex-basis: calc(50% - 30px);
   min-height: 30px;
-  border-bottom: solid 1px #eaeaea;
 }
 /* .data-item-item:nth-child(odd) {
   margin-right: 15px;
@@ -699,4 +727,28 @@ export default {
   justify-content: space-between;
   align-items: center
 }
+
+.root-images {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  width: 100%;
+  overflow-x: auto;
+}
+.root-images img {
+  height: 150px;
+}
+
+
+.major-images {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  width: 100%;
+  overflow-x: auto;
+}
+.major-images img {
+  height: 30px;
+}
+
 </style>

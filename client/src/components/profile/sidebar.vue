@@ -12,9 +12,9 @@
             <div class="project-item" :class="{'active':(activeNav == 1)}" @click="activateNav(1)">
                 <div class="project-item-title"><i class="fa fa-gear"></i>Settings</div>
             </div>
-            <div class="project-item" :class="{'active':(activeNav == 2)}" @click="activateNav(2)">
+            <!-- <div class="project-item" :class="{'active':(activeNav == 2)}" @click="activateNav(2)">
                 <div class="project-item-title"><i class="fa fa-bars"></i>More Settings</div>
-            </div>
+            </div> -->
         </div>
     </div>
     </div>
@@ -22,16 +22,17 @@
 <script>
 export default {
   name: "project-sidebar",
+
+  props: ['activeNav'],
   data() {
     return {
       hovered: -1,
-      activeNav: 0,
       isLoading: true
     };
   },
   methods: {
     activateNav(nav) {
-      this.activeNav = nav;
+      this.$emit('activateNav', nav);
     }
   },
   computed: {

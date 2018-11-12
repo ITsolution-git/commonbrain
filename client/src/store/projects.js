@@ -30,7 +30,7 @@ export default {
     },
     getProjects({ commit, rootState }) {
       return new Promise(function(resolve, reject) {
-        ApiWrapper.get("/api/projects/" + rootState.user.id).then(res => {
+        ApiWrapper.get("/api/projects/" + rootState.user._id).then(res => {
           commit("GET_PROJECTS", res.data);
           resolve();
         });

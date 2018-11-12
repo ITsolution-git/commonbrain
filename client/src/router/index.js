@@ -5,6 +5,7 @@ import ProfileRoutes from "./profile";
 import ProjectRoutes from "./project";
 import FileRoutes from "./file";
 import OfacRoutes from "./ofac";
+import TemplatesRoutes from "./templates";
 //import { store } from "../store/store.js";
 
 var baseRoutes = [
@@ -20,7 +21,8 @@ const routes = baseRoutes
   .concat(ProfileRoutes)
   .concat(ProjectRoutes)
   .concat(FileRoutes)
-  .concat(OfacRoutes);
+  .concat(OfacRoutes)
+  .concat(TemplatesRoutes);
 
 Vue.use(Router);
 
