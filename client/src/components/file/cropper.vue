@@ -30,6 +30,7 @@
 
 <script>
 import ApiWrapper from '@/shared/utils/ApiWrapper';
+import { mapGetters, mapActions } from 'vuex';
 //import auth from "../../auth";
 export default {
   props: ["hide", "upload", "imgType"],
@@ -122,7 +123,10 @@ export default {
     },
     fileId() {
       return this.$route.params.fileId;
-    }
+    },
+    ...mapGetters({
+      user: 'user',
+    }),
   }
 };
 </script>

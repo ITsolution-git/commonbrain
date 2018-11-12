@@ -56,12 +56,11 @@
 <script>
 import Cropper from "./cropper";
 import { deleteRequest } from "../helpers/api_helper";
-import { mapActions } from "vuex";
 import ApiWrapper from '@/shared/utils/ApiWrapper';
 import ReplaceFile from "./replace_file";
 import ExportPdf from "./export_pdf";
 import ToggleImageFrom from "./toggle_import_from";
-
+import { mapGetters, mapActions } from 'vuex';
 export default {
   name: "file-sidebar",
   props: ["sheets", "activate", "dashes", "activeDash", "showSelectDash", 'file', 'updateFile'],
@@ -191,7 +190,10 @@ export default {
     },
     projectId() {
       return this.$route.params.projectId;
-    }
+    },
+    ...mapGetters({
+      user: 'user',
+    }),
   },
   watch: {
   }

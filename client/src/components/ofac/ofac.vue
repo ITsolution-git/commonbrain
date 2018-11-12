@@ -17,7 +17,7 @@
               <p>
                 Criteria
               </p>
-              <button @click="addCriterion()" class="modal-btn btn-white" type="submit">
+              <button @click="addCriterion()" class="modal-btn" type="submit" :style="{background: user.theme}">
                 Add Criterion
               </button>
             </div>
@@ -42,16 +42,17 @@
                   :max="100"
                   :min="50"
                   :step="1"
+                  :color="user.theme"
                   thumb-label
                 ></v-slider>
               </v-flex>
 
-              <button @click="removeCriterion(index)" class="modal-btn btn-white" type="submit">
+              <button @click="removeCriterion(index)" class="modal-btn" :style="{background: user.theme}">
                 Remove Criterion
               </button>
             </div>
           </div>
-          <button @click="startSearch()" class="modal-btn btn-white" type="submit">
+          <button @click="startSearch()" class="modal-btn" :style="{background: user.theme}">
             <img v-if="isLoading" style="width:25px" src="../../img/spinner_white.svg"/>
             Request Search
           </button>
@@ -86,6 +87,7 @@
 import StandardInput from "../form_elements/standard_input";
 import ApiWrapper from '@/shared/utils/ApiWrapper';
 
+import { mapGetters, mapActions } from 'vuex';
 export default {
   name: "ofac",
   data() {
@@ -158,7 +160,10 @@ export default {
 
     }
   },
-  computed: {}
+  computed: {
+    ...mapGetters({
+      user: 'user',
+    }),}
 };
 </script>
 <style>

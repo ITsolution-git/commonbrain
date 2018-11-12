@@ -22,6 +22,7 @@
 </template>
 
 <script>
+import { mapGetters, mapActions } from 'vuex';
 export default {
   name: "confirm_delete",
   props: ["hide"],
@@ -42,7 +43,11 @@ export default {
   computed: {
     allData() {
       return this.$store.state.fileStore;
-    }
+    },
+    
+    ...mapGetters({
+      user: 'user',
+    }),
   }
 };
 </script>

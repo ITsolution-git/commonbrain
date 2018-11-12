@@ -43,7 +43,7 @@
         />
 
         <div style="margin: 0px 10px; text-align: end;">
-          <button @click="toggleCollapseAll" class="modal-btn btn-white" type="submit">
+          <button @click="toggleCollapseAll" class="modal-btn btn-white" type="submit" :style="{background: user.theme}">
             {{collapseStatus  == 'collapse' ? 'Expand All' : 'Collapse All'}}
           </button>
         </div>
@@ -110,7 +110,7 @@
 <script>
 import Cropper from "./cropper";
 import FileSidebar from "./file_sidebar";
-import { mapActions } from "vuex";
+import { mapGetters, mapActions } from 'vuex';
 import StandardInput from "../form_elements/standard_input";
 
 import ApiWrapper from '@/shared/utils/ApiWrapper';
@@ -581,6 +581,9 @@ export default {
         }
       })
     },
+    ...mapGetters({
+      user: 'user',
+    }),
   },
   mounted() {
     this.loadFile()
@@ -709,16 +712,6 @@ export default {
 }
 .center .data-item-title {
 
-}
-
-.btn-white {
-  background: #fff;
-  color: #66d0f7;
-  padding: 5px, 10px;
-}
-.btn-white:hover {
-  color: #fff;
-  background: #66d0f7;
 }
 .top-toolbar {
   margin: 10px;

@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <img style="width:200px;" src="../img/brain.svg" alt="">
+  <div style="margin-top: 200px; text-align: center">
+    <img src="../img/brain.svg" alt="" class="pulse">
   </div>
 </template>
 <script>
@@ -20,15 +20,10 @@ export default {
 <style>
 
 .pulse {
-  margin:100px;
-  display: block;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: #cca92c;
+  width: 100px;
   cursor: pointer;
   box-shadow: 0 0 0 rgba(204,169,44, 0.4);
-  animation: pulse 2s infinite;
+  animation: pulse 0.8s infinite;
 }
 .pulse:hover {
   animation: none;
@@ -47,16 +42,16 @@ export default {
 }
 @keyframes pulse {
   0% {
-    -moz-box-shadow: 0 0 0 0 rgba(204,169,44, 0.4);
-    box-shadow: 0 0 0 0 rgba(204,169,44, 0.4);
+    width: 100px;
+    opacity: 0.8;
   }
   70% {
-      -moz-box-shadow: 0 0 0 10px rgba(204,169,44, 0);
-      box-shadow: 0 0 0 10px rgba(204,169,44, 0);
+    width: 110px;
+    opacity: 1;
   }
   100% {
-      -moz-box-shadow: 0 0 0 0 rgba(204,169,44, 0);
-      box-shadow: 0 0 0 0 rgba(204,169,44, 0);
+    width: 100px;
+    opacity: 0.8;
   }
 }
 </style>

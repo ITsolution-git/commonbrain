@@ -1,7 +1,7 @@
 <template>
     <div>
         <Sidebar :activeNav="activeNav" @activateNav="activateNav"/>
-        <div class="profile-container" v-if="activeNav == 0">
+        <div class="profile-container profile-img-back" v-if="activeNav == 0" >
             <div class="main-title">User Profile</div>
             <div class="profile-top-row">
               <div class="profile-image">
@@ -43,10 +43,15 @@
               </div> -->
             </div>
         </div>
-        <div class="profile-container" v-if="activeNav == 1">
+        <div class="profile-container profile-img-back" v-if="activeNav == 1">
           <div class="main-title">Settings</div>
           <div class="setting-top-row" v-if="wipUser">
-            <div>
+            <div class="pa-2">
+              <v-flex style="display: flex" xs12 align-center justify-space-around>
+                <div style="width: 30%; border: 1px solid #c0c1c2;"></div>
+                General
+                <div style="width: 30%; border: 1px solid #c0c1c2;"></div>
+              </v-flex>
               <v-flex style="display: flex" xs6 align-center flex-row flex pa-3>
                 <v-flex xs12 sm6> <span>Theme</span></v-flex>
                 <v-flex xs12 sm6 d-flex align-center>
@@ -55,9 +60,27 @@
                   </select>
                 </v-flex>
               </v-flex>
+
+              <v-flex style="display: flex" xs6 >
+              </v-flex>
+              <v-flex style="display: flex" xs12 align-center justify-space-around>
+                <div style="width: 30%; border: 1px solid #c0c1c2;"></div>
+                Export
+                <div style="width: 30%; border: 1px solid #c0c1c2;"></div>
+              </v-flex>
+              <v-flex style="display: flex" xs6 align-center flex-row flex pa-3>
+                <v-flex xs12 sm6> <span>Show Hover comments as a Tool Tip on Export</span></v-flex>
+                <v-flex xs12 sm6 d-flex align-center>
+                  <select v-model="wipUser.showHoverOnExport">
+                    <option :value="true">Yes</option>
+                    <option :value="false">No</option>
+                  </select>
+                </v-flex>
+              </v-flex>
+              
             </div>
-            <div>
-              <button @click="save()" :class="'modal-btn btn-' + user.theme" type="submit">
+            <div style="text-align: right; margin-right: 10px">
+              <button @click="save()" class="modal-btn" :style="{background: user.theme}">
                 Save
               </button>
             </div>
@@ -76,11 +99,14 @@ export default {
       imageHovered: false,
       activeNav: 1,
       themes: [{
-        value: 'blue',
+        value: '#66d0f7',
         text: 'Blue',
       },{
-        value: 'orange',
+        value: '#f96c48',
         text: 'Orange',
+      },{
+        value: '#228B22',
+        text: 'Green',
       }],
 
       wipUser: null
@@ -95,7 +121,7 @@ export default {
     Sidebar
   },
   mounted() {
-    this.wipUser = Object.assign({ theme: 'blue'}, this.$store.state.user);
+    this.wipUser = Object.assign({ theme: '#66d0f7', showHoverOnExport: false}, this.$store.state.user);
   },
   methods: {
     activateNav(nav) {
@@ -113,25 +139,19 @@ export default {
     ...mapGetters({
       user: 'user',
     }),
-
   }
 };
 </script>
 <style>
-.profile-top-row {
-  display: flex;
-  height: 300px;
-  position: relative;
-  align-items: center;
-  background-image: url(../../img/neural_net2.jpg);
+.profile-img-back {
+  height: 100%;
+  background-image: url(/static/img/neural_net2.cd0ef2b.jpg); 
   background-size: cover;
   background-position: center;
 }
+.profile-top-row {
+}
 .setting-top-row {
-  height: 300px;
-  background-image: url(../../img/neural_net2.jpg);
-  background-size: cover;
-  background-position: center;
 }
 .profile-image {
   overflow: hidden;

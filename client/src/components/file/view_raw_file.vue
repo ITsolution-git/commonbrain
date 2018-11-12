@@ -31,7 +31,7 @@
     </div>
 </template>
 <script>
-import { mapActions } from "vuex";
+import { mapGetters, mapActions } from 'vuex';
 import Bar from "./bar_chart";
 import StandardSelect from "../form_elements/custom_select";
 import LineChart from "./line_chart";
@@ -234,7 +234,10 @@ export default {
     },
     userId() {
       return this.$store.state.user.id;
-    }
+    },
+    ...mapGetters({
+      user: 'user',
+    }),
   }
 };
 </script>

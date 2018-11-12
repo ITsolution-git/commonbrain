@@ -32,6 +32,7 @@ import StandardInput from "../form_elements/standard_input";
 import StandardSelect from "../form_elements/custom_select";
 import ApiWrapper from '@/shared/utils/ApiWrapper';
 import auth from "../../auth.js";
+import { mapGetters, mapActions } from 'vuex';
 export default {
   name: "replace_file",
   data() {
@@ -120,7 +121,10 @@ export default {
   computed: {
     userId() {
       return this.$store.state.user.id;
-    }
+    },
+    ...mapGetters({
+      user: 'user',
+    }),
   },
   components: {
     StandardInput,

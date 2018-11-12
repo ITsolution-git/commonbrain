@@ -52,7 +52,8 @@ router.post("/signup", (req, res, next) => {
             username: username,
             password: passwordHash,
             email: email,
-            theme: 'blue'
+            theme: '#66d0f7',
+            showHoverOnExport: false
           })
           .then(result => {
 

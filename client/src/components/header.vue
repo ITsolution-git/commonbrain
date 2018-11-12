@@ -1,13 +1,13 @@
 <template>
-  <div class="top-bar">
-    <div class="nav-bar">
-      <div @click="$router.push('/projects')" :class="{'nav-item': true, active: currentPath.indexOf('projects')!=-1}">Projects</div>
+  <div class="top-bar" :style="{'background': user.theme}">
+    <div :class="'nav-bar nav-bar-' + user.theme">
+      <div @click="$router.push('/projects')" :class="{'nav-item': true, active: currentPath.indexOf('projects')!=-1}" :style="{'color': '#fff'}">Projects</div>
       <img @click="$router.push('/templates')" src="../img/brain_white.svg" alt="" >
-      <div @click="$router.push('/ofac')" :class="{'nav-item': true, active: currentPath.indexOf('ofac')!=-1}">OFAC</div>
+      <div @click="$router.push('/ofac')" :class="{'nav-item': true, active: currentPath.indexOf('ofac')!=-1}" :style="{'color': '#fff'}">OFAC</div>
       <!-- <div @click="$router.push('/templates')" :class="{'nav-item': true, active: currentPath.indexOf('templates')!=-1}">Templates</div> -->
     </div>
     <div class="user-nav">
-      <div @click="toggleUserDropdown" class="nav-item"><i class="fa fa-user-circle-o"></i>
+      <div @click="toggleUserDropdown" :class="'nav-item nav-item-' + user.theme"><i class="fa fa-user-circle-o"></i>
         <div v-click-outside="toggleUserDropdown" v-if="userDropdown" class="simple-dropdown animated-fast fadeInDown">
           <ul>
             <li @click="$router.push('/profile')">Profile</li>
@@ -21,6 +21,7 @@
 <script>
 import auth from "../auth";
 import { mapMutations } from "vuex";
+import { mapGetters, mapActions } from 'vuex';
 export default {
   name: "header_main",
   data() {
@@ -28,6 +29,12 @@ export default {
       userDropdown: false,
       currentPath: window.location.href,
     };
+  },
+  computed: {
+    ...mapGetters({
+      user: 'user',
+    }),
+
   },
   watch:{
     $route (to, from){
@@ -49,13 +56,13 @@ export default {
   }
 };
 </script>
-<style>
+<style lang="scss">
 .top-bar {
   height: 70px;
   width: 100%;
   text-align: center;
-  background: #66d0f7;
   position: relative;
+  background: #66d0f7;
   z-index: 10;
 }
 .nav-bar {
@@ -63,6 +70,24 @@ export default {
   height: 100%;
   justify-content: center;
   align-items: center;
+
+}
+.nav-item {
+  color: #fff;
+  text-shadow: 1px 1px rgba(255, 255, 255, 0.1);
+  font-size: 13pt;
+  margin: 0px 50px;
+  text-align: center;
+  font-weight: 300;
+  cursor: pointer;
+  position: relative;
+  &:hover {
+    color: #31a6d1;
+  }
+  &.active {
+    color: #fff;
+    border-bottom: solid 2px #fff;
+  }
 }
 .nav-bar img {
   height: 70%;
@@ -71,23 +96,6 @@ export default {
 }
 .nav-bar img:hover {
   transform: scale(1.05, 1.05);
-}
-.nav-item {
-  color: #3cb3df;
-  text-shadow: 1px 1px rgba(255, 255, 255, 0.1);
-  font-size: 13pt;
-  margin: 0px 50px;
-  text-align: center;
-  font-weight: 300;
-  cursor: pointer;
-  position: relative;
-}
-.nav-item:hover {
-  color: #31a6d1;
-}
-.nav-item.active {
-  color: #fff;
-  border-bottom: solid 2px #fff;
 }
 .user-nav {
   position: absolute;
@@ -110,5 +118,6 @@ export default {
   padding: 10px;
   text-align: left;
   white-space: nowrap;
+  color: #4a4a4a;
 }
 </style>

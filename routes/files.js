@@ -134,6 +134,11 @@ router.get("/report/excel/:fileId", (req, res, next) => {
                   if (i+1 < majcat.data.length) {
                     row = worksheet.addRow(['', '', '', '', `${majcat.data[i].spec_category || ''}`, `${majcat.data[i].formatted || ''}`, '', `${majcat.data[i+1].spec_category || ''}`, `${majcat.data[i+1].formatted || ''}`]);
 
+                    if (majcat.data[i].source)
+                      row.getCell(6).value = { text: majcat.data[i].formatted, hyperlink: majcat.data[i].source };
+                    if (majcat.data[i+1].source)
+                      row.getCell(9).value = { text: majcat.data[i+1].formatted, hyperlink: majcat.data[i+1].source };
+
                     row.getCell(5).alignment = { wrapText: true };
                     row.getCell(6).alignment = { wrapText: true };
                     row.getCell(8).alignment = { wrapText: true };
@@ -142,6 +147,9 @@ router.get("/report/excel/:fileId", (req, res, next) => {
                   } else {
                     row = worksheet.addRow(['', '', '', '', `${majcat.data[i].spec_category || ''}`, `${majcat.data[i].formatted || ''}`]);
 
+                    if (majcat.data[i].source)
+                      row.getCell(6).value = { text: majcat.data[i].formatted, hyperlink: majcat.data[i].source };
+                    
                     row.getCell(5).alignment = { wrapText: true };
                     row.getCell(6).alignment = { wrapText: true };
                     row.getCell(8).alignment = { wrapText: true };

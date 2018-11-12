@@ -28,7 +28,7 @@
 </template>
 <script>
 import AddProject from "./add_project";
-import { mapActions } from "vuex";
+import { mapGetters, mapActions } from 'vuex';
 export default {
   name: "project-sidebar",
   data() {
@@ -102,7 +102,10 @@ export default {
     },
     userId() {
       return this.$store.state.user.id;
-    }
+    },
+    ...mapGetters({
+      user: 'user',
+    })
   },
   mounted() {
     this.getProjects();

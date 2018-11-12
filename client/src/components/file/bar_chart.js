@@ -1,6 +1,7 @@
 import { Bar, mixins } from "vue-chartjs";
 const { reactiveProp } = mixins;
 
+import { mapGetters, mapActions } from 'vuex';
 export default {
   extends: Bar,
   mixins: [reactiveProp],

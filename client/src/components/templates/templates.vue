@@ -24,6 +24,7 @@
 import StandardInput from "../form_elements/standard_input";
 import ApiWrapper from '@/shared/utils/ApiWrapper';
 
+import { mapGetters, mapActions } from 'vuex';
 export default {
   name: "ofac",
   data() {
@@ -59,7 +60,11 @@ export default {
     }
 
   },
-  computed: {}
+  computed: {
+    ...mapGetters({
+      user: 'user',
+    })
+  }
 };
 </script>
 <style>

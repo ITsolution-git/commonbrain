@@ -17,6 +17,7 @@
 </div>
 </template>
 <script>
+import { mapGetters, mapActions } from 'vuex';
 export default {
   name: "",
   data: () => ({
@@ -29,6 +30,11 @@ export default {
     handleInput (e) {
       this.$emit('input', this.inputValue)
     }
+  },
+  computed: {
+    ...mapGetters({
+      user: 'user',
+    }),
   },
   props: ["type", "width", "name", "field", "required", "value", "id", "placeholder"],
   inject: ["$validator"]

@@ -17,6 +17,7 @@
   </div>
 </template>
 <script>
+import { mapGetters, mapActions } from 'vuex';
 export default {
   name: "custom_select",
   props: ["field", "name", "width", "options", "value", "required"],

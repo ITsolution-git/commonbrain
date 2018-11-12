@@ -20,6 +20,7 @@
 <script>
 import ApiWrapper from '@/shared/utils/ApiWrapper';
 //import auth from "../../auth";
+import { mapGetters, mapActions } from 'vuex';
 export default {
   props: ["hide", "upload"],
   data() {
@@ -111,7 +112,10 @@ export default {
     },
     fileId() {
       return this.$route.params.fileId;
-    }
+    },
+    ...mapGetters({
+      user: 'user',
+    }),
   }
 };
 </script>

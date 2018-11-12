@@ -11,8 +11,8 @@ var URL = process.env.MONGO_URL;
 
 router.get("/:userId", (req, res, next) => {
   var token = req.headers["authorization"];
-  if (token == null) {
-    res.status(500).send({ auth: false, message: "No token provided." });
+  if (!req.params.userId) {
+    res.status(404).send({ auth: false, message: "No UserID provided." });
   }
   MongoClient.connect(URL, function(err, db) {
     if (err) throw err;

@@ -5,18 +5,19 @@
   <router-view name="login"></router-view>
 
 
-  <div v-if="loader">
-    Loading
+  <div v-if="globalLoader">
+    <Loader />
   </div>
-  <router-view v-if="!loader">
+  <router-view v-if="!globalLoader">
     
   </router-view>
 </v-app>
 </template>
 
 <script>
-import { mapActions } from "vuex";
 import Loader from './components/loader'
+import jwt_decode from "jwt-decode";
+import { mapGetters, mapActions } from 'vuex';
 export default {
   name: "App",
   components: {
@@ -27,30 +28,31 @@ export default {
   },
   data() {
     return {
-      loader: true,
     };
+  },
+
+  computed: {
+    ...mapGetters({
+      globalLoader: 'globalLoader',
+    }),
+
   },
   created() {
     const token = localStorage.getItem("token");
     if (token) {
       this.setToken(token);
+
+      setTimeout(()=>{
+        this.$store.dispatch('getCurrentUser').then(res=>{
+        }).catch(err=>{
+
+        });
+      }, 2000)
     } else {
       this.$router.push("/");
     }
   },
   mounted() {
-    this.$store.dispatch('getCurrentUser').then(res=>{
-      setTimeout(()=>{
-        this.loader = false;  
-      }, 506660)
-    });
-    // const token = localStorage.getItem("token");
-    // if (token) {
-    //   // this.setToken(token);
-    //   // this.setUser(decode(token));
-    // } else {
-    //   this.$router.push("/");
-    // }
   }
 };
 </script>

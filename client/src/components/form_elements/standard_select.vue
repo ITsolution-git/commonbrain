@@ -24,6 +24,7 @@
   </div>
 </template>
 <script>
+import { mapGetters, mapActions } from 'vuex';
 export default {
   name: "standard_select",
   data: () => ({}),
@@ -40,7 +41,10 @@ export default {
   computed: {
     options2: function() {
       return this.options;
-    }
+    },
+    ...mapGetters({
+      user: 'user',
+    }),
   },
   methods: {
     change(val) {

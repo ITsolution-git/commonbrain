@@ -20,6 +20,7 @@
     </div>
 </template>
 <script>
+import { mapGetters, mapActions } from 'vuex';
 export default {
   name: "project-sidebar",
 
@@ -44,7 +45,10 @@ export default {
     },
     userId() {
       return this.$store.state.user.id;
-    }
+    },
+    ...mapGetters({
+      user: 'user',
+    }),
   }
 };
 </script>
