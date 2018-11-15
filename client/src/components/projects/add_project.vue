@@ -106,7 +106,7 @@ export default {
   },
   computed: {
     userId() {
-      return this.$store.state.user.id;
+      return this.$store.state.user._id;
     },
     ...mapGetters({
       user: 'user',
