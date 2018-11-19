@@ -99,14 +99,26 @@ export default {
       imageHovered: false,
       activeNav: 1,
       themes: [{
-        value: '#66d0f7',
-        text: 'Blue',
+        value: '#FF0000',
+        text: 'Red',
       },{
         value: '#f96c48',
         text: 'Orange',
       },{
+        value: '#FFFF00',
+        text: 'Yellow',
+      },{
         value: '#228B22',
         text: 'Green',
+      },{
+        value: '#66d0f7',
+        text: 'Blue',
+      },{
+        value: '#4B0082',
+        text: 'Indigo',
+      },{
+        value: '#9400D3',
+        text: 'Violet',
       }],
 
       wipUser: null

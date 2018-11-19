@@ -12,12 +12,13 @@ import pusher from "vue-pusher";
 import VueMq from 'vue-mq';
 import Vuetify from 'vuetify'
 
+import 'vuetify/dist/vuetify.min.css';
+
 require("./css/bootstrap.min.css");
 require("./css/font-awesome.min.css");
 require("./css/css.css");
 require("./css/animate.css");
 require("./css/tooltip.css");
-import 'vuetify/dist/vuetify.min.css';
 
 Vue.config.productionTip = false;
 Vue.use(pusher, {

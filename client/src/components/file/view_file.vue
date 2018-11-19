@@ -88,7 +88,6 @@
               </div>
             </div>
           </div>
-
           <div class="data-elements" v-if="data.show"  :style="{'background': ((data.images && data.images.length > 0 && data.images[0].position && data.images[0].position.charAt(0).toLowerCase() == 's') ? ('url('+ data.images[0].link + ')  no-repeat center center fixed') : 'transparent')}">
             <div class="major-images" v-if="data.images && data.images.length > 0 && data.images[0].position && data.images[0].position.charAt(0).toLowerCase() == 't'">
               <div class="major-image-item" v-for="(img,index) in data.images" :key="index">
