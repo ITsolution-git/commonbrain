@@ -4,7 +4,6 @@
     
     <Cropper :upload="toggleCropper"  :hide="toggleCropper" v-if="cropper" imgType="image"></Cropper>
     <div class="projects-container" v-if="selectDashScreen" style="padding: 30px;overflow-y: auto;">
-      
       <div>
         <StandardInput
           field="Search Entity"
@@ -36,15 +35,24 @@
     </div>
 
     <div class="projects-container" v-else>
+      <div class="breadcrumbs-cont">
+        <a class="breadcrumbs-item" @click="$router.push('/projects/' + projectId)" style="color: #66d0f7">Project: {{project.project_name}}</a><span>/</span>
+        <div class="breadcrumbs-item">File: {{file.name}}</div><span>/</span>
+        <div class="breadcrumbs-item" v-if="activeDash">Dash: {{activeDash.dashName}}</div><span  v-if="activeDash">/</span>
+        <div class="breadcrumbs-item">Sheet: {{activeSheet}}</div>
+      </div>
       <div class="top-toolbar">
         <StandardInput
           v-model="searchMainDataKey"
           placeholder="Search..."
         />
 
-        <div style="margin: 0px 10px; text-align: end;">
+        <div style="margin: 0px 10px; text-align: end; display: flex">
           <button @click="toggleCollapseAll" class="modal-btn btn-white" type="submit" :style="{background: user.theme}">
             {{collapseStatus  == 'collapse' ? 'Expand All' : 'Collapse All'}}
+          </button>
+          <button @click="rootImgBoxStatus = (rootImgBoxStatus=='show' ? 'hide' : 'show')" class="modal-btn btn-icon" :class="{'btn-icon-toggled': rootImgBoxStatus=='hide'}" type="submit" :style="{background: user.theme}">
+            <i class="fa fa-image"></i>
           </button>
         </div>
       </div>
@@ -62,13 +70,19 @@
           <img :src="imagePath" v-if="imagePath" style="height: 200px; margin: 0 auto; width: auto"/>
         </div>
       </div>
-      <div class="root-images">
-        <div class="root-image-item" v-for="(img,index) in file.rootImages" :key="index">
-          <img :src="img.link" />
+      <div class="root-images-container" :class="{'root-images-container-opened': rootImgBoxStatus=='hide'}">
+        <div class="root-images">
+          <div class="root-image-item" v-for="(img,index) in file.rootImages" :key="index"  v-viewer>
+            <img :src="img.link" />
+          </div>
+        </div>
+
+        <div class="root-image-close-btn">
+          <i class="fa fa-close" @click="rootImgBoxStatus='hide'"></i>
         </div>
       </div>
       <div class="tab-container">
-        <div v-for="(tab,i) in tabs" :class="{'active':(activeTab == tab)}" :key="i" @click="activateTab(i,tab)" class="tab">{{tab}}</div>
+        <div v-for="(tab,i) in tabs" :class="{'active':(activeTab == tab), 'tab-name': true}" :key="i" @click="activateTab(i,tab)" class="tab">{{tab}}</div>
       </div>
       <div v-if="isLoading"  style="display:flex; align-items:center; justify-content:center;width:100%; height:100%;">
       <img class="spinner-big" src="../../img/spinner.svg" alt="">
@@ -83,14 +97,14 @@
               <div class="data-title" v-html="formatWithSearch(data.title)"></div>
             </div>
             <div class="major-images">
-              <div class="major-image-item" v-for="(img,index) in data.images" :key="index">
+              <div class="major-image-item" v-for="(img,index) in data.images" :key="index"  v-viewer>
                 <img :src="img.link" />
               </div>
             </div>
           </div>
           <div class="data-elements" v-if="data.show"  :style="{'background': ((data.images && data.images.length > 0 && data.images[0].position && data.images[0].position.charAt(0).toLowerCase() == 's') ? ('url('+ data.images[0].link + ')  no-repeat center center fixed') : 'transparent')}">
             <div class="major-images" v-if="data.images && data.images.length > 0 && data.images[0].position && data.images[0].position.charAt(0).toLowerCase() == 't'">
-              <div class="major-image-item" v-for="(img,index) in data.images" :key="index">
+              <div class="major-image-item" v-for="(img,index) in data.images" :key="index"  v-viewer>
                 <img :src="img.link"  style="height: 100px"/>
               </div>
             </div>
@@ -143,7 +157,8 @@ export default {
       imagePath: '',
       cropper: false,
 
-      dashImages: []
+      dashImages: [],
+      rootImgBoxStatus: 'show'
     };
   },
   watch: {
@@ -382,6 +397,7 @@ export default {
     getData(tab) {
       this.mainData = [];
       let mainData = {};
+      let seq = 0; //set sequence
       for (let i = 0; i < this.activeRows.length; i++) {
         if (this.activeRows[i].tab_name == tab) {
           
@@ -394,8 +410,10 @@ export default {
               data: [],
               images: this.dashImages.filter(img=>{
                 return ((img.sheetName == this.activeSheet) && (img.tabName == tab) && (img.majorCategory == majorCat))
-              })
-            }
+              }),
+              seq: seq
+            };
+            seq ++;
           }
 
           mainData[majorCat].data.push({
@@ -417,8 +435,13 @@ export default {
           title: mainData[key].title,
           data: this.sortDataByJust(mainData[key].data),
           images: mainData[key].images,
+          seq: mainData[key].seq,
         });
       }
+
+
+      //sort by seq
+      this.mainData = this.mainData.sort((s1, s2)=>s1.seq-s2.seq);
 
     },
 
@@ -505,6 +528,7 @@ export default {
         projectId: this.projectId,
         fileId: this.fileId
       }).then(res => {
+        console.log(res);
         this.getRows();
 
         if (this.file.imageFrom == 'file') {
@@ -529,6 +553,10 @@ export default {
     file() {
       return this.$store.state.fileStore.file[0] ? Object.assign({}, this.$store.state.fileStore.file[0]) : {}; 
     },
+    project() {
+      return this.$store.state.fileStore.project[0] ? Object.assign({}, this.$store.state.fileStore.project[0]) : {}; 
+    },
+
     sheets() {
       var sheetArr = [];
       for (var i = 0; i < this.dashRows.length; i++) {
@@ -594,22 +622,26 @@ export default {
   }
 };
 </script>
-<style>
+<style lang="scss">
 .tab-container {
   width: 100%;
   display: flex;
   align-items: center;
   padding-top: 10px;
-  border-bottom: solid 1px #eaeaea;
+  border-bottom: solid 1px #4a4a4a;
   box-shadow: inset -9px -18px 10px -20px rgba(0, 0, 0, 0.2);
   padding-left: 15px;
   background: #f8fafb;
+}
+.tab-name {
+  font-size: 17px !important;
+  font-weight: 600 !important;
 }
 .tab {
   background: #fff;
   border-top-right-radius: 3px;
   border-top-left-radius: 3px;
-  border: solid 1px #eaeaea;
+  border: solid 1px #4a4a4a;
   height: 50px;
   font-size: 10pt;
   padding: 10px;
@@ -663,7 +695,7 @@ export default {
   display: flex;
   width: 100%;
   justify-content: space-between;
-  border-bottom: solid 1px #eaeaea;
+  border-bottom: solid 1px #4a4a4a;
   cursor: pointer;
   align-items: center;
 }
@@ -714,33 +746,78 @@ export default {
 }
 .top-toolbar {
   margin: 10px;
+
   flex-direction: row;
   display: flex;
   justify-content: space-between;
   align-items: center
 }
-
-.root-images {
+.root-images-container {
   display: flex;
+  transition: all 0.1s ease-out;
   flex-direction: row;
-  justify-content: center;
   width: 100%;
-  overflow-x: auto;
+  &.root-images-container-opened {
+    height: 0px;
+    width: 0px;
+    margin-left: -100px;
+  }
+  .root-images {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    width: 100%;
+    overflow-x: auto;
+    flex-wrap: wrap;
+  }
+  .root-images img {
+    height: 150px;
+    padding: 5px;
+  }
+  .root-image-close-btn {
+    margin: 10px;
+    width: 30px;
+    height: 30px;
+    background: #00000080;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    color: #fff;
+    cursor: pointer;
+    font-size: 15px;
+    i:hover {
+      color: #4a4a4a;
+    }
+  }
 }
-.root-images img {
-  height: 150px;
-}
+
 
 
 .major-images {
   display: flex;
   flex-direction: row;
   justify-content: flex-end;
-  width: 100%;
   overflow-x: auto;
 }
 .major-images img {
   height: 30px;
 }
 
+.breadcrumbs-cont {
+  display: flex;
+  align-items: center;
+  padding: 5px;
+  margin: 5px 12px;
+  margin-top: 10px;
+  background: #fff;
+  border: 1px solid #4a4a4a;
+  border-radius: 2px;
+
+  .breadcrumbs-item {
+    padding-left: 5px;
+    padding-right: 5px;
+    font-weight: bold;
+  }
+}
 </style>

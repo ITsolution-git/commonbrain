@@ -12,8 +12,10 @@ import pusher from "vue-pusher";
 import VueMq from 'vue-mq';
 import Vuetify from 'vuetify'
 
-import 'vuetify/dist/vuetify.min.css';
+import Viewer from 'v-viewer'
 
+import 'vuetify/dist/vuetify.min.css';
+import 'viewerjs/dist/viewer.css'
 require("./css/bootstrap.min.css");
 require("./css/font-awesome.min.css");
 require("./css/css.css");
@@ -35,6 +37,7 @@ Vue.use(VueCroppie);
 Vue.component("v-select", vSelect);
 Vue.component("v-loader", Loader);
 Vue.use(Vuetify);
+Vue.use(Viewer);
 
 Vue.use(VueMq, {
   breakpoints: {

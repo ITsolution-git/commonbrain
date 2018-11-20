@@ -86,18 +86,6 @@ export default {
     ToggleImageFrom
   },
   mounted() {
-    if (this.file.logoFrom == 'file') {
-      this.logoPath = this.file.logoFileUrl;
-    } else if (this.file.logoFrom == 'download') {
-      this.logoPath =
-        "/api/static/" +
-        this.$store.state.user.id +
-        "/" +
-        this.$route.params.projectId +
-        "/" +
-        this.$route.params.fileId +
-        "_logo.jpg";
-    }
   },
   methods: {
     ...mapActions(["getFiles"]),
@@ -196,6 +184,21 @@ export default {
     }),
   },
   watch: {
+    file(file) {
+      
+      if (file.logoFrom == 'file') {
+        this.logoPath = file.logoFileUrl;
+      } else if (file.logoFrom == 'download') {
+        this.logoPath =
+          "/api/static/" +
+          this.$store.state.user.id +
+          "/" +
+          this.$route.params.projectId +
+          "/" +
+          this.$route.params.fileId +
+          "_logo.jpg";
+      }
+    }
   }
 };
 </script>
@@ -244,6 +247,7 @@ export default {
   justify-content: space-between;
   flex-direction: row;
   display: flex;
+  align-items: center;
 }
 .dash-nav:hover{
   color: #66d0f7;
@@ -261,7 +265,7 @@ export default {
   display: inline-flex;
   position: relative;
   background: #f8fafb;
-  border: solid 1px #eaeaea;
+  border: solid 1px #4a4a4a;
   color: #808080;
   max-width: 100px;
   margin-bottom: 15px;
@@ -277,5 +281,9 @@ export default {
 .standard-btn.back:hover {
   background: #eff1f2;
   cursor: pointer;
+}
+.add-project-btn {
+  border: 1px solid #4a4a4a;
+  border-radius: 3px;
 }
 </style>

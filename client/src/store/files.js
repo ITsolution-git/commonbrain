@@ -1,7 +1,8 @@
 import ApiWrapper from '@/shared/utils/ApiWrapper';
 var initialState = {
   files: [],
-  file: {}
+  file: {},
+  project: {}
 };
 export default {
   state: {
@@ -16,6 +17,10 @@ export default {
     },
     SET_FILE: (state, file) => {
       state.file = file;
+    },
+
+    SET_PROJECT: (state, project) => {
+      state.project = project;
     },
     loadingFiles: state => {
       state.filesLoading = true;
@@ -51,7 +56,8 @@ export default {
           )
           .then(res => {
             //console.log(res.data);
-            commit("SET_FILE", res.data);
+            commit("SET_FILE", res.data.file);
+            commit("SET_PROJECT", res.data.project);
             resolve(res.data);
           });
       });

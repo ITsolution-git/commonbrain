@@ -20,6 +20,7 @@
     "postcss-flexbugs-fixes": "^3.3.0",
     "pusher-js": "^4.2.2",
     "v-tooltip": "^2.0.0-rc.31",
+    "v-viewer": "^1.2.1",
     "vee-validate": "^2.0.3",
     "vtk.js": "^5.15.4",
     "vue": "^2.5.2",

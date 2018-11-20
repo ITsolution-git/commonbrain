@@ -22,6 +22,56 @@ module.exports.parseSheet = function(filename) {
       var name1 = names[n].Ref;
       namedRanges[names[n].Name] = name1;
   }
+  
+
+  /* check named ranges and search key if match then go, if no, then return error */
+  let CBRowNum = {};
+  for (let k in namedRanges) {
+    if (namedRanges[k].split('$').length > 2) {
+      CBRowNum[k] = namedRanges[k].split('$')[1];
+    }
+  }
+
+  for (var i = 0; i < Object.keys(cb).length; i++) {
+    var key = Object.keys(cb)[i];
+    var letter = key.charAt(0);
+    var number = key.substr(1);
+    if (number == 2) {
+      if ((cb[key].v+'').indexOf('Dash') != -1 && !CBRowNum['CBrainDashItem']) {
+        CBRowNum['CBrainDashItem'] = letter;
+      }
+      if ((cb[key].v+'').indexOf('Sheet') != -1 && !CBRowNum['CBrainSheet']) {
+        CBRowNum['CBrainSheet'] = letter;
+      }
+      if ((cb[key].v+'').indexOf('Tab') != -1 && !CBRowNum['CBrainTab']) {
+        CBRowNum['CBrainTab'] = letter;
+      }
+      if ((cb[key].v+'').indexOf('Major') != -1 && !CBRowNum['CBrainMajor']) {
+        CBRowNum['CBrainMajor'] = letter;
+      }
+      if ((cb[key].v+'').indexOf('Value') != -1 && !CBRowNum['CBrainValue']) {
+        CBRowNum['CBrainValue'] = letter;
+      }
+      if ((cb[key].v+'').indexOf('Justification') != -1 && !CBRowNum['CBrainJustification']) {
+        CBRowNum['CBrainJustification'] = letter;
+      }
+      if ((cb[key].v+'').indexOf('Hover') != -1 && !CBRowNum['CBrainHover']) {
+        CBRowNum['CBrainHover'] = letter;
+      }
+      if ((cb[key].v+'').indexOf('Source') != -1 && !CBRowNum['CBrainSource']) {
+        CBRowNum['CBrainSource'] = letter;
+      }
+    }
+  }
+  if (!CBRowNum['CBrainSheet'])
+    return {sucess: 0, error: 'Named Range CBrainSheet is Missing.'}
+  if (!CBRowNum['CBrainTab'])
+    return {sucess: 0, error: 'Named Range CBrainTab is Missing.'}
+  if (!CBRowNum['CBrainMajor'])
+    return {sucess: 0, error: 'Named Range CBrainMajor is Missing.'}
+  /* finish */
+
+
   for (var i = 0; i < Object.keys(cb).length; i++) {
     if (i == Object.keys(cb).length / 2) {
     }
@@ -43,7 +93,6 @@ module.exports.parseSheet = function(filename) {
         imageFileUrl = cb[Object.keys(cb)[i]].v;
       }
     }
-
     if (letter.match(/[a-z]/i) || letter.match(/[A-z]/i)) {
       var row = {};
 
@@ -54,42 +103,33 @@ module.exports.parseSheet = function(filename) {
             rows[number] = {};
           }
 
-          if (namedRanges['CBrainDashItem'] && namedRanges['CBrainDashItem'].split('$').length > 2 &&
-            letter == namedRanges['CBrainDashItem'].split('$')[1]) {
+          if (CBRowNum['CBrainDashItem'] && letter == CBRowNum['CBrainDashItem']) {
             rows[number]["dash_name"] = cb[Object.keys(cb)[i]].v;
           }
-          if (namedRanges['CBrainSheet'] && namedRanges['CBrainSheet'].split('$').length > 2 &&
-            letter == namedRanges['CBrainSheet'].split('$')[1]) {
+          if (CBRowNum['CBrainSheet'] && letter == CBRowNum['CBrainSheet']) {
             rows[number]["sheet_name"] = cb[Object.keys(cb)[i]].v;
           }
-          if (namedRanges['CBrainTab'] && namedRanges['CBrainTab'].split('$').length > 2 &&
-            letter == namedRanges['CBrainTab'].split('$')[1]) {
+          if (CBRowNum['CBrainTab'] && letter == CBRowNum['CBrainTab']) {
             rows[number]["tab_name"] = cb[Object.keys(cb)[i]].v;
           }
-          if (namedRanges['CBrainMajor'] && namedRanges['CBrainMajor'].split('$').length > 2 &&
-            letter == namedRanges['CBrainMajor'].split('$')[1]) {
+          if (CBRowNum['CBrainMajor'] && letter == CBRowNum['CBrainMajor']) {
             rows[number]["major_category"] = cb[Object.keys(cb)[i]].v;
           }
-          if (namedRanges['CBrainSpecific'] && namedRanges['CBrainSpecific'].split('$').length > 2 &&
-            letter == namedRanges['CBrainSpecific'].split('$')[1]) {
+          if (CBRowNum['CBrainSpecific'] && letter == CBRowNum['CBrainSpecific']) {
             rows[number]["spec_category"] = cb[Object.keys(cb)[i]].v;
           }
-          if (namedRanges['CBrainValue'] && namedRanges['CBrainValue'].split('$').length > 2 &&
-            letter == namedRanges['CBrainValue'].split('$')[1]) {
+          if (CBRowNum['CBrainValue'] && letter == CBRowNum['CBrainValue']) {
             rows[number]["value"] = cb[Object.keys(cb)[i]].v;
             rows[number]["type"] = cb[Object.keys(cb)[i]].t;
             rows[number]["formatted"] = cb[Object.keys(cb)[i]].w
           }
-          if (namedRanges['CBrainJustification'] && namedRanges['CBrainJustification'].split('$').length > 2 &&
-            letter == namedRanges['CBrainJustification'].split('$')[1]) {
+          if (CBRowNum['CBrainJustification'] && letter == CBRowNum['CBrainJustification']) {
             rows[number]["justification"] = cb[Object.keys(cb)[i]].v;
           }
-          if (namedRanges['CBrainHover'] && namedRanges['CBrainHover'].split('$').length > 2 &&
-            letter == namedRanges['CBrainHover'].split('$')[1]) {
+          if (CBRowNum['CBrainHover'] && letter == CBRowNum['CBrainHover']) {
             rows[number]["hover"] = cb[Object.keys(cb)[i]].v;
           }
-          if (namedRanges['CBrainSource'] && namedRanges['CBrainSource'].split('$').length > 2 &&
-            letter == namedRanges['CBrainSource'].split('$')[1]) {
+          if (CBRowNum['CBrainSource'] && letter == CBRowNum['CBrainSource']) {
             rows[number]["source"] = cb[Object.keys(cb)[i]].v;
           }
         }
@@ -196,7 +236,7 @@ module.exports.parseSheet = function(filename) {
   imageFileUrl = ''; //ignore this one for now
 
   return {
-  	rows, sheet, title, dashes, imageFileUrl, logoFileUrl, rootImages, majorImages
+  	sucess: 1, rows, sheet, title, dashes, imageFileUrl, logoFileUrl, rootImages, majorImages
   }
 }
 

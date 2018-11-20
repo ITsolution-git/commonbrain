@@ -171,7 +171,7 @@ table td {
   background: #fff;
   color: #252e32;
   padding: 10px;
-  border: solid 1px #eaeaea;
+  border: solid 1px #4a4a4a;
   border-radius: 3px;
   width: 100%;
   z-index: 1;
@@ -902,4 +902,13 @@ table td {
   justify-content: center;
   height: 100px;
   color: #d0d0d0;
+}
+
+.btn-icon {
+  padding: 5px 10px;
+  font-size: 20px;
+}
+
+.btn-icon-toggled {
+  box-shadow: inset 0px 0px 10px 2px #ffffff;
 }

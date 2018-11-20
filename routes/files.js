@@ -326,6 +326,14 @@ router.post("/:projectId/add", (req, res, next) => {
             } else {
               let obj = xlxsUtil.parseSheet("./" + dir + "/" + filepath)
 
+              if (!obj.success) {
+                res.status(401).json({
+                  errors: {
+                    form: obj.error
+                  }
+                });
+                return;
+              }
               let fileSave = {
                 name: filename.substring(0, filename.length - 5),
                 filename: filename,
@@ -416,6 +424,14 @@ router.post("/replace/:projectId/:fileId", (req, res, next) => {
                   });
                 } else {
                   let obj = xlxsUtil.parseSheet("./" + dir + "/" + filepath);
+                  if (!obj.success) {
+                    res.status(401).json({
+                      errors: {
+                        form: obj.error
+                      }
+                    });
+                    return;
+                  }
                   MongoClient.connect(URL, function(err, db) {
                     if (err) throw err;
                     var collection = db.collection("files");
@@ -764,15 +780,21 @@ router.get("/:userId/:projectId/:fileId", (req, res, next) => {
   const userId = req.params.userId;
   const projectId = req.params.projectId;
   const fileId = req.params.fileId;
+
   MongoClient.connect(URL, function(err, db) {
     if (err) throw err;
     var collection = db.collection("files");
-    collection
+    var projects = db.collection('projects');
+    Promise.all([
+      collection
       .find({ _id: ObjectId(fileId) }, { sheet: 0 })
-      .toArray()
-      .then(result => {
-        res.status(200).send(result);
-      });
+      .toArray(), 
+      projects
+      .find({ _id: ObjectId(projectId) })
+      .toArray()])
+    .then(result=>{
+      res.status(200).send({file: result[0], project: result[1]});
+    });
   });
 });
 
