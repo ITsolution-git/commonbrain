@@ -236,7 +236,7 @@ module.exports.parseSheet = function(filename) {
   imageFileUrl = ''; //ignore this one for now
 
   return {
-  	sucess: 1, rows, sheet, title, dashes, imageFileUrl, logoFileUrl, rootImages, majorImages
+  	success: 1, rows, sheet, title, dashes, imageFileUrl, logoFileUrl, rootImages, majorImages
   }
 }
 

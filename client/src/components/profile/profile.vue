@@ -173,7 +173,7 @@ export default {
     Photoshop
   },
   mounted() {
-    this.wipUser = Object.assign({ theme: '#66d0f7', showHoverOnExport: false, buttonBorder: '#000', showButtonBorders: true, fillButtons: true}, this.$store.state.user);
+    this.wipUser = Object.assign({ theme: '#66d0f7', showHoverOnExport: false, buttonBorder: {hex: '#000000'}, showButtonBorders: true, fillButtons: true}, this.$store.state.user);
   },
   methods: {
     activateNav(nav) {
