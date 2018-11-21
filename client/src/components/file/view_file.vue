@@ -48,10 +48,10 @@
         />
 
         <div style="margin: 0px 10px; text-align: end; display: flex">
-          <button @click="toggleCollapseAll" class="modal-btn btn-white" type="submit" :style="{background: user.theme}">
+          <button @click="toggleCollapseAll" class="modal-btn btn-white" style="width: 120px" type="submit" :style="{background: user.fillButtons? user.theme : 'transparent', color: user.fillButtons ? '#fff' : '#111111', 'border-width': '1px', 'border-color': user.showButtonBorders ? user.buttonBorder.hex : 'none', 'border-style': 'solid'}">
             {{collapseStatus  == 'collapse' ? 'Expand All' : 'Collapse All'}}
           </button>
-          <button @click="rootImgBoxStatus = (rootImgBoxStatus=='show' ? 'hide' : 'show')" class="modal-btn btn-icon" :class="{'btn-icon-toggled': rootImgBoxStatus=='hide'}" type="submit" :style="{background: user.theme}">
+          <button @click="rootImgBoxStatus = (rootImgBoxStatus=='show' ? 'hide' : 'show')" class="modal-btn btn-icon" :class="{'btn-icon-toggled': rootImgBoxStatus=='hide'}" type="submit" :style="{background: user.fillButtons? user.theme : 'transparent', color: user.fillButtons ? '#fff' : '#111111', 'border-width': '1px', 'border-color': user.showButtonBorders ? user.buttonBorder.hex : 'none', 'border-style': 'solid'}">
             <i class="fa fa-image"></i>
           </button>
         </div>

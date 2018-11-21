@@ -6,18 +6,34 @@
 
   
     <div class="sidebar-container">
-        <div @click="$router.go(-1)" class="standard-btn back"><i class="fa fa-angle-left"></i> Back</div>
+        <div style="display: flex; margin: 10px">
+          <div @click="$router.go(-1)" class="standard-btn back" :style="{background: user.fillButtons? user.theme : 'transparent', color: user.fillButtons ? '#fff' : '#111111', 'border-width': '1px', 'border-color': user.showButtonBorders ? user.buttonBorder.hex : 'none', 'border-style': 'solid'}"><i class="fa fa-angle-left"></i> Back</div>
+
+          <button @click="deleteFile" class="modal-btn btn-icon" style="padding: 1px 6px" :style="{background: user.fillButtons? user.theme : 'transparent', color: user.fillButtons ? '#fff' : '#111111', 'border-width': '1px', 'border-color': user.showButtonBorders ? user.buttonBorder.hex : 'none', 'border-style': 'solid'}">
+            <i class="fa fa-trash"></i>
+          </button>
+
+          <button @click="downloadFile" class="modal-btn btn-icon" style="padding: 1px 6px" :style="{background: user.fillButtons? user.theme : 'transparent', color: user.fillButtons ? '#fff' : '#111111', 'border-width': '1px', 'border-color': user.showButtonBorders ? user.buttonBorder.hex : 'none', 'border-style': 'solid'}">
+            <i class="fa fa-download"></i>
+          </button>
+          <button @click="toggleExportPdf" class="modal-btn btn-icon" style="padding: 1px 6px" :style="{background: user.fillButtons? user.theme : 'transparent', color: user.fillButtons ? '#fff' : '#111111', 'border-width': '1px', 'border-color': user.showButtonBorders ? user.buttonBorder.hex : 'none', 'border-style': 'solid'}">
+            <i class="fa fa-file-pdf-o"></i>
+          </button>
+          <button @click="toggleExportPdf" class="modal-btn btn-icon" style="padding: 1px 6px" :style="{background: user.fillButtons? user.theme : 'transparent', color: user.fillButtons ? '#fff' : '#111111', 'border-width': '1px', 'border-color': user.showButtonBorders ? user.buttonBorder.hex : 'none', 'border-style': 'solid'}">
+            <i class="fa fa-file-excel-o"></i>
+          </button>
+        </div>
         <div class="sidebar-title" v-if="file">
-          {{file.name}}
+          <span style="font-style: italic;">{{file.name}}.xlsx</span>
             <div class="left-sub-sidebar-options">
-            <div @click.stop="toggleOptionsDropdown" class="add-project-btn dropdown-btn"><i class="fa fa-ellipsis-h" />
+            <div @click.stop="toggleOptionsDropdown" class="add-project-btn dropdown-btn" :style="{background: user.fillButtons? user.theme : 'transparent', color: user.fillButtons ? '#fff' : '#111111', 'border-width': '1px', 'border-color': user.showButtonBorders ? user.buttonBorder.hex : 'none', 'border-style': 'solid'}">
+              <i class="fa fa-ellipsis-h" />
                 <div v-click-outside="toggleOptionsDropdown"  v-if="optionsDropdown" class="basic-dropdown add-project-btn-dropdown animated-fast fadeInDown" >
                   <ul>
-                    <li @click="deleteFile">Delete File</li>
-                    <li @click="downloadFile">Download File</li>
+                    <!-- <li @click="downloadFile">Download File</li> -->
                     <li @click="toggleReplaceFile">Replace File</li>
-                    <li @click="toggleExportPdf">Export PDF</li>
-                    <li @click.stop="toggleExportExcel">Export Excel</li>
+                    <!-- <li @click="toggleExportPdf">Export PDF</li> -->
+                    <!-- <li @click.stop="toggleExportExcel">Export Excel</li> -->
                     <li @click.stop="toggleImageFrom" v-if="file.imageFrom=='download'">Use Image From File</li>
                     <li @click.stop="toggleImageFrom" v-if="file.imageFrom=='file'">Use Image From Upload</li>
                     <li @click.stop="toggleLogoFrom" v-if="file.logoFrom=='download'">Use Logo From File</li>
@@ -42,7 +58,7 @@
           </div>
         </div>
         <div class="dash-nav" v-if="activeDash" @click="showSelectDash(true)">
-          <span>{{activeDash.dashName}}</span>
+          <span style="font-weight: bold">{{activeDash.dashName}}</span>
           <i class="fa fa-angle-right" ></i>
         </div>
         <div class="file-nav">
@@ -185,7 +201,7 @@ export default {
   },
   watch: {
     file(file) {
-      
+
       if (file.logoFrom == 'file') {
         this.logoPath = file.logoFileUrl;
       } else if (file.logoFrom == 'download') {
@@ -262,18 +278,13 @@ export default {
 }
 
 .standard-btn.back {
-  display: inline-flex;
   position: relative;
   background: #f8fafb;
   border: solid 1px #4a4a4a;
   color: #808080;
   max-width: 100px;
-  margin-bottom: 15px;
-  bottom: unset !important;
-  margin: unset !important;
-  right: unset !important;
-  margin: 15px !important;
-  float: none;
+  right: 0px;
+  bottom: 0px;
 }
 .standard-btn.back i {
   margin-right: 10px;

@@ -63,6 +63,8 @@
 
               <v-flex style="display: flex" xs6 >
               </v-flex>
+
+
               <v-flex style="display: flex" xs12 align-center justify-space-around>
                 <div style="width: 30%; border: 1px solid #c0c1c2;"></div>
                 Export
@@ -78,9 +80,43 @@
                 </v-flex>
               </v-flex>
               
+
+
+              <v-flex style="display: flex" xs12 align-center justify-space-around>
+                <div style="width: 30%; border: 1px solid #c0c1c2;"></div>
+                Customization
+                <div style="width: 30%; border: 1px solid #c0c1c2;"></div>
+              </v-flex>
+              <v-flex style="display: flex" xs6 align-center flex-row flex pa-3>
+                <v-flex xs12 sm6> <span>You want borders on buttons?</span></v-flex>
+                <v-flex xs12 sm6 d-flex align-center>
+                  <select v-model="wipUser.showButtonBorders">
+                    <option :value="true">Yes</option>
+                    <option :value="false">No</option>
+                  </select>
+                </v-flex>
+              </v-flex>
+              <v-flex style="display: flex" xs6 align-center flex-row flex pa-3>
+                <v-flex xs12 sm6> <span>You want transparent or fill buttons?</span></v-flex>
+                <v-flex xs12 sm6 d-flex align-center>
+                  <select v-model="wipUser.fillButtons">
+                    <option :value="true">Yes</option>
+                    <option :value="false">No</option>
+                  </select>
+                </v-flex>
+              </v-flex>
+              <v-flex style="display: flex" xs6 align-center flex-row flex pa-3>
+                <v-flex xs12 sm6> <span>Border Color</span></v-flex>
+                <v-flex xs12 sm6 d-flex align-center style="position: relative;">
+                  <div style="display: flex; justify-content: center; align-items: center" :style="{'background-color': wipUser.buttonBorder.hex}" @click="showPicker=true">
+                    {{wipUser.buttonBorder.hex}}
+                  </div>
+                  <photoshop v-model="wipUser.buttonBorder" style="position: absolute;" @ok="showPicker=false" @@cancel="showPicker=false" v-if="showPicker"/>
+                </v-flex>
+              </v-flex>
             </div>
             <div style="text-align: right; margin-right: 10px">
-              <button @click="save()" class="modal-btn" :style="{background: user.theme}">
+              <button @click="save()" class="modal-btn" :style="{background: user.fillButtons? user.theme : 'transparent', color: user.fillButtons ? '#fff' : '#111111', 'border-width': '1px', 'border-color': user.showButtonBorders ? user.buttonBorder.hex : 'none', 'border-style': 'solid'}">
                 Save
               </button>
             </div>
@@ -92,6 +128,8 @@
 import Sidebar from "./sidebar";
 import { mapGetters, mapActions } from 'vuex';
 import ApiWrapper from '@/shared/utils/ApiWrapper';
+import { Photoshop } from 'vue-color'
+
 export default {
   name: "profile",
   data() {
@@ -121,7 +159,8 @@ export default {
         text: 'Violet',
       }],
 
-      wipUser: null
+      wipUser: null,
+      showPicker: false
     };
   },
   watch: {
@@ -130,10 +169,11 @@ export default {
     },
   },
   components: {
-    Sidebar
+    Sidebar,
+    Photoshop
   },
   mounted() {
-    this.wipUser = Object.assign({ theme: '#66d0f7', showHoverOnExport: false}, this.$store.state.user);
+    this.wipUser = Object.assign({ theme: '#66d0f7', showHoverOnExport: false, buttonBorder: '#000', showButtonBorders: true, fillButtons: true}, this.$store.state.user);
   },
   methods: {
     activateNav(nav) {
