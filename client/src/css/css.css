@@ -796,7 +796,7 @@ table td {
   position: relative;
   z-index: 1;
 }
-.top-bar img,
+.top-bar header-logo,
 .web-top-bar img {
   height: 70%;
 }

@@ -53,7 +53,10 @@ router.post("/signup", (req, res, next) => {
             password: passwordHash,
             email: email,
             theme: '#66d0f7',
-            showHoverOnExport: false
+            showHoverOnExport: false, 
+            buttonBorder: {hex: '#000000'}, 
+            showButtonBorders: true, 
+            fillButtons: true
           })
           .then(result => {
 

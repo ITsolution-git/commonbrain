@@ -2,14 +2,14 @@
   <div class="top-bar" :style="{'background': user.theme}">
     <div :class="'nav-bar nav-bar-' + user.theme">
       <div @click="$router.push('/projects')" :class="{'nav-item': true, active: currentPath.indexOf('projects')!=-1}" :style="{'color': '#fff'}">Projects</div>
-      <img @click="$router.push('/templates')" src="../img/brain_white.svg" alt="" >
+      <img @click="$router.push('/templates')" src="../img/brain_white.svg" alt="" class="header-logo">
       <div @click="$router.push('/ofac')" :class="{'nav-item': true, active: currentPath.indexOf('ofac')!=-1}" :style="{'color': '#fff'}">OFAC</div>
       <!-- <div @click="$router.push('/templates')" :class="{'nav-item': true, active: currentPath.indexOf('templates')!=-1}">Templates</div> -->
     </div>
     <div class="user-nav">
       <div @click="toggleUserDropdown" :class="'nav-item nav-item-' + user.theme">
         <div>
-          <img style="" :src="user.image ?  ('/api/static/' + user._id + '/' +user._id + '.jpg') : '../../img/empty_profile.png'" class="profile-avatar"/>
+          <img style="" :src="user.image ?  ('/api/static/' + user._id + '/' +user._id + '.jpg') : emptyProfile" class="profile-avatar"/>
           {{user.username}}
         </div>
         <div v-click-outside="toggleUserDropdown" v-if="userDropdown" class="simple-dropdown animated-fast fadeInDown">
@@ -26,10 +26,12 @@
 import auth from "../auth";
 import { mapMutations } from "vuex";
 import { mapGetters, mapActions } from 'vuex';
+import emptyProfile from "../img/empty_profile.png"
 export default {
   name: "header_main",
   data() {
     return {
+      emptyProfile: emptyProfile,
       userDropdown: false,
       currentPath: window.location.href,
     };

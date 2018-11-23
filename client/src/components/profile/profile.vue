@@ -9,8 +9,8 @@
           <div  class="profile-image">
             <div @mouseover="imageHover" @mouseout="imageHover" class="profile-image-image">
               <div v-if="imageHovered" class="image-overlay animated-fast fadeIn" @click="toggleCropper"><span class="animated-fast fadeInDown"><i class="fa fa-camera"></i> Change</span></div>
-              <img style="width:100%;" :src="user.image ?  ('/api/static/' + user._id + '/' +user._id + '.jpg') : '../../img/empty_profile.png'" />
-          
+
+              <img style="width:100%;" :src="user.image ?  ('/api/static/' + user._id + '/' +user._id + '.jpg') : emptyProfile" />
             </div>
             <div class="profile-image-title">Profile Image</div>
           </div>
@@ -118,10 +118,12 @@ import { mapGetters, mapActions } from 'vuex';
 import ApiWrapper from '@/shared/utils/ApiWrapper';
 import { Photoshop } from 'vue-color'
 import Cropper from "../file/cropper";
+import emptyProfile from "../../img/empty_profile.png"
 export default {
   name: "profile",
   data() {
     return {
+      emptyProfile: emptyProfile,
       imageHovered: false,
       activeNav: 0,
       themes: [{
