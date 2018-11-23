@@ -4,36 +4,58 @@
   <Cropper :upload="toggleCropper"  :hide="toggleCropper" v-if="cropper" imgType="logo"></Cropper>
   <ReplaceFile :hide="toggleReplaceFile" :uploaded="submitReplaceFile" v-if="replaceFile" />
 
+  <ConfirmDelete :hide="toggleConfirmDelete" :del="deleteFile" v-if="confirmDelete"/>
   
-    <div class="sidebar-container">
-        <div style="display: flex; margin: 10px">
-          <div @click="$router.go(-1)" class="standard-btn back" :style="{background: user.fillButtons? user.theme : 'transparent', color: user.fillButtons ? '#fff' : '#111111', 'border-width': '1px', 'border-color': user.showButtonBorders ? user.buttonBorder.hex : 'none', 'border-style': 'solid'}"><i class="fa fa-angle-left"></i> Back</div>
+  <div class="sidebar-container">
+      <div style="display: flex; margin: 10px">
+        <div @click="$router.go(-1)" class="standard-btn back" :style="{background: user.fillButtons? user.theme : 'transparent', color: user.fillButtons ? '#fff' : '#111111', 'border-width': '1px', 'border-color': user.showButtonBorders ? user.buttonBorder.hex : 'none', 'border-style': 'solid'}"><i class="fa fa-angle-left"></i> Back</div>
 
-          <button @click="deleteFile" class="modal-btn btn-icon" style="padding: 1px 6px" :style="{background: user.fillButtons? user.theme : 'transparent', color: user.fillButtons ? '#fff' : '#111111', 'border-width': '1px', 'border-color': user.showButtonBorders ? user.buttonBorder.hex : 'none', 'border-style': 'solid'}">
-            <i class="fa fa-trash"></i>
+        <v-tooltip bottom style="">
+          <button slot="activator" @click="toggleReplaceFile" class="modal-btn btn-icon" style="" :style="{background: user.fillButtons? user.theme : 'transparent', color: user.fillButtons ? '#fff' : '#111111', 'border-width': '1px', 'border-color': user.showButtonBorders ? user.buttonBorder.hex : 'none', 'border-style': 'solid'}">
+            <i class="fa fa-upload"></i>
           </button>
+          <span>Replace file</span>
+        </v-tooltip>
+        
+        <!-- <button @click="deleteFile" class="modal-btn btn-icon" style="" :style="{background: user.fillButtons? user.theme : 'transparent', color: user.fillButtons ? '#fff' : '#111111', 'border-width': '1px', 'border-color': user.showButtonBorders ? user.buttonBorder.hex : 'none', 'border-style': 'solid'}">
+          <i class="fa fa-trash"></i>
+        </button> -->
 
-          <button @click="downloadFile" class="modal-btn btn-icon" style="padding: 1px 6px" :style="{background: user.fillButtons? user.theme : 'transparent', color: user.fillButtons ? '#fff' : '#111111', 'border-width': '1px', 'border-color': user.showButtonBorders ? user.buttonBorder.hex : 'none', 'border-style': 'solid'}">
+        <v-tooltip bottom style="">
+          <button slot="activator" @click="downloadFile" class="modal-btn btn-icon" style="" :style="{background: user.fillButtons? user.theme : 'transparent', color: user.fillButtons ? '#fff' : '#111111', 'border-width': '1px', 'border-color': user.showButtonBorders ? user.buttonBorder.hex : 'none', 'border-style': 'solid'}">
             <i class="fa fa-download"></i>
           </button>
-          <button @click="toggleExportPdf" class="modal-btn btn-icon" style="padding: 1px 6px" :style="{background: user.fillButtons? user.theme : 'transparent', color: user.fillButtons ? '#fff' : '#111111', 'border-width': '1px', 'border-color': user.showButtonBorders ? user.buttonBorder.hex : 'none', 'border-style': 'solid'}">
+          <span>Download</span>
+        </v-tooltip>
+        <v-tooltip bottom style="">
+          <button slot="activator" @click="toggleExportPdf" class="modal-btn btn-icon" style="" :style="{background: user.fillButtons? user.theme : 'transparent', color: user.fillButtons ? '#fff' : '#111111', 'border-width': '1px', 'border-color': user.showButtonBorders ? user.buttonBorder.hex : 'none', 'border-style': 'solid'}">
             <i class="fa fa-file-pdf-o"></i>
           </button>
-          <button @click="toggleExportPdf" class="modal-btn btn-icon" style="padding: 1px 6px" :style="{background: user.fillButtons? user.theme : 'transparent', color: user.fillButtons ? '#fff' : '#111111', 'border-width': '1px', 'border-color': user.showButtonBorders ? user.buttonBorder.hex : 'none', 'border-style': 'solid'}">
+          <span>Export PDF</span>
+        </v-tooltip>
+        <v-tooltip bottom style="">
+          <button slot="activator" @click="toggleExportExcel" class="modal-btn btn-icon" style="" :style="{background: user.fillButtons? user.theme : 'transparent', color: user.fillButtons ? '#fff' : '#111111', 'border-width': '1px', 'border-color': user.showButtonBorders ? user.buttonBorder.hex : 'none', 'border-style': 'solid'}">
             <i class="fa fa-file-excel-o"></i>
           </button>
-        </div>
-        <div class="sidebar-title" v-if="file">
-          <span style="font-style: italic;">{{file.name}}.xlsx</span>
-            <div class="left-sub-sidebar-options">
-            <div @click.stop="toggleOptionsDropdown" class="add-project-btn dropdown-btn" :style="{background: user.fillButtons? user.theme : 'transparent', color: user.fillButtons ? '#fff' : '#111111', 'border-width': '1px', 'border-color': user.showButtonBorders ? user.buttonBorder.hex : 'none', 'border-style': 'solid'}">
+          <span>Export Excel</span>
+        </v-tooltip>
+      </div>
+      <div class="sidebar-title" v-if="file">
+        <span style="font-style: italic;">{{file.name}}.xlsx</span>
+          <!-- class="left-sub-sidebar-options" -->
+          <div>
+          <!-- class="" -->
+
+          <v-tooltip left style="">
+            <div slot="activator" class="modal-btn btn-icon dropdown-btn add-project-btn"  @click.stop="toggleOptionsDropdown"  :style="{background: user.fillButtons? user.theme : 'transparent', color: user.fillButtons ? '#fff' : '#111111', 'border-width': '1px', 'border-color': user.showButtonBorders ? user.buttonBorder.hex : 'none', 'border-style': 'solid', cursor: 'pointer'}">
               <i class="fa fa-ellipsis-h" />
                 <div v-click-outside="toggleOptionsDropdown"  v-if="optionsDropdown" class="basic-dropdown add-project-btn-dropdown animated-fast fadeInDown" >
                   <ul>
                     <!-- <li @click="downloadFile">Download File</li> -->
-                    <li @click="toggleReplaceFile">Replace File</li>
                     <!-- <li @click="toggleExportPdf">Export PDF</li> -->
                     <!-- <li @click.stop="toggleExportExcel">Export Excel</li> -->
+                    <!-- <li @click="toggleReplaceFile">Replace File</li> -->
+                    <li @click="toggleConfirmDelete">Delete File</li>
                     <li @click.stop="toggleImageFrom" v-if="file.imageFrom=='download'">Use Image From File</li>
                     <li @click.stop="toggleImageFrom" v-if="file.imageFrom=='file'">Use Image From Upload</li>
                     <li @click.stop="toggleLogoFrom" v-if="file.logoFrom=='download'">Use Logo From File</li>
@@ -42,32 +64,34 @@
                   </ul>
                 </div>
             </div>
-          </div>
+            <span>More Actions</span>
+          </v-tooltip>
         </div>
-        <div class="file-logo">
-          <div v-if="file.logoFrom == 'download'" @click="toggleCropper">
-            <div class="add-image" style="padding:15px">
-              <i class="fa fa-camera" style=" margin-right:10px;"></i>
-              Upload
-            </div>
-            <img :src="logoPath" v-if="file.logo"/>
+      </div>
+      <div class="file-logo">
+        <div v-if="file.logoFrom == 'download'" @click="toggleCropper">
+          <div class="add-image" style="padding:15px">
+            <i class="fa fa-camera" style=" margin-right:10px;"></i>
+            Upload
           </div>
+          <img :src="logoPath" v-if="file.logo"/>
+        </div>
 
-          <div v-if="file.logoFrom == 'file'">
-            <img :src="logoPath" v-if="logoPath"/>
-          </div>
+        <div v-if="file.logoFrom == 'file'">
+          <img :src="logoPath" v-if="logoPath"/>
         </div>
-        <div class="dash-nav" v-if="activeDash" @click="showSelectDash(true)">
-          <span style="font-weight: bold">{{activeDash.dashName}}</span>
-          <i class="fa fa-angle-right" ></i>
-        </div>
-        <div class="file-nav">
-            <ul>
-                <li v-for="(sheet,i) in sheets" :key="i" :class="{'active':(activeNav == i)}" @click="activateSheet(i,sheet)">{{sheet}}</li>
-            </ul>
-        </div>
+      </div>
+      <div class="dash-nav" v-if="activeDash" @click="showSelectDash(true)">
+        <span style="font-weight: bold">{{activeDash.dashName}}</span>
+        <i class="fa fa-angle-right" ></i>
+      </div>
+      <div class="file-nav">
+          <ul>
+              <li v-for="(sheet,i) in sheets" :key="i" :class="{'active':(activeNav == i)}" @click="activateSheet(i,sheet)">{{sheet}}</li>
+          </ul>
+      </div>
     </div>
-    </div>
+  </div>
 </template>
 <script>
 import Cropper from "./cropper";
@@ -77,6 +101,7 @@ import ReplaceFile from "./replace_file";
 import ExportPdf from "./export_pdf";
 import ToggleImageFrom from "./toggle_import_from";
 import { mapGetters, mapActions } from 'vuex';
+import ConfirmDelete from "../helpers/confirm_delete";
 export default {
   name: "file-sidebar",
   props: ["sheets", "activate", "dashes", "activeDash", "showSelectDash", 'file', 'updateFile'],
@@ -93,13 +118,15 @@ export default {
       imageSelect: false,
 
       exportExcel: false,
+      confirmDelete: false
     };
   },
   components: {
     Cropper,
     ReplaceFile,
     ExportPdf,
-    ToggleImageFrom
+    ToggleImageFrom,
+    ConfirmDelete
   },
   mounted() {
   },
@@ -117,6 +144,9 @@ export default {
     },
     toggleExportPdf() {
       this.exportPdf = !this.exportPdf;
+    },
+    toggleConfirmDelete() {
+      this.confirmDelete = !this.confirmDelete;
     },
     submitReplaceFile() {
       this.replaceFile = !this.replaceFile;
@@ -156,7 +186,9 @@ export default {
       ).then(() => {
         this.getFiles({ project_id: this.$route.params.projectId });
         this.$router.go(-1);
+        this.confirmDelete = false;
       });
+
     },
     downloadFile() {
       let self = this;
@@ -285,6 +317,7 @@ export default {
   max-width: 100px;
   right: 0px;
   bottom: 0px;
+  height: 34px;
 }
 .standard-btn.back i {
   margin-right: 10px;

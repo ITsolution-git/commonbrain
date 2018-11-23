@@ -2,25 +2,32 @@
 <div>
   <AddProject v-if="addProjectOpen" :hide="toggleAddProject" :create="projectCreated"/>
     <div class="sidebar-container ">
-        <div class="sidebar-title">
-            Projects <i @click="toggleAddProject" class="fa fa-plus"></i>
+      <div style="padding: 10px">
+        <span style="font-size: 20px">Projects</span>
+        <v-tooltip bottom style="">
+          <button slot="activator" @click="toggleAddProject" class="modal-btn btn-icon" type="submit" :style="{background: user.fillButtons? user.theme : 'transparent', color: user.fillButtons ? '#fff' : '#111111', 'border-width': '1px', 'border-color': user.showButtonBorders ? user.buttonBorder.hex : 'none', 'border-style': 'solid'}">
+            <i class="fa fa-plus"></i>
+          </button>
+          <span>Add Project</span>
+        </v-tooltip>
+      </div>
+
+      <div v-if="isLoading" class="spinner-container animated flash infinite">
+        <img class="spinner-big"  src="../../img/spinner.svg" alt="">&nbsp;&nbsp;&nbsp;
+        <div style="line-height:10px">
+          <div style="background:#d0d0d0; height:15px; width:125px; border-radius:20px;"></div><br>
+          <div style="background:#dfdfdf; height:10px; width:55px; border-radius:20px;"></div>
         </div>
-        <div v-if="isLoading" class="spinner-container animated flash infinite">
-          <img class="spinner-big"  src="../../img/spinner.svg" alt="">&nbsp;&nbsp;&nbsp;
-          <div style="line-height:10px">
-            <div style="background:#d0d0d0; height:15px; width:125px; border-radius:20px;"></div><br>
-            <div style="background:#dfdfdf; height:10px; width:55px; border-radius:20px;"></div>
+        
+      </div>
+      <div class="no-items" v-if="!isLoading && projects.length < 1">No Projects</div>
+      <div v-if="!isLoading" class="project-list animated-fast fadeInLeft">
+          <div v-for="(project, i) in projects" :key="i" v-on:mouseover="mouseOver(i)" v-on:mouseout="mouseOver(-1)" class="project-item" :class="{'active':(activeProject == i)}" @click="activateProject(i, project._id)">
+              <i class="fa fa-folder-o"></i> 
+              <div class="project-item-title">{{project.project_name}} <br> <span class="animated-fast fadeInDown" v-if="hovered == i || activeProject == i">Created {{formatDate(project.project_create_date)}}</span></div>
+              <!-- <div v-if="hovered == i" class="project-item-options animated-fast fadeInRight"><i class="fa fa-ellipsis-h"></i></div> -->
           </div>
           
-        </div>
-        <div class="no-items" v-if="!isLoading && projects.length < 1">No Projects</div>
-        <div v-if="!isLoading" class="project-list animated-fast fadeInLeft">
-            <div v-for="(project, i) in projects" :key="i" v-on:mouseover="mouseOver(i)" v-on:mouseout="mouseOver(-1)" class="project-item" :class="{'active':(activeProject == i)}" @click="activateProject(i, project._id)">
-                <i class="fa fa-folder-o"></i> 
-                <div class="project-item-title">{{project.project_name}} <br> <span class="animated-fast fadeInDown" v-if="hovered == i || activeProject == i">Created {{formatDate(project.project_create_date)}}</span></div>
-                <!-- <div v-if="hovered == i" class="project-item-options animated-fast fadeInRight"><i class="fa fa-ellipsis-h"></i></div> -->
-            </div>
-            
         </div>
                
     </div>

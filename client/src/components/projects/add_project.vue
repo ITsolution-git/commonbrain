@@ -18,7 +18,7 @@
               </div>
               <div class="modal-buttons">
                   <div @click="hideThis" class="modal-btn cancel">Cancel</div>
-                  <button type="submit" class="modal-btn confirm"><span v-if="!isLoading">Create</span><img v-if="isLoading" class="spinner" src="../../img/spinner_white.svg" alt=""></button>
+                  <button type="submit" class="modal-btn confirm" :style="{background: user.fillButtons? user.theme : 'transparent', color: user.fillButtons ? '#fff' : '#111111', 'border-width': '1px', 'border-color': user.showButtonBorders ? user.buttonBorder.hex : 'none', 'border-style': 'solid'}"><span v-if="!isLoading">Create</span><img v-if="isLoading" class="spinner" src="../../img/spinner_white.svg" alt=""></button>
               </div>
               </form>
               </div>

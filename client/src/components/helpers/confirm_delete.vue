@@ -17,6 +17,7 @@
 </template>
 
 <script>
+import { mapGetters, mapActions } from 'vuex';
 export default {
   name: "confirm_delete",
   props: ["hide", "del"],
@@ -33,6 +34,11 @@ export default {
         that.hide();
       }, 300);
     }
+  },
+  computed: {
+    ...mapGetters({
+      user: 'user',
+    }),
   }
 };
 </script>

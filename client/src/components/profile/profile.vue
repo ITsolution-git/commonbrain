@@ -1,141 +1,129 @@
 <template>
-    <div>
-        <Sidebar :activeNav="activeNav" @activateNav="activateNav"/>
-        <div class="profile-container profile-img-back" v-if="activeNav == 0" >
-            <div class="main-title">User Profile</div>
-            <div class="profile-top-row">
-              <div class="profile-image">
-                <div @mouseover="imageHover" @mouseout="imageHover" class="profile-image-image">
-                  <div v-if="imageHovered" class="image-overlay animated-fast fadeIn"><span class="animated-fast fadeInDown"><i class="fa fa-camera"></i> Change</span></div>
-                  <img style="width:100%;" src="../../img/swany.jpg" alt="">
-                </div>
-                <div class="profile-image-title">Profile Image</div>
-              </div>
-              <div class="profile-details">
-                <div class="profile-detail-item">
-                  <div class="profile-detail-title">Name</div>
-                  <div class="profile-detail-value">Swany Lopez</div>
-                  <div class="profile-detail-change-btn"><i class="fa fa-pencil"></i></div>
-                </div>
-                <div class="profile-detail-item">
-                  <div class="profile-detail-title">Email</div>
-                  <div class="profile-detail-value">Swanylopez@gmail.com</div>
-                  <div class="profile-detail-change-btn"><i class="fa fa-pencil"></i></div>
-                </div>
-                <!-- <div class="profile-detail-item">
-                  <div class="profile-detail-title">Other Detail</div>
-                  <div class="profile-detail-value">Subscriptions</div>
-                  <div class="profile-detail-change-btn"><i class="fa fa-pencil"></i></div>
-                </div> -->
-              </div>
-              <!-- <div class="profile-other">
-                <div class="profile-detail-item">
-                  <div class="profile-detail-title">Member Since</div>
-                  <div class="profile-detail-value">12/01/2017</div>
-                  
-                </div>
-                <div class="profile-detail-item">
-                  <div class="profile-detail-title">Name</div>
-                  <div class="profile-detail-value">Swany Lopez</div>
-                  
-                </div>
-                
-              </div> -->
+  <div>
+    <Cropper :upload="toggleCropper"  :hide="toggleCropper" v-if="cropper" imgType="profile"></Cropper>
+    <Sidebar :activeNav="activeNav" @activateNav="activateNav"/>
+    <div class="profile-container profile-img-back" v-if="activeNav == 0" >
+      <div class="main-title">User Profile</div>
+      <v-layout>
+        <v-flex xs6>
+          <div  class="profile-image">
+            <div @mouseover="imageHover" @mouseout="imageHover" class="profile-image-image">
+              <div v-if="imageHovered" class="image-overlay animated-fast fadeIn" @click="toggleCropper"><span class="animated-fast fadeInDown"><i class="fa fa-camera"></i> Change</span></div>
+              <img style="width:100%;" :src="user.image ?  ('/api/static/' + user._id + '/' +user._id + '.jpg') : '../../img/empty_profile.png'" />
+          
             </div>
-        </div>
-        <div class="profile-container profile-img-back" v-if="activeNav == 1">
-          <div class="main-title">Settings</div>
-          <div class="setting-top-row" v-if="wipUser">
-            <div class="pa-2">
-              <v-flex style="display: flex" xs12 align-center justify-space-around>
-                <div style="width: 30%; border: 1px solid #c0c1c2;"></div>
-                General
-                <div style="width: 30%; border: 1px solid #c0c1c2;"></div>
-              </v-flex>
-              <v-flex style="display: flex" xs6 align-center flex-row flex pa-3>
-                <v-flex xs12 sm6> <span>Theme</span></v-flex>
-                <v-flex xs12 sm6 d-flex align-center>
-                  <select v-model="wipUser.theme">
-                    <option :value="theme.value" v-for="theme in themes" :key="theme.value">{{theme.text}}</option>
-                  </select>
-                </v-flex>
-              </v-flex>
-
-              <v-flex style="display: flex" xs6 >
-              </v-flex>
-
-
-              <v-flex style="display: flex" xs12 align-center justify-space-around>
-                <div style="width: 30%; border: 1px solid #c0c1c2;"></div>
-                Export
-                <div style="width: 30%; border: 1px solid #c0c1c2;"></div>
-              </v-flex>
-              <v-flex style="display: flex" xs6 align-center flex-row flex pa-3>
-                <v-flex xs12 sm6> <span>Show Hover comments as a Tool Tip on Export</span></v-flex>
-                <v-flex xs12 sm6 d-flex align-center>
-                  <select v-model="wipUser.showHoverOnExport">
-                    <option :value="true">Yes</option>
-                    <option :value="false">No</option>
-                  </select>
-                </v-flex>
-              </v-flex>
-              
-
-
-              <v-flex style="display: flex" xs12 align-center justify-space-around>
-                <div style="width: 30%; border: 1px solid #c0c1c2;"></div>
-                Customization
-                <div style="width: 30%; border: 1px solid #c0c1c2;"></div>
-              </v-flex>
-              <v-flex style="display: flex" xs6 align-center flex-row flex pa-3>
-                <v-flex xs12 sm6> <span>You want borders on buttons?</span></v-flex>
-                <v-flex xs12 sm6 d-flex align-center>
-                  <select v-model="wipUser.showButtonBorders">
-                    <option :value="true">Yes</option>
-                    <option :value="false">No</option>
-                  </select>
-                </v-flex>
-              </v-flex>
-              <v-flex style="display: flex" xs6 align-center flex-row flex pa-3>
-                <v-flex xs12 sm6> <span>You want transparent or fill buttons?</span></v-flex>
-                <v-flex xs12 sm6 d-flex align-center>
-                  <select v-model="wipUser.fillButtons">
-                    <option :value="true">Yes</option>
-                    <option :value="false">No</option>
-                  </select>
-                </v-flex>
-              </v-flex>
-              <v-flex style="display: flex" xs6 align-center flex-row flex pa-3>
-                <v-flex xs12 sm6> <span>Border Color</span></v-flex>
-                <v-flex xs12 sm6 d-flex align-center style="position: relative;">
-                  <div style="display: flex; justify-content: center; align-items: center" :style="{'background-color': wipUser.buttonBorder.hex}" @click="showPicker=true">
-                    {{wipUser.buttonBorder.hex}}
-                  </div>
-                  <photoshop v-model="wipUser.buttonBorder" style="position: absolute;" @ok="showPicker=false" @@cancel="showPicker=false" v-if="showPicker"/>
-                </v-flex>
-              </v-flex>
+            <div class="profile-image-title">Profile Image</div>
+          </div>
+        </v-flex>
+        <v-flex xs6>
+          <div class="profile-details">
+            <div class="profile-detail-item">
+              <div class="profile-detail-title">Name</div>
+              <div class="profile-detail-value">{{user.username}}</div>
+              <div class="profile-detail-change-btn"><i class="fa fa-pencil"></i></div>
             </div>
-            <div style="text-align: right; margin-right: 10px">
-              <button @click="save()" class="modal-btn" :style="{background: user.fillButtons? user.theme : 'transparent', color: user.fillButtons ? '#fff' : '#111111', 'border-width': '1px', 'border-color': user.showButtonBorders ? user.buttonBorder.hex : 'none', 'border-style': 'solid'}">
-                Save
-              </button>
+            <div class="profile-detail-item">
+              <div class="profile-detail-title">Email</div>
+              <div class="profile-detail-value">{{user.email}}</div>
+              <div class="profile-detail-change-btn"><i class="fa fa-pencil"></i></div>
             </div>
           </div>
-        </div>
+        </v-flex>
+      </v-layout>
     </div>
+    <div class="profile-container profile-img-back" v-if="activeNav == 1">
+      <div class="main-title">Settings</div>
+      <div class="setting-top-row" v-if="wipUser">
+        <div class="pa-2">
+          <v-flex style="display: flex" xs12 align-center justify-space-around>
+            <div style="width: 30%; border: 1px solid #c0c1c2;"></div>
+            General
+            <div style="width: 30%; border: 1px solid #c0c1c2;"></div>
+          </v-flex>
+          <v-flex style="display: flex" xs6 align-center flex-row flex pa-3>
+            <v-flex xs12 sm6> <span>Theme</span></v-flex>
+            <v-flex xs12 sm6 d-flex align-center>
+              <select v-model="wipUser.theme">
+                <option :value="theme.value" v-for="theme in themes" :key="theme.value">{{theme.text}}</option>
+              </select>
+            </v-flex>
+          </v-flex>
+
+          <v-flex style="display: flex" xs6 >
+          </v-flex>
+
+
+          <v-flex style="display: flex" xs12 align-center justify-space-around>
+            <div style="width: 30%; border: 1px solid #c0c1c2;"></div>
+            Export
+            <div style="width: 30%; border: 1px solid #c0c1c2;"></div>
+          </v-flex>
+          <v-flex style="display: flex" xs6 align-center flex-row flex pa-3>
+            <v-flex xs12 sm6> <span>Show Hover comments as a Tool Tip on Export</span></v-flex>
+            <v-flex xs12 sm6 d-flex align-center>
+              <select v-model="wipUser.showHoverOnExport">
+                <option :value="true">Yes</option>
+                <option :value="false">No</option>
+              </select>
+            </v-flex>
+          </v-flex>
+          
+
+
+          <v-flex style="display: flex" xs12 align-center justify-space-around>
+            <div style="width: 30%; border: 1px solid #c0c1c2;"></div>
+            Customization
+            <div style="width: 30%; border: 1px solid #c0c1c2;"></div>
+          </v-flex>
+          <v-flex style="display: flex" xs6 align-center flex-row flex pa-3>
+            <v-flex xs12 sm6> <span>You want borders on buttons?</span></v-flex>
+            <v-flex xs12 sm6 d-flex align-center>
+              <select v-model="wipUser.showButtonBorders">
+                <option :value="true">Yes</option>
+                <option :value="false">No</option>
+              </select>
+            </v-flex>
+          </v-flex>
+          <v-flex style="display: flex" xs6 align-center flex-row flex pa-3>
+            <v-flex xs12 sm6> <span>You want transparent or fill buttons?</span></v-flex>
+            <v-flex xs12 sm6 d-flex align-center>
+              <select v-model="wipUser.fillButtons">
+                <option :value="true">Yes</option>
+                <option :value="false">No</option>
+              </select>
+            </v-flex>
+          </v-flex>
+          <v-flex style="display: flex" xs6 align-center flex-row flex pa-3>
+            <v-flex xs12 sm6> <span>Border Color</span></v-flex>
+            <v-flex xs12 sm6 d-flex align-center style="position: relative;">
+              <div style="display: flex; justify-content: center; align-items: center" :style="{'background-color': wipUser.buttonBorder.hex}" @click="showPicker=true">
+                {{wipUser.buttonBorder.hex}}
+              </div>
+              <photoshop v-model="wipUser.buttonBorder" style="position: absolute;" @ok="showPicker=false" @@cancel="showPicker=false" v-if="showPicker"/>
+            </v-flex>
+          </v-flex>
+        </div>
+        <div style="text-align: right; margin-right: 10px">
+          <button @click="save()" class="modal-btn" :style="{background: user.fillButtons? user.theme : 'transparent', color: user.fillButtons ? '#fff' : '#111111', 'border-width': '1px', 'border-color': user.showButtonBorders ? user.buttonBorder.hex : 'none', 'border-style': 'solid'}">
+            Save
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 <script>
 import Sidebar from "./sidebar";
 import { mapGetters, mapActions } from 'vuex';
 import ApiWrapper from '@/shared/utils/ApiWrapper';
 import { Photoshop } from 'vue-color'
-
+import Cropper from "../file/cropper";
 export default {
   name: "profile",
   data() {
     return {
       imageHovered: false,
-      activeNav: 1,
+      activeNav: 0,
       themes: [{
         value: '#FF0000',
         text: 'Red',
@@ -160,7 +148,9 @@ export default {
       }],
 
       wipUser: null,
-      showPicker: false
+      showPicker: false,
+
+      cropper: false
     };
   },
   watch: {
@@ -169,6 +159,7 @@ export default {
     },
   },
   components: {
+    Cropper,
     Sidebar,
     Photoshop
   },
@@ -185,7 +176,10 @@ export default {
 
     save() {
       this.$store.dispatch('updateUser', this.wipUser);
-    }
+    },
+    toggleCropper: function() {
+      this.cropper = !this.cropper;
+    },
   },
   computed: {
     ...mapGetters({
@@ -206,11 +200,8 @@ export default {
 .setting-top-row {
 }
 .profile-image {
-  overflow: hidden;
   display: flex;
   flex-direction: column;
-  margin: 15px;
-  padding: 55px;
   align-items: center;
   justify-content: center;
 }

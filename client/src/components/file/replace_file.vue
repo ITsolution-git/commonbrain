@@ -20,7 +20,7 @@
           <div v-if="hasError" class="alert-danger animated fadeIn" style="color:#ff0000; margin:15px;">{{errorMessage}}</div>
           <div class="modal-buttons">
               <div @click="hideThis" class="modal-btn cancel">Cancel</div>
-              <button class="modal-btn confirm" type="submit"><span v-if="!isLoading">Upload</span> <img v-if="isLoading" style="width:25px" src="../../img/spinner_white.svg"/></button>
+              <button class="modal-btn confirm" type="submit" :style="{background: user.fillButtons? user.theme : 'transparent', color: user.fillButtons ? '#fff' : '#111111', 'border-width': '1px', 'border-color': user.showButtonBorders ? user.buttonBorder.hex : 'none', 'border-style': 'solid'}"><span v-if="!isLoading">Upload</span> <img v-if="isLoading" style="width:25px" src="../../img/spinner_white.svg"/></button>
           </div>
           </form>
           </div>

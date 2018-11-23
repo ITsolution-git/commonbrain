@@ -7,7 +7,11 @@
       <!-- <div @click="$router.push('/templates')" :class="{'nav-item': true, active: currentPath.indexOf('templates')!=-1}">Templates</div> -->
     </div>
     <div class="user-nav">
-      <div @click="toggleUserDropdown" :class="'nav-item nav-item-' + user.theme"><i class="fa fa-user-circle-o"></i>
+      <div @click="toggleUserDropdown" :class="'nav-item nav-item-' + user.theme">
+        <div>
+          <img style="" :src="user.image ?  ('/api/static/' + user._id + '/' +user._id + '.jpg') : '../../img/empty_profile.png'" class="profile-avatar"/>
+          {{user.username}}
+        </div>
         <div v-click-outside="toggleUserDropdown" v-if="userDropdown" class="simple-dropdown animated-fast fadeInDown">
           <ul>
             <li @click="$router.push('/profile')">Profile</li>
@@ -119,5 +123,10 @@ export default {
   text-align: left;
   white-space: nowrap;
   color: #4a4a4a;
+}
+.profile-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
 }
 </style>

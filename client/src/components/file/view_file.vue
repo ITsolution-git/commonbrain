@@ -9,6 +9,7 @@
           field="Search Entity"
           v-model="searchEntityKey"
           width="100%"
+          placeholder="Entity Name..."
         />
       </div>
       <table class="standard-table">
@@ -35,7 +36,7 @@
     </div>
 
     <div class="projects-container" v-else>
-      <div class="breadcrumbs-cont">
+      <div class="breadcrumbs-cont" :style="{'border': '1px solid ' + user.buttonBorder.hex}">
         <a class="breadcrumbs-item" @click="$router.push('/projects/' + projectId)" style="color: #66d0f7">Project: {{project.project_name}}</a><span>/</span>
         <div class="breadcrumbs-item">File: {{file.name}}</div><span>/</span>
         <div class="breadcrumbs-item" v-if="activeDash">Dash: {{activeDash.dashName}}</div><span  v-if="activeDash">/</span>
@@ -51,9 +52,13 @@
           <button @click="toggleCollapseAll" class="modal-btn btn-white" style="width: 120px" type="submit" :style="{background: user.fillButtons? user.theme : 'transparent', color: user.fillButtons ? '#fff' : '#111111', 'border-width': '1px', 'border-color': user.showButtonBorders ? user.buttonBorder.hex : 'none', 'border-style': 'solid'}">
             {{collapseStatus  == 'collapse' ? 'Expand All' : 'Collapse All'}}
           </button>
-          <button @click="rootImgBoxStatus = (rootImgBoxStatus=='show' ? 'hide' : 'show')" class="modal-btn btn-icon" :class="{'btn-icon-toggled': rootImgBoxStatus=='hide'}" type="submit" :style="{background: user.fillButtons? user.theme : 'transparent', color: user.fillButtons ? '#fff' : '#111111', 'border-width': '1px', 'border-color': user.showButtonBorders ? user.buttonBorder.hex : 'none', 'border-style': 'solid'}">
-            <i class="fa fa-image"></i>
-          </button>
+
+          <v-tooltip bottom style="">
+            <button slot="activator" style="padding: 7px 10px" @click="rootImgBoxStatus = (rootImgBoxStatus=='show' ? 'hide' : 'show')" class="modal-btn btn-icon" :class="{'btn-icon-toggled': rootImgBoxStatus=='hide'}" type="submit" :style="{background: user.fillButtons? user.theme : 'transparent', color: user.fillButtons ? '#fff' : '#111111', 'border-width': '1px', 'border-color': user.showButtonBorders ? user.buttonBorder.hex : 'none', 'border-style': 'solid'}">
+              <i class="fa fa-image"></i>
+            </button>
+            <span>Images</span>
+          </v-tooltip>
         </div>
       </div>
 
@@ -81,8 +86,8 @@
           <i class="fa fa-close" @click="rootImgBoxStatus='hide'"></i>
         </div>
       </div>
-      <div class="tab-container">
-        <div v-for="(tab,i) in tabs" :class="{'active':(activeTab == tab), 'tab-name': true}" :key="i" @click="activateTab(i,tab)" class="tab">{{tab}}</div>
+      <div class="tab-container" :style="{'border-bottom': '1px solid ' + user.buttonBorder.hex}">
+        <div v-for="(tab,i) in tabs" :class="{'active':(activeTab == tab), 'tab-name': true}" :key="i" @click="activateTab(i,tab)" class="tab" :style="{'border': '1px solid ' + user.buttonBorder.hex}">{{tab}}</div>
       </div>
       <div v-if="isLoading"  style="display:flex; align-items:center; justify-content:center;width:100%; height:100%;">
       <img class="spinner-big" src="../../img/spinner.svg" alt="">
@@ -90,7 +95,7 @@
       <div v-if="!isLoading" class="main-data-container animated-fast fadeInUp">
         <div v-for="(data,i) in filteredMainData" :key="i" class="data-container">
           
-          <div class="data-item" @click="toggleDropdown(i)">
+          <div class="data-item" @click="toggleDropdown(i)" :style="{'border-bottom': '1px solid ' + user.buttonBorder.hex}">
             <div style="display: flex; flex-direction: row; align-items: center">
               <i class="fa fa-minus" v-if="data.show"></i>
               <i class="fa fa-plus" v-if="!data.show"></i>
@@ -628,7 +633,6 @@ export default {
   display: flex;
   align-items: center;
   padding-top: 10px;
-  border-bottom: solid 1px #4a4a4a;
   box-shadow: inset -9px -18px 10px -20px rgba(0, 0, 0, 0.2);
   padding-left: 15px;
   background: #f8fafb;
@@ -641,7 +645,6 @@ export default {
   background: #fff;
   border-top-right-radius: 3px;
   border-top-left-radius: 3px;
-  border: solid 1px #4a4a4a;
   height: 50px;
   font-size: 10pt;
   padding: 10px;
@@ -664,7 +667,7 @@ export default {
 }
 .tab.active {
   color: #66d0f7;
-  border-bottom: none;
+  border-bottom: none !important;
 }
 .data-container {
   padding: 15px;
@@ -695,7 +698,6 @@ export default {
   display: flex;
   width: 100%;
   justify-content: space-between;
-  border-bottom: solid 1px #4a4a4a;
   cursor: pointer;
   align-items: center;
 }

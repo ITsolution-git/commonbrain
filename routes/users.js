@@ -5,10 +5,27 @@ var MongoClient = require("mongodb").MongoClient;
 var CircularJSON = require("circular-json");
 var ObjectId = require("mongodb").ObjectId;
 var crypto = require("crypto");
+var fs = require("fs-extra");
 
 var URL = process.env.MONGO_URL;
 
+var storage = multer.diskStorage({
+  destination: function(req, file, cb) {
+    cb(null, "./tmp/");
+  },
+  filename: function(req, file, cb) {
+    //var datetimestamp = Date.now();
+    cb(null, file.originalname);
+  }
+});
 
+var upload = multer({
+  storage: storage,
+  onError: function(err, next) {
+    console.log("error", err);
+    next(err);
+  }
+}).single("file");
 router.get("/:userId", (req, res, next) => {
   var token = req.headers["authorization"];
   if (!req.params.userId) {
@@ -115,4 +132,40 @@ router.delete("/:id", (req, res, next) => {
   });
 });
 
+
+
+//--------------------------------
+// Upload Profile Image
+//--------------------------------
+
+router.post("/:userId/profile-image", (req, res, next) => {
+  upload(req, res, function(err) {
+    var userId = req.params.userId;
+    if(err){
+      console.log(err)
+    }
+    var extension = req.file.filename.substr(-4);
+    var fileName = userId;
+    fs.rename('./tmp/' + req.file.filename, './tmp/'+ fileName + extension).then(res1=>{
+      fs.move('./tmp/' + fileName + extension, './uploads/'+userId+'/' + fileName + extension, { overwrite: true }).then(result=>{
+        MongoClient.connect(URL, function(err, db) {
+          if (err) throw err;
+          var collection = db.collection("users");
+          collection.findOne({ _id: ObjectId(userId) }).then(result => {
+            if (result != null) {
+              collection
+                .update({ _id: ObjectId(userId) },{$set : {"image": true}})
+                .then(result => {
+                  res.status(200).send({message:'uploaded'})
+                });
+            } else {
+              res.status(401).send({ error: err });
+            }
+          });
+        });
+        
+      })
+    });
+  })
+})
 module.exports = router;

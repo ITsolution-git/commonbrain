@@ -14,7 +14,7 @@
         </div>
         <div class="modal-btn-container">
           <div @click="toggleVisible" id="cancel-btn" class="modal-btn cancel">Cancel</div>
-          <div id="delete-btn"  class="modal-btn confirm">Export</div>
+          <div id="delete-btn"  class="modal-btn confirm" :style="{background: user.fillButtons? user.theme : 'transparent', color: user.fillButtons ? '#fff' : '#111111', 'border-width': '1px', 'border-color': user.showButtonBorders ? user.buttonBorder.hex : 'none', 'border-style': 'solid'}">Export</div>
         </div>
       </div>
     </div>

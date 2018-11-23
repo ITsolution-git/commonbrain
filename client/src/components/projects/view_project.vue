@@ -8,7 +8,21 @@
         <div style="display:flex; align-items:center;">
           <img class="spinner" v-if="isLoading" src="../../img/spinner.svg" alt="">
           {{projectName}}
-          <div class="left-sub-sidebar-options">
+
+          <v-tooltip bottom style="">
+            <button slot="activator" @click.stop="toggleFileUpload" class="modal-btn btn-icon" type="submit" :style="{background: user.fillButtons? user.theme : 'transparent', color: user.fillButtons ? '#fff' : '#111111', 'border-width': '1px', 'border-color': user.showButtonBorders ? user.buttonBorder.hex : 'none', 'border-style': 'solid'}">
+              <i class="fa fa-plus"></i>
+            </button>
+            <span>Add File</span>
+          </v-tooltip>
+
+          <v-tooltip bottom style="">
+            <button slot="activator" @click.stop="toggleConfirmDelete" class="modal-btn btn-icon" type="submit" :style="{background: user.fillButtons? user.theme : 'transparent', color: user.fillButtons ? '#fff' : '#111111', 'border-width': '1px', 'border-color': user.showButtonBorders ? user.buttonBorder.hex : 'none', 'border-style': 'solid'}">
+              <i class="fa fa-trash"></i>
+            </button>
+            <span>Delete Project</span>
+          </v-tooltip>
+          <!-- <div class="left-sub-sidebar-options">
             <div @click.stop="toggleOptionsDropdown" class="add-project-btn dropdown-btn"><i class="fa fa-ellipsis-h" />
                 <div v-click-outside="toggleOptionsDropdown"  v-if="optionsDropdown" class="basic-dropdown add-project-btn-dropdown animated-fast fadeInDown">
                   <ul>
@@ -17,7 +31,7 @@
                   </ul>
                 </div>
             </div>
-          </div>
+          </div> -->
 
         </div>
       </div>
@@ -66,7 +80,7 @@ export default {
       this.fileUpload = !this.fileUpload;
     },
     deleteThisProject() {
-      var userId = JSON.parse(JSON.stringify(this.$store.state.user.id));
+      var userId = JSON.parse(JSON.stringify(this.user._id));
       var projectId = JSON.parse(JSON.stringify(this.projectId));
       this.deleteProject({ userId: userId, projectId: projectId });
       this.$router.push("/projects");

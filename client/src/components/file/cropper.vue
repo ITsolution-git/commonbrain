@@ -2,7 +2,7 @@
   <div class="overlay animated-fast fadeIn" >
     <div class="modal-1 animated-fast zoomIn" style="width: 400px">
       <div class="modal-top">
-        <div class="modal-title"> Change Logo / Image</div>
+        <div class="modal-title"> {{imgType == 'profile' ? 'Upload Profile Image' : 'Change Logo / Image'}}</div>
         <div v-on:click="hide" class="modal-close"><img src="../../img/close.svg"/></div>
       </div>
       <div class="modal-inner">
@@ -21,7 +21,7 @@
 
         <div class="modal-btn-container">
           <div @click="hide"  class="modal-btn cancel">Cancel</div>
-          <div @click="crop()"  class="modal-btn confirm">Confirm</div>
+          <div @click="crop()"  class="modal-btn confirm" :style="{background: user.fillButtons? user.theme : 'transparent', color: user.fillButtons ? '#fff' : '#111111', 'border-width': '1px', 'border-color': user.showButtonBorders ? user.buttonBorder.hex : 'none', 'border-style': 'solid'}">Confirm</div>
         </div>
       </div>
     </div>
@@ -84,7 +84,20 @@ export default {
         var file = this.dataURLtoFile(this.cropped, "file.jpg");
         var formData = new FormData();
         formData.append("file", file);
-        ApiWrapper
+        if (this.imgType == 'profile') {
+          ApiWrapper
+          .post(
+            "/api/users/" +
+              this.userId +
+              "/profile-image",
+            formData
+          )
+          .then(res => {
+            //console.log(res.data);
+            window.location.reload();
+          });
+        } else {
+          ApiWrapper
           .post(
             "/api/files/" +
               this.userId +
@@ -99,6 +112,7 @@ export default {
             //console.log(res.data);
             window.location.reload();
           });
+        }
       });
     },
     cropViaEvent() {
@@ -119,7 +133,7 @@ export default {
       return this.$route.params.projectId;
     },
     userId() {
-      return this.$store.state.user.id;
+      return this.$store.state.user._id;
     },
     fileId() {
       return this.$route.params.fileId;
