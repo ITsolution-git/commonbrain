@@ -78,7 +78,7 @@
       <div class="root-images-container" :class="{'root-images-container-opened': rootImgBoxStatus=='hide'}">
         <div class="root-images">
           <div class="root-image-item" v-for="(img,index) in file.rootImages" :key="index"  v-viewer>
-            <img :src="img.link" />
+            <img :src="img.link" @mouseover="mouseHoverImage($event, index)" @mouseleave="mouseLeaveImage($event, index)" ref="rootImageEl"/>
           </div>
         </div>
 
@@ -173,6 +173,16 @@ export default {
   },
   methods: {
     ...mapActions(["getFile"]),
+    mouseHoverImage(event, index) {
+      clearTimeout(this.imgTimer);
+      this.imgTimer = setTimeout(()=>{
+        this.$refs.rootImageEl[index].click();
+      }, 1000)
+      
+    },
+    mouseLeaveImage(event) {
+      clearTimeout(this.imgTimer);
+    },
     exportExcel() {
 
       ApiWrapper
@@ -756,7 +766,7 @@ export default {
 }
 .root-images-container {
   display: flex;
-  transition: all 0.1s ease-out;
+  /*transition: all 0.1s ease-out;*/
   flex-direction: row;
   width: 100%;
   &.root-images-container-opened {
