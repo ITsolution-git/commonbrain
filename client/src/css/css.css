@@ -414,6 +414,8 @@ table td {
   width: 100%;
 }
 .standard-table {
+  color: #000000;
+  font-weight: 400;
   width: 100%;
 }
 .standard-table th {
@@ -741,7 +743,8 @@ table td {
   user-select: none;
   padding: 10px;
   font-size: 10pt;
-  color: #688187;
+  color: #000000;
+  font-weight: #300;
   cursor: pointer;
 }
 
@@ -751,7 +754,7 @@ table td {
 }
 
 .basic-dropdown li:hover {
-  color: #000;
+  font-weight: 400;
 }
 .spinner {
   height: 25px;

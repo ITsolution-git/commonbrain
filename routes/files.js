@@ -68,6 +68,15 @@ router.get("/download/:userId/:projectId/:fileId", (req, res, next) => {
 router.get("/report/excel/:fileId", (req, res, next) => {
   
   const fileId = req.params.fileId;
+  const pad_with_zeroes = function(number, length) {
+    var my_string = '' + number;
+    while (my_string.length < length) {
+        my_string = '0' + my_string;
+    }
+
+    return my_string;
+  }
+
   MongoClient.connect(URL, function(err, db) {
     if (err) throw err;
     var collection = db.collection("files");
@@ -100,7 +109,7 @@ router.get("/report/excel/:fileId", (req, res, next) => {
         };
         let rowNum = 2;
         let row;
-        renderData.map(dash=>{
+        renderData.map((dash, dashIndex)=>{
           
           row = worksheet.addRow([`${dash.dash.dashName || ''}  ${dash.dash.name2 || ''}`]);
           row.height = 30;
@@ -108,28 +117,33 @@ router.get("/report/excel/:fileId", (req, res, next) => {
               size: 25,
               bold: true
           };
+          row.getCell(1).name = "Dash" + pad_with_zeroes(dashIndex+1, 2);
           rowNum ++;
-          dash.data.map(sheet=>{
+          dash.data.map((sheet, sheetIndex)=>{
             row = worksheet.addRow(['', `${sheet.name || ''}`]);
             row.height = 25;
-            row.getCell(1).font = {
+            row.getCell(2).font = {
                 size: 20,
                 bold: true
             };
+            row.getCell(2).name = "Dash" + pad_with_zeroes(dashIndex+1, 2) + "Sheet" + pad_with_zeroes(sheetIndex+1, 2);
             rowNum ++;
-            sheet.data.map(tab=>{
+            sheet.data.map((tab, tabIndex)=>{
               row = worksheet.addRow(['', '', `${tab.name || ''}`]);
               row.height = 20;
-              row.getCell(1).font = {
+              row.getCell(3).font = {
                   size: 18,
                   bold: true
               };
+              row.getCell(3).name = "Dash" + pad_with_zeroes(dashIndex+1, 2) + "Sheet" + pad_with_zeroes(sheetIndex+1, 2) + "Tab" + pad_with_zeroes(tabIndex+1, 2);
               rowNum ++;
 
-              tab.data.map(majcat=>{
+              tab.data.map((majcat, majIndex)=>{
                 row = worksheet.addRow(['', '', '', `${majcat.name || ''}`]);
                 rowNum ++;
 
+                row.getCell(4).name = "Dash" + pad_with_zeroes(dashIndex+1, 2) + "Sheet" + pad_with_zeroes(sheetIndex+1, 2) + "Tab" + pad_with_zeroes(tabIndex+1, 2) + "Major" + pad_with_zeroes(majIndex+1, 2);
+                
                 for (let i = 0; i < majcat.data.length; i+=2) {
                   if (i+1 < majcat.data.length) {
                     row = worksheet.addRow(['', '', '', '', `${majcat.data[i].spec_category || ''}`, `${majcat.data[i].formatted || ''}`, '', `${majcat.data[i+1].spec_category || ''}`, `${majcat.data[i+1].formatted || ''}`]);

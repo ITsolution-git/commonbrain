@@ -75,7 +75,7 @@
           <img :src="imagePath" v-if="imagePath" style="height: 200px; margin: 0 auto; width: auto"/>
         </div>
       </div>
-      <div class="root-images-container" :class="{'root-images-container-opened': rootImgBoxStatus=='hide'}">
+      <div class="root-images-container" :class="{'root-images-container-opened': rootImgBoxStatus=='hide'}" v-if="file.rootImages && file.rootImages.length > 0">
         <div class="root-images">
           <div class="root-image-item" v-for="(img,index) in file.rootImages" :key="index"  v-viewer>
             <img :src="img.link" @mouseover="mouseHoverImage($event, index)" @mouseleave="mouseLeaveImage($event, index)" ref="rootImageEl"/>
@@ -130,7 +130,7 @@ import Cropper from "./cropper";
 import FileSidebar from "./file_sidebar";
 import { mapGetters, mapActions } from 'vuex';
 import StandardInput from "../form_elements/standard_input";
-
+import moment from 'moment';
 import ApiWrapper from '@/shared/utils/ApiWrapper';
 var _ = require('lodash');
 
@@ -195,7 +195,7 @@ export default {
           const url = window.URL.createObjectURL(new Blob([res.data]));
           const link = document.createElement("a");
           link.href = url;
-          link.setAttribute("download", this.file.filename);
+          link.setAttribute("download", this.file.name + '_' + moment().format('YYYY-MM-DD HH:mm') + '.xlsx');
           document.body.appendChild(link);
           link.click();
         });
@@ -647,6 +647,7 @@ export default {
   padding-left: 15px;
   background: #f8fafb;
 }
+
 .tab-name {
   font-size: 17px !important;
   font-weight: 600 !important;
@@ -662,7 +663,7 @@ export default {
   max-width: 200px;
   width: 100%;
   font-weight: 500;
-  color: #ddd;
+  color: #2a2a2a;
   display: flex;
   align-items: center;
   justify-content: center;
