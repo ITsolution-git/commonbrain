@@ -80,10 +80,22 @@ router.get("/report/excel/:fileId", (req, res, next) => {
   MongoClient.connect(URL, function(err, db) {
     if (err) throw err;
     var collection = db.collection("files");
-    collection
-      .find({ _id: ObjectId(fileId) }, { sheet: 0 })
-      .toArray()
-      .then(result => {
+    var users = db.collection("users");
+    var user = null;
+    users
+    .find({ _id: ObjectId(req.user._id) }, { sheet: 0 })
+    .toArray()
+    .then(result => {
+      if (result.length > 0)
+        return result[0];
+      else
+        throw new Error('User is not Found');
+    }).then(userObj => {
+      user = userObj;
+      return collection
+        .find({ _id: ObjectId(fileId) }, { sheet: 0 })
+        .toArray();
+    }).then(result => {
 
         let renderData = xlxsUtil.getRenderData(result[0]);
         var workbook = new Excel.Workbook();
@@ -148,9 +160,9 @@ router.get("/report/excel/:fileId", (req, res, next) => {
                   if (i+1 < majcat.data.length) {
                     row = worksheet.addRow(['', '', '', '', `${majcat.data[i].spec_category || ''}`, `${majcat.data[i].formatted || ''}`, '', `${majcat.data[i+1].spec_category || ''}`, `${majcat.data[i+1].formatted || ''}`]);
 
-                    if (majcat.data[i].source)
+                    if (majcat.data[i].source && user.showHyperlink)
                       row.getCell(6).value = { text: majcat.data[i].formatted, hyperlink: majcat.data[i].source };
-                    if (majcat.data[i+1].source)
+                    if (majcat.data[i+1].source && user.showHyperlink)
                       row.getCell(9).value = { text: majcat.data[i+1].formatted, hyperlink: majcat.data[i+1].source };
 
                     row.getCell(5).alignment = { wrapText: true };
@@ -161,7 +173,7 @@ router.get("/report/excel/:fileId", (req, res, next) => {
                   } else {
                     row = worksheet.addRow(['', '', '', '', `${majcat.data[i].spec_category || ''}`, `${majcat.data[i].formatted || ''}`]);
 
-                    if (majcat.data[i].source)
+                    if (majcat.data[i].source && user.showHyperlink)
                       row.getCell(6).value = { text: majcat.data[i].formatted, hyperlink: majcat.data[i].source };
                     
                     row.getCell(5).alignment = { wrapText: true };
@@ -180,7 +192,9 @@ router.get("/report/excel/:fileId", (req, res, next) => {
         workbook.xlsx.writeFile(filename).then(()=>{
           res.download(filename)
         });
-      });
+    }).catch(err => {
+      res.status(500).json(err);
+    });
   });
 });
 
@@ -365,7 +379,8 @@ router.post("/:projectId/add", (req, res, next) => {
                 logoFrom: 'file',
                 logoFileUrl: obj.logoFileUrl,
                 rootImages: obj.rootImages,
-                majorImages: obj.majorImages
+                majorImages: obj.majorImages,
+                dashItemNameLabel:  obj.dashItemNameLabel
               };
               MongoClient.connect(URL, function(err, db) {
                 if (err) throw err;
@@ -468,7 +483,8 @@ router.post("/replace/:projectId/:fileId", (req, res, next) => {
                         logoFrom: 'file',
                         logoFileUrl: obj.logoFileUrl,
                         rootImages: obj.rootImages,
-                        majorImages: obj.majorImages
+                        majorImages: obj.majorImages,
+                        dashItemNameLabel: obj.dashItemNameLabel
                       }})
                       .then(
                         result => {

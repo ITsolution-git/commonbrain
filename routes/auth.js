@@ -56,7 +56,8 @@ router.post("/signup", (req, res, next) => {
             showHoverOnExport: false, 
             buttonBorder: {hex: '#000000'}, 
             showButtonBorders: true, 
-            fillButtons: true
+            fillButtons: true,
+            showHyperlink: true
           })
           .then(result => {
 
@@ -82,7 +83,7 @@ router.get("/me", function(req, res) {
   if (!token[1])
     return res.status(401).send({ auth: false, message: "No token provided." });
 
-    jwt.verify(token[1], config.secret, function(err, decoded) {
+  jwt.verify(token[1], config.secret, function(err, decoded) {
     if (err)
       return res
         .status(500)

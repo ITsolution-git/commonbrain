@@ -6,15 +6,15 @@
     <div class="projects-container" v-if="selectDashScreen" style="padding: 30px;overflow-y: auto;">
       <div>
         <StandardInput
-          field="Search Entity"
+          :field="'Serach ' + dashItemNameLabel"
           v-model="searchEntityKey"
           width="100%"
-          placeholder="Entity Name..."
+          :placeholder="dashItemNameLabel+'...'"
         />
       </div>
       <table class="standard-table">
         <tbody>
-          <tr><th>Entity Name</th><th>Name2</th><th>Status</th><th>Geography</th><th>Other</th></tr>
+          <tr><th>{{dashItemNameLabel}} Name</th><th>Name2</th><th>Status</th><th>Geography</th><th>Other</th></tr>
           <tr v-for="(dash,i)  in filteredDashes" :key="i">
             <td @click="activateDash(dash)">
               <div  class="project-name">
@@ -75,9 +75,9 @@
           <img :src="imagePath" v-if="imagePath" style="height: 200px; margin: 0 auto; width: auto"/>
         </div>
       </div>
-      <div class="root-images-container" :class="{'root-images-container-opened': rootImgBoxStatus=='hide'}" v-if="file.rootImages && file.rootImages.length > 0">
+      <div class="root-images-container" :class="{'root-images-container-opened': rootImgBoxStatus=='hide'}" v-if="dashRootImges && dashRootImges.length > 0">
         <div class="root-images">
-          <div class="root-image-item" v-for="(img,index) in file.rootImages" :key="index"  v-viewer>
+          <div class="root-image-item" v-for="(img,index) in dashRootImges" :key="index"  v-viewer>
             <img :src="img.link" @mouseover="mouseHoverImage($event, index)" @mouseleave="mouseLeaveImage($event, index)" ref="rootImageEl"/>
           </div>
         </div>
@@ -163,7 +163,10 @@ export default {
       cropper: false,
 
       dashImages: [],
-      rootImgBoxStatus: 'show'
+      dashRootImges: [],
+      rootImgBoxStatus: 'show',
+
+      dashItemNameLabel: 'Asset Name'
     };
   },
   watch: {
@@ -327,6 +330,7 @@ export default {
       }
     },
     getRows() {
+      this.dashItemNameLabel = this.file.dashItemNameLabel ? this.file.dashItemNameLabel : 'Asset Name';
       if (this.file.dashes) {
         for (let key in this.file.dashes) {
           this.dashes.push(this.file.dashes[key]);
@@ -358,8 +362,9 @@ export default {
         this.activateSheet(this.activeSheet);
 
         this.dashImages = this.file.majorImages.filter(row=>row.dashItem == dash.dashName);
+        this.dashRootImges = this.file.rootImages.filter(row=>row.dashItem == dash.dashName);;
       } else {
-
+        this.dashRootImges = this.file.rootImages;
         this.activeSheet = "";
         this.activeRows = [];
         this.activeData = [];

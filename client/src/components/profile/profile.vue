@@ -67,6 +67,16 @@
               </select>
             </v-flex>
           </v-flex>
+          <v-flex style="display: flex" xs6 align-center flex-row flex pa-3>
+            <v-flex xs12 sm6> <span>Show HyperLinks?</span></v-flex>
+            <v-flex xs12 sm6 d-flex align-center>
+              <select v-model="wipUser.showHyperlink">
+                <option :value="true">Yes</option>
+                <option :value="false">No</option>
+              </select>
+            </v-flex>
+          </v-flex>
+
           
 
 
@@ -85,7 +95,7 @@
             </v-flex>
           </v-flex>
           <v-flex style="display: flex" xs6 align-center flex-row flex pa-3>
-            <v-flex xs12 sm6> <span>You want transparent or fill buttons?</span></v-flex>
+            <v-flex xs12 sm6> <span>Do you want buttons to be transparent?</span></v-flex>
             <v-flex xs12 sm6 d-flex align-center>
               <select v-model="wipUser.fillButtons">
                 <option :value="true">Yes</option>
@@ -166,7 +176,7 @@ export default {
     Photoshop
   },
   mounted() {
-    this.wipUser = Object.assign({ theme: '#66d0f7', showHoverOnExport: false, buttonBorder: {hex: '#000000'}, showButtonBorders: true, fillButtons: true}, this.$store.state.user);
+    this.wipUser = Object.assign({ theme: '#66d0f7', showHoverOnExport: false, buttonBorder: {hex: '#000000'}, showButtonBorders: true, fillButtons: true, showHyperlink: true},  this.$store.state.user);
   },
   methods: {
     activateNav(nav) {

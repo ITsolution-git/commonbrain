@@ -41,7 +41,7 @@
         </v-tooltip>
       </div>
       <div class="sidebar-title" v-if="file">
-        <span style="font-style: italic;">{{file.name}}.xlsx</span>
+        <span style="font-style: italic;">{{file.filename}}</span>
           <!-- class="left-sub-sidebar-options" -->
           <div>
           <!-- class="" -->

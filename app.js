@@ -12,6 +12,7 @@ var ofacRoutes = require("./routes/ofac");
 var fileRoutes = require("./routes/files");
 var templateRoutes = require("./routes/templates");
 
+var authMiddleware = require('./middlewares/auth');
 var morgan = require("morgan");
 var nodemailer = require('nodemailer');
 var smtpTransport = require("nodemailer-smtp-transport");
@@ -33,13 +34,14 @@ app.use((req, res, next) => {
 
 app.use(express.static(path.join(__dirname + '/client/dist')));
 
-app.use("/api/users", userRoutes);
-app.use("/api/upload", uploadRoutes);
 app.use("/api/auth", authRoutes);
-app.use("/api/projects", projectRoutes);
-app.use("/api/files", fileRoutes);
-app.use("/api/templates", templateRoutes);
-app.use("/api/ofac", ofacRoutes);
+app.use("/api/projects", authMiddleware, projectRoutes);
+app.use("/api/files", authMiddleware, fileRoutes);
+app.use("/api/users", authMiddleware, userRoutes);
+app.use("/api/upload", authMiddleware, uploadRoutes);
+app.use("/api/templates", authMiddleware, templateRoutes);
+app.use("/api/ofac", authMiddleware, ofacRoutes);
+
 app.use('/api/static', express.static(path.join(__dirname + '/uploads')));
 
 app.post('/api/learnmore', (req,res,next)=>{

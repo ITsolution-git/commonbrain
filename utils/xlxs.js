@@ -18,6 +18,7 @@ module.exports.parseSheet = function(filename) {
   var names = sheet.Workbook.Names;
   
   var namedRanges = {};
+  var dashItemNameLabel = 'Asset Name';
   for(var n = 1; n < names.length; n++){
       var name1 = names[n].Ref;
       namedRanges[names[n].Name] = name1;
@@ -144,6 +145,13 @@ module.exports.parseSheet = function(filename) {
     for (let key in cbd) {
       var letter = key.charAt(0);
       var number = key.substr(1);
+
+      if (namedRanges['DashItemNameLabel'] && namedRanges['DashItemNameLabel'].split('$').length > 2) {
+        if (letter == namedRanges['DashItemNameLabel'].split('$')[1] && number == namedRanges['DashItemNameLabel'].split('$')[2]) {
+          dashItemNameLabel = cbd[key].v;
+        }
+      }
+
       if (letter.match(/[a-z]/i) || letter.match(/[A-z]/i)) {
         
         if (number > 2) {
@@ -236,7 +244,7 @@ module.exports.parseSheet = function(filename) {
   imageFileUrl = ''; //ignore this one for now
 
   return {
-  	success: 1, rows, sheet, title, dashes, imageFileUrl, logoFileUrl, rootImages, majorImages
+  	success: 1, rows, sheet, title, dashes, imageFileUrl, logoFileUrl, rootImages, majorImages, dashItemNameLabel
   }
 }
 
