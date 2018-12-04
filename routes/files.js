@@ -41,6 +41,17 @@ var upload = multer({
   }
 }).single("file");
 
+
+function makeLink(link) {
+  link = link + '';
+  if (!link.startsWith('https://') || !link.startsWith('http://')) {
+    // The following line is based on the assumption that the URL will resolve using https.
+    // Ideally, after all checks pass, the URL should be pinged to verify the correct protocol.
+    // Better yet, it should need to be provided by the user - there are nice UX techniques to address this.
+    link = `http://${link}`
+  }
+  return link;
+}
 //--------------------------------
 // Download File
 //--------------------------------
@@ -160,10 +171,14 @@ router.get("/report/excel/:fileId", (req, res, next) => {
                   if (i+1 < majcat.data.length) {
                     row = worksheet.addRow(['', '', '', '', `${majcat.data[i].spec_category || ''}`, `${majcat.data[i].formatted || ''}`, '', `${majcat.data[i+1].spec_category || ''}`, `${majcat.data[i+1].formatted || ''}`]);
 
-                    if (majcat.data[i].source && user.showHyperlink)
-                      row.getCell(6).value = { text: majcat.data[i].formatted, hyperlink: majcat.data[i].source };
-                    if (majcat.data[i+1].source && user.showHyperlink)
-                      row.getCell(9).value = { text: majcat.data[i+1].formatted, hyperlink: majcat.data[i+1].source };
+                    if (majcat.data[i].source && user.showHyperlink) {
+                      row.getCell(6).font = { color: { argb: 'FF0000FF' } };
+                      row.getCell(6).value = { text: majcat.data[i].formatted, hyperlink: makeLink(majcat.data[i].source)}; 
+                    }
+                    if (majcat.data[i+1].source && user.showHyperlink) {
+                      row.getCell(9).font = { color: { argb: 'FF0000FF' } };
+                      row.getCell(9).value = { text: majcat.data[i+1].formatted, hyperlink: makeLink(majcat.data[i+1].source) };
+                    }
 
                     row.getCell(5).alignment = { wrapText: true };
                     row.getCell(6).alignment = { wrapText: true };
@@ -173,8 +188,10 @@ router.get("/report/excel/:fileId", (req, res, next) => {
                   } else {
                     row = worksheet.addRow(['', '', '', '', `${majcat.data[i].spec_category || ''}`, `${majcat.data[i].formatted || ''}`]);
 
-                    if (majcat.data[i].source && user.showHyperlink)
-                      row.getCell(6).value = { text: majcat.data[i].formatted, hyperlink: majcat.data[i].source };
+                    if (majcat.data[i].source && user.showHyperlink) {
+                      row.getCell(6).font = { color: { argb: 'FF0000FF' } };
+                      row.getCell(6).value = { text: majcat.data[i].formatted, hyperlink: makeLink(majcat.data[i].source) };
+                    }
                     
                     row.getCell(5).alignment = { wrapText: true };
                     row.getCell(6).alignment = { wrapText: true };

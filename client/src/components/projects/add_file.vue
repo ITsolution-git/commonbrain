@@ -100,7 +100,7 @@ export default {
                 Math.round(progressEvent.loaded * 100 / progressEvent.total)
               );
             }
-          }))
+          }, this.$Progress))
         else 
           resolve(ApiWrapper.post("/api/files/replace/" + this.$route.params.projectId + "/" + this.conflictFile._id, formData, {
             onUploadProgress: function(progressEvent) {
@@ -108,7 +108,7 @@ export default {
                 Math.round(progressEvent.loaded * 100 / progressEvent.total)
               );
             }
-          }))
+          }, this.$Progress))
       }).then(
           res => {
             if (res.data.message == "Upload Successful") {

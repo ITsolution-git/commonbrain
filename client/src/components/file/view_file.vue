@@ -116,7 +116,7 @@
             <div v-for="(dat,i2) in data.data" :key="i2" class="data-item-item animated-fast fadeIn"  :class="{'left' : (dat.just != undefined && dat.just.charAt(0).toLowerCase() == 'l'), 'right' : (dat.just != undefined && dat.just.charAt(0).toLowerCase() == 'r'), 'center' : (dat.just != undefined && dat.just.charAt(0).toLowerCase() == 'c')}">
               <div class="data-item-title"  v-html="formatWithSearch(dat.title)"></div>
               <div v-if="(!dat.source)" class="data-item-value animated-fast fadeInUp" v-tooltip="{ content:dat.hover  , placement:'top'}"  v-html="formatWithSearch(dat.formatted)"></div>
-              <div v-if="(dat.source)" class="data-item-value animated-fast fadeInUp" v-tooltip="{ content:dat.hover  , placement:'top'}"><a :href="makeLink(dat.source)"  v-html="formatWithSearch(dat.formatted)"></a></div>
+              <div v-if="(dat.source)" class="data-item-value animated-fast fadeInUp" v-tooltip="{ content:dat.hover  , placement:'top'}"><a :href="makeLink(dat.source)"  v-html="formatWithSearch(dat.formatted)" target="_blank"></a></div>
             </div>
           </div>
         </div>
@@ -192,7 +192,8 @@ export default {
         .download(
           "/api/files/report/excel/" +
             this.$route.params.fileId,
-          { responseType: "arraybuffer" }
+          { responseType: "arraybuffer" },
+          this.$Progress
         )
         .then(res => {
           const url = window.URL.createObjectURL(new Blob([res.data]));

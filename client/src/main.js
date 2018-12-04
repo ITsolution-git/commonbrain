@@ -11,7 +11,7 @@ import Loader from "vue-spinner/src/RingLoader.vue";
 import pusher from "vue-pusher";
 import VueMq from 'vue-mq';
 import Vuetify from 'vuetify'
-
+import VueProgressBar from 'vue-progressbar'
 import Viewer from 'v-viewer'
 
 import 'vuetify/dist/vuetify.min.css';
@@ -39,6 +39,17 @@ Vue.component("v-loader", Loader);
 Vue.use(Vuetify);
 Vue.use(Viewer);
 
+Vue.use(VueProgressBar, {
+  color: 'rgb(255, 255, 255)',
+  failedColor: 'red',
+  thickness: '2px',
+
+  transition: {
+    speed: '20s',
+    opacity: '0.6s',
+    termination: 500
+  },
+})
 Vue.use(VueMq, {
   breakpoints: {
     sm: 728,

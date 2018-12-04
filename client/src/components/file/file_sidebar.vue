@@ -200,7 +200,8 @@ export default {
             this.$route.params.projectId +
             "/" +
             this.$route.params.fileId,
-          { responseType: "arraybuffer" }
+          { responseType: "arraybuffer" },
+          this.$Progress
         )
         .then(res => {
           const url = window.URL.createObjectURL(new Blob([res.data]));

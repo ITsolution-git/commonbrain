@@ -3,7 +3,7 @@
     <div :class="'nav-bar nav-bar-' + user.theme">
       <div @click="$router.push('/projects')" :class="{'nav-item': true, active: currentPath.indexOf('projects')!=-1}" :style="{'color': '#fff'}">Projects</div>
       <img @click="$router.push('/templates')" src="../img/brain_white.svg" alt="" class="header-logo">
-      <div @click="$router.push('/ofac')" :class="{'nav-item': true, active: currentPath.indexOf('ofac')!=-1}" :style="{'color': '#fff'}">OFAC</div>
+      <div @click="$router.push('/ofac')" :class="{'nav-item': true, active: currentPath.indexOf('ofac')!=-1}" :style="{'color': '#fff'}" style="width: 190px">Due Diligence Report</div>
       <!-- <div @click="$router.push('/templates')" :class="{'nav-item': true, active: currentPath.indexOf('templates')!=-1}">Templates</div> -->
     </div>
     <div class="user-nav">

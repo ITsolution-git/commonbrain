@@ -3,7 +3,8 @@ import CONSTANTS from '@/shared/constants';
 
 export default {
 
-  get: (url, config = {}) => { // eslint-disable-line
+  get: (url, config = {}, $Progress) => { // eslint-disable-line
+    $Progress && $Progress.start();
     return axios({
       method: 'get',
       url: CONSTANTS.API_BASE_URL + url,
@@ -11,10 +12,17 @@ export default {
         Accept: "application/json",
         Authorization: "Bearer " + localStorage.getItem("token")
       }
-    }).then(data => data);
+    }).then(data => {
+      $Progress && $Progress.finish();
+      return data
+    }).catch(err=> {
+      $Progress && $Progress.fail()
+      throw err;
+    });
   },
 
-  download: (url, config = {}) => { // eslint-disable-line
+  download: (url, config = {}, $Progress) => { // eslint-disable-line
+    $Progress && $Progress.start();
     return axios({
       method: 'get',
       url: CONSTANTS.API_BASE_URL + url,
@@ -24,10 +32,17 @@ export default {
         Authorization: "Bearer " + localStorage.getItem("token")
       },
       responseType:'arraybuffer'
-    }).then(data => data);
+    }).then(data => {
+      $Progress && $Progress.finish();
+      return data
+    }).catch(err=> {
+      $Progress && $Progress.fail()
+      throw err;
+    });
   },
 
-  post: (url, data, config = {}) => { // eslint-disable-line
+  post: (url, data, config = {}, $Progress) => { // eslint-disable-line
+    $Progress && $Progress.start();
     return axios({
       method: 'post',
       url: CONSTANTS.API_BASE_URL + url,
@@ -37,10 +52,17 @@ export default {
         Accept: "application/json",
         Authorization: "Bearer " + localStorage.getItem("token")
       }
-    }).then(data => data);
+    }).then(data => {
+      $Progress && $Progress.finish();
+      return data
+    }).catch(err=> {
+      $Progress && $Progress.fail()
+      throw err;
+    });
   },
 
-  put: (url, data, config = {}) => { // eslint-disable-line
+  put: (url, data, config = {}, $Progress) => { // eslint-disable-line
+    $Progress && $Progress.start();
     return axios({
       method: 'put',
       url: CONSTANTS.API_BASE_URL + url,
@@ -50,10 +72,17 @@ export default {
         Accept: "application/json",
         Authorization: "Bearer " + localStorage.getItem("token")
       }
-    }).then(data => data);
+    }).then(data => {
+      $Progress && $Progress.finish();
+      return data
+    }).catch(err=> {
+      $Progress && $Progress.fail()
+      throw err;
+    });
   },
 
-  delete: (url, config = {}) => { // eslint-disable-line
+  delete: (url, config = {}, $Progress) => { // eslint-disable-line
+    $Progress && $Progress.start();
     return axios({
       method: 'delete',
       url: CONSTANTS.API_BASE_URL + url,
@@ -62,6 +91,12 @@ export default {
         Accept: "application/json",
         Authorization: "Bearer " + localStorage.getItem("token")
       }
-    }).then(data => data);
+    }).then(data => {
+      $Progress && $Progress.finish();
+      return data
+    }).catch(err=> {
+      $Progress && $Progress.fail()
+      throw err;
+    });
   }
 }

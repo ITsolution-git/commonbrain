@@ -96,7 +96,8 @@ export default {
                 Math.round(progressEvent.loaded * 100 / progressEvent.total)
               );
             }
-          }
+          },
+          this.$Progress
         )
         .then(
           res => {

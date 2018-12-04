@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="no-sidebar-container">
-            <div class="main-title">Search OFAC</div>
+            <div class="main-title">Search Public Records</div>
         </div>
         <div class="ofac-content">
           

@@ -1,6 +1,7 @@
 <template>
 <v-app id="app">
 
+  <vue-progress-bar></vue-progress-bar>
   <router-view name="header"></router-view>
   <router-view name="login"></router-view>
 
