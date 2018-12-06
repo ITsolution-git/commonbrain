@@ -14,7 +14,7 @@
       </div>
       <table class="standard-table">
         <tbody>
-          <tr><th>{{dashItemNameLabel}} Name</th><th>Name2</th><th>Status</th><th>Geography</th><th>Other</th></tr>
+          <tr><th>{{dashItemNameLabel}}</th><th>Name2</th><th>Status</th><th>Geography</th><th>Other</th></tr>
           <tr v-for="(dash,i)  in filteredDashes" :key="i">
             <td @click="activateDash(dash)">
               <div  class="project-name">
@@ -77,7 +77,7 @@
       </div>
       <div class="root-images-container" :class="{'root-images-container-opened': rootImgBoxStatus=='hide'}" v-if="dashRootImges && dashRootImges.length > 0">
         <div class="root-images">
-          <div class="root-image-item" v-for="(img,index) in dashRootImges" :key="index"  v-viewer>
+          <div class="root-image-item" v-for="(img,index) in dashRootImges" :key="index"  v-viewer="{title: (image, imageData) => { return dashRootImges[index].desc;},}">
             <img :src="img.link" @mouseover="mouseHoverImage($event, index)" @mouseleave="mouseLeaveImage($event, index)" ref="rootImageEl"/>
           </div>
         </div>
@@ -102,7 +102,7 @@
               <div class="data-title" v-html="formatWithSearch(data.title)"></div>
             </div>
             <div class="major-images">
-              <div class="major-image-item" v-for="(img,index) in data.images" :key="index"  v-viewer>
+              <div class="major-image-item" v-for="(img,index) in data.images" :key="index"  :v-viewer="viewerOptions">
                 <img :src="img.link" />
               </div>
             </div>
@@ -166,7 +166,11 @@ export default {
       dashRootImges: [],
       rootImgBoxStatus: 'show',
 
-      dashItemNameLabel: 'Asset Name'
+      dashItemNameLabel: 'Asset Name',
+      viewerOptions: {
+        movable: false,
+        title: (image, imageData) => { console.log(image, imageData); return 'SSS';},
+      }
     };
   },
   watch: {
@@ -575,7 +579,7 @@ export default {
       return this.$store.state.fileStore.file[0] ? Object.assign({}, this.$store.state.fileStore.file[0]) : {}; 
     },
     project() {
-      return this.$store.state.fileStore.project[0] ? Object.assign({}, this.$store.state.fileStore.project[0]) : {}; 
+      return (this.$store.state.fileStore.project && this.$store.state.fileStore.project[0]) ? Object.assign({}, this.$store.state.fileStore.project[0]) : {}; 
     },
 
     sheets() {

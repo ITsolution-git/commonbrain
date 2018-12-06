@@ -78,7 +78,7 @@
         </div>
 
         <div v-if="file.logoFrom == 'file'">
-          <img :src="logoPath" v-if="logoPath"/>
+          <img :src="logoPath ? logoPath : '/static/brain.svg'"/>
         </div>
       </div>
       <div class="dash-nav" v-if="activeDash" @click="showSelectDash(true)">

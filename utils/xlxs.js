@@ -227,6 +227,9 @@ module.exports.parseSheet = function(filename) {
             if (letter == namedRanges['CBImageMajorCategory'].split('$')[1]) {
               images[number].majorCategory = cbimages[key].v;
             }
+            if (letter == namedRanges['CBImageDescription'].split('$')[1]) {
+              images[number].desc = cbimages[key].v;
+            }
           }
         }
       }
