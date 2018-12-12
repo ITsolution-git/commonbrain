@@ -11,6 +11,7 @@
     "build": "node build/build.js"
   },
   "dependencies": {
+    "@babel/polyfill": "^7.0.0",
     "axios": "^0.17.1",
     "base64-js": "^1.2.3",
     "chart.js": "^2.7.2",
