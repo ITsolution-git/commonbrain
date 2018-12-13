@@ -51,7 +51,7 @@ function sendMailTo(mailTo, templateName, context, subject, filenames) {
    	for (let key in context) {
    		contentHtml = contentHtml.split(`$$$${key}$$$`).join(context[key])
    	}
-   	contentHtml = contentHtml.split(`$$$DOMAIN$$$`).join('http://18.222.107.103:3000')	
+   	contentHtml = contentHtml.split(`$$$DOMAIN$$$`).join('http://commonbrain.io')	
 
 	var data = {
 		from: 'Support <' + config.ADMIN_EMAIL + '>',

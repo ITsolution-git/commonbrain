@@ -13,6 +13,7 @@ var config = require("../config");
 var Pusher = require("pusher");
 var xlxsUtil = require('../utils/xlxs');
 var Excel = require('exceljs');
+var mailer = require('../utils/mailer');
 
 
 var pusher = new Pusher({
@@ -41,17 +42,6 @@ var upload = multer({
   }
 }).single("file");
 
-
-function makeLink(link) {
-  link = link + '';
-  if (!link.startsWith('https://') || !link.startsWith('http://')) {
-    // The following line is based on the assumption that the URL will resolve using https.
-    // Ideally, after all checks pass, the URL should be pinged to verify the correct protocol.
-    // Better yet, it should need to be provided by the user - there are nice UX techniques to address this.
-    link = `http://${link}`
-  }
-  return link;
-}
 //--------------------------------
 // Download File
 //--------------------------------
@@ -74,20 +64,11 @@ router.get("/download/:userId/:projectId/:fileId", (req, res, next) => {
 
 
 //--------------------------------
-// Download Excel File
+// Send Report
 //--------------------------------
-router.get("/report/excel/:fileId", (req, res, next) => {
+router.post("/report/sendreport/:fileId", (req, res, next) => {
   
   const fileId = req.params.fileId;
-  const pad_with_zeroes = function(number, length) {
-    var my_string = '' + number;
-    while (my_string.length < length) {
-        my_string = '0' + my_string;
-    }
-
-    return my_string;
-  }
-
   MongoClient.connect(URL, function(err, db) {
     if (err) throw err;
     var collection = db.collection("files");
@@ -108,107 +89,59 @@ router.get("/report/excel/:fileId", (req, res, next) => {
         .toArray();
     }).then(result => {
 
-        let renderData = xlxsUtil.getRenderData(result[0]);
-        var workbook = new Excel.Workbook();
-        var worksheet = workbook.addWorksheet('CommonBrain');
+      let renderData = xlxsUtil.getRenderData(result[0]);
+      return xlxsUtil.makeReport(renderData, result[0], user);
+    }).then(filename=>{
+      console.log(filename);
+      console.log(req.body);
 
-        worksheet.columns = [
-          { header: `${result[0].title}`, key: 'A', width: 10 },
-          { header: '', key: 'B', width: 10 },
-          { header: '', key: 'C', width: 10 },
-          { header: '', key: 'D', width: 10 },
-          { header: '', key: 'E', width: 20 },
-          { header: '', key: 'F', width: 20 },
-          { header: '', key: 'G', width: 5 },
-          { header: '', key: 'H', width: 20 },
-          { header: '', key: 'I', width: 20 },
-          { header: '', key: 'J', width: 10 },
-        ];
-        worksheet.mergeCells('A1:J1');
-        worksheet.getRow(1).height = 40;
-        worksheet.getCell('A1').font = {
-            size: 40,
-            bold: true
-        };
-        let rowNum = 2;
-        let row;
-        renderData.map((dash, dashIndex)=>{
-          
-          row = worksheet.addRow([`${dash.dash.dashName || ''}  ${dash.dash.name2 || ''}`]);
-          row.height = 30;
-          row.getCell(1).font = {
-              size: 25,
-              bold: true
-          };
-          row.getCell(1).name = "Dash" + pad_with_zeroes(dashIndex+1, 2);
-          rowNum ++;
-          dash.data.map((sheet, sheetIndex)=>{
-            row = worksheet.addRow(['', `${sheet.name || ''}`]);
-            row.height = 25;
-            row.getCell(2).font = {
-                size: 20,
-                bold: true
-            };
-            row.getCell(2).name = "Dash" + pad_with_zeroes(dashIndex+1, 2) + "Sheet" + pad_with_zeroes(sheetIndex+1, 2);
-            rowNum ++;
-            sheet.data.map((tab, tabIndex)=>{
-              row = worksheet.addRow(['', '', `${tab.name || ''}`]);
-              row.height = 20;
-              row.getCell(3).font = {
-                  size: 18,
-                  bold: true
-              };
-              row.getCell(3).name = "Dash" + pad_with_zeroes(dashIndex+1, 2) + "Sheet" + pad_with_zeroes(sheetIndex+1, 2) + "Tab" + pad_with_zeroes(tabIndex+1, 2);
-              rowNum ++;
+      return mailer.sendMailTo(req.body.emailAddress, 'excel-report', {
+        
+      }, 'Report', [filename]).then(()=>{
+        fs.remove('./tmp' + filename);
+        res.json({success: 1});
+      });
+      
+      
 
-              tab.data.map((majcat, majIndex)=>{
-                row = worksheet.addRow(['', '', '', `${majcat.name || ''}`]);
-                rowNum ++;
+    }).catch(err => {
+      res.status(500).json(err);
+    });
+  });
+});
 
-                row.getCell(4).name = "Dash" + pad_with_zeroes(dashIndex+1, 2) + "Sheet" + pad_with_zeroes(sheetIndex+1, 2) + "Tab" + pad_with_zeroes(tabIndex+1, 2) + "Major" + pad_with_zeroes(majIndex+1, 2);
-                
-                for (let i = 0; i < majcat.data.length; i+=2) {
-                  if (i+1 < majcat.data.length) {
-                    row = worksheet.addRow(['', '', '', '', `${majcat.data[i].spec_category || ''}`, `${majcat.data[i].formatted || ''}`, '', `${majcat.data[i+1].spec_category || ''}`, `${majcat.data[i+1].formatted || ''}`]);
 
-                    if (majcat.data[i].source && user.showHyperlink) {
-                      row.getCell(6).font = { color: { argb: 'FF0000FF' } };
-                      row.getCell(6).value = { text: majcat.data[i].formatted, hyperlink: makeLink(majcat.data[i].source)}; 
-                    }
-                    if (majcat.data[i+1].source && user.showHyperlink) {
-                      row.getCell(9).font = { color: { argb: 'FF0000FF' } };
-                      row.getCell(9).value = { text: majcat.data[i+1].formatted, hyperlink: makeLink(majcat.data[i+1].source) };
-                    }
 
-                    row.getCell(5).alignment = { wrapText: true };
-                    row.getCell(6).alignment = { wrapText: true };
-                    row.getCell(8).alignment = { wrapText: true };
-                    row.getCell(9).alignment = { wrapText: true };
-                    rowNum ++;
-                  } else {
-                    row = worksheet.addRow(['', '', '', '', `${majcat.data[i].spec_category || ''}`, `${majcat.data[i].formatted || ''}`]);
+//--------------------------------
+// Download Excel File
+//--------------------------------
+router.get("/report/excel/:fileId", (req, res, next) => {
+  
+  const fileId = req.params.fileId;
+  MongoClient.connect(URL, function(err, db) {
+    if (err) throw err;
+    var collection = db.collection("files");
+    var users = db.collection("users");
+    var user = null;
+    users
+    .find({ _id: ObjectId(req.user._id) }, { sheet: 0 })
+    .toArray()
+    .then(result => {
+      if (result.length > 0)
+        return result[0];
+      else
+        throw new Error('User is not Found');
+    }).then(userObj => {
+      user = userObj;
+      return collection
+        .find({ _id: ObjectId(fileId) }, { sheet: 0 })
+        .toArray();
+    }).then(result => {
 
-                    if (majcat.data[i].source && user.showHyperlink) {
-                      row.getCell(6).font = { color: { argb: 'FF0000FF' } };
-                      row.getCell(6).value = { text: majcat.data[i].formatted, hyperlink: makeLink(majcat.data[i].source) };
-                    }
-                    
-                    row.getCell(5).alignment = { wrapText: true };
-                    row.getCell(6).alignment = { wrapText: true };
-                    row.getCell(8).alignment = { wrapText: true };
-                    row.getCell(9).alignment = { wrapText: true };
-                    rowNum++;
-                  }
-                }
-              })
-            })
-          })
-        })
-
-        let filename = `./tmp/${new Date().getTime()}.xlsx`;
-        workbook.xlsx.writeFile(filename).then(()=>{
-          res.download(filename)
-        });
+      let renderData = xlxsUtil.getRenderData(result[0]);
+      return xlxsUtil.makeReport(renderData, result[0], user);
+    }).then(filename=>{
+      res.download(filename);
     }).catch(err => {
       res.status(500).json(err);
     });

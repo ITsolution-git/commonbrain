@@ -3,6 +3,7 @@
   <ExportPdf :hide="toggleExportPdf" v-if="exportPdf" />
   <Cropper :upload="toggleCropper"  :hide="toggleCropper" v-if="cropper" imgType="logo"></Cropper>
   <ReplaceFile :hide="toggleReplaceFile" :uploaded="submitReplaceFile" v-if="replaceFile" />
+  <ReportViaEmail :hide="toggleReportViaEmail"   v-if="reportViaEmail"/>
 
   <ConfirmDelete :hide="toggleConfirmDelete" :del="deleteFile" v-if="confirmDelete"/>
   
@@ -61,6 +62,7 @@
                     <li @click.stop="toggleLogoFrom" v-if="file.logoFrom=='download'">Use Logo From File</li>
                     <li @click.stop="toggleLogoFrom" v-if="file.logoFrom=='file'">Use Logo From Upload</li>
                     <li @click="$router.push('/projects/'+projectId + '/rawfile/'+fileId)">Edit Charts</li>
+                    <li @click.stop="toggleReportViaEmail">Send Report Via Email</li>
                   </ul>
                 </div>
             </div>
@@ -74,9 +76,8 @@
             <i class="fa fa-camera" style=" margin-right:10px;"></i>
             Upload
           </div>
-          <img :src="logoPath" v-if="file.logo"/>
+          <img :src="logoPath ? logoPath : '/static/brain.svg'" v-if="file.logo"/>
         </div>
-
         <div v-if="file.logoFrom == 'file'">
           <img :src="logoPath ? logoPath : '/static/brain.svg'" :style="{padding: logoPath ? '0px' : '40px'}"/>
         </div>
@@ -100,6 +101,7 @@ import ApiWrapper from '@/shared/utils/ApiWrapper';
 import ReplaceFile from "./replace_file";
 import ExportPdf from "./export_pdf";
 import ToggleImageFrom from "./toggle_import_from";
+import ReportViaEmail from "./report_via_email";
 import { mapGetters, mapActions } from 'vuex';
 import ConfirmDelete from "../helpers/confirm_delete";
 export default {
@@ -118,7 +120,8 @@ export default {
       imageSelect: false,
 
       exportExcel: false,
-      confirmDelete: false
+      confirmDelete: false,
+      reportViaEmail: false
     };
   },
   components: {
@@ -126,7 +129,8 @@ export default {
     ReplaceFile,
     ExportPdf,
     ToggleImageFrom,
-    ConfirmDelete
+    ConfirmDelete,
+    ReportViaEmail
   },
   mounted() {
   },
@@ -141,6 +145,9 @@ export default {
       else if (this.file.logoFrom == 'download')
         this.$emit('updateFile', {logoFrom: 'file'});
       this.optionsDropdown = false;
+    },
+    toggleReportViaEmail() {
+      this.reportViaEmail = !this.reportViaEmail;
     },
     toggleExportPdf() {
       this.exportPdf = !this.exportPdf;
@@ -240,7 +247,7 @@ export default {
       } else if (file.logoFrom == 'download') {
         this.logoPath =
           "/api/static/" +
-          this.$store.state.user.id +
+          this.$store.state.user._id +
           "/" +
           this.$route.params.projectId +
           "/" +

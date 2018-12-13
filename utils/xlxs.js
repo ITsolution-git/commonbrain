@@ -2,6 +2,7 @@
 var XLSX = require("xlsx");
 var CircularJSON = require("circular-json");
 var _ = require('lodash');
+var Excel = require('exceljs');
 module.exports.parseSheet = function(filename) {
   var workbook = XLSX.readFile(filename, {cellStyles: true});
   var sheet = JSON.parse(CircularJSON.stringify(workbook));
@@ -189,6 +190,63 @@ module.exports.parseSheet = function(filename) {
   var majorImages = null;
   var images = null;
   if (cbimages) {
+
+    for (var i = 0; i < Object.keys(cbimages).length; i++) {
+      var key = Object.keys(cbimages)[i];
+      var letter = key.charAt(0);
+      var number = key.substr(1);
+
+      if (number == 2) {
+        if ((cbimages[key].v+'').toLowerCase().indexOf('type') != -1 && !CBRowNum['CBImageType']) {
+          CBRowNum['CBImageType'] = letter;
+        }
+        if ((cbimages[key].v+'').toLowerCase().indexOf('link') != -1 && !CBRowNum['CBImageLink']) {
+          CBRowNum['CBImageLink'] = letter;
+        }
+        if ((cbimages[key].v+'').toLowerCase().indexOf('justification') != -1 && !CBRowNum['CBImageJustification']) {
+          CBRowNum['CBImageJustification'] = letter;
+        }
+        if ((cbimages[key].v+'').toLowerCase().indexOf('position') != -1 && !CBRowNum['CBImagePosition']) {
+          CBRowNum['CBImagePosition'] = letter;
+        }
+        if ((cbimages[key].v+'').toLowerCase().indexOf('dashitem') != -1 && !CBRowNum['CBImageDashItem']) {
+          CBRowNum['CBImageDashItem'] = letter;
+        }
+        if ((cbimages[key].v+'').toLowerCase().indexOf('sheetname') != -1 && !CBRowNum['CBImageSheetName']) {
+          CBRowNum['CBImageSheetName'] = letter;
+        }
+        if ((cbimages[key].v+'').toLowerCase().indexOf('tabname') != -1 && !CBRowNum['CBImageTabName']) {
+          CBRowNum['CBImageTabName'] = letter;
+        }
+        if ((cbimages[key].v+'').toLowerCase().indexOf('major') != -1 && !CBRowNum['CBImageMajorCategory']) {
+          CBRowNum['CBImageMajorCategory'] = letter;
+        }
+        if ((cbimages[key].v+'').toLowerCase().indexOf('description') != -1 && !CBRowNum['CBImageDescription']) {
+          CBRowNum['CBImageDescription'] = letter;
+        }
+      }
+    }
+    if (!CBRowNum['CBImageType'])
+      return {sucess: 0, error: 'Named Range CBImageType is Missing.'}
+    if (!CBRowNum['CBImageLink'])
+      return {sucess: 0, error: 'Named Range CBImageLink is Missing.'}
+    if (!CBRowNum['CBImageDashItem'])
+      return {sucess: 0, error: 'Named Range CBImageDashItem is Missing.'}
+    if (!CBRowNum['CBImageJustification'])
+      return {sucess: 0, error: 'Named Range CBImageJustification is Missing.'}
+    if (!CBRowNum['CBImagePosition'])
+      return {sucess: 0, error: 'Named Range CBImagePosition is Missing.'}
+    if (!CBRowNum['CBImageSheetName'])
+      return {sucess: 0, error: 'Named Range CBImageSheetName is Missing.'}
+    if (!CBRowNum['CBImageTabName'])
+      return {sucess: 0, error: 'Named Range CBImageTabName is Missing.'}
+    if (!CBRowNum['CBImageMajorCategory'])
+      return {sucess: 0, error: 'Named Range CBImageMajorCategory is Missing.'}
+    if (!CBRowNum['CBImageDescription'])
+      return {sucess: 0, error: 'Named Range CBImageDescription is Missing.'}
+    /* finish */
+
+
     images = {};
     for (let key in cbimages) {
       var letter = key.charAt(0);
@@ -202,32 +260,31 @@ module.exports.parseSheet = function(filename) {
               images[number] = {};
             }
 
-            // CBDashItem
-            if (letter == namedRanges['CBImageType'].split('$')[1]) {
+            if (CBRowNum['CBImageType'] && letter == CBRowNum['CBImageType']) {
               images[number].type = cbimages[key].v;
             }
-            if (letter == namedRanges['CBImageLink'].split('$')[1]) {
+            if (CBRowNum['CBImageLink'] && letter == CBRowNum['CBImageLink']) {
               images[number].link = cbimages[key].v;
             }
-            if (letter == namedRanges['CBImageJustification'].split('$')[1]) {
+            if (CBRowNum['CBImageJustification'] && letter == CBRowNum['CBImageJustification']) {
               images[number].just = cbimages[key].v;
             }
-            if (letter == namedRanges['CBImagePosition'].split('$')[1]) {
+            if (CBRowNum['CBImagePosition'] && letter == CBRowNum['CBImagePosition']) {
               images[number].position = cbimages[key].v;
             }
-            if (letter == namedRanges['CBImageDashItem'].split('$')[1]) {
+            if (CBRowNum['CBImageDashItem'] && letter == CBRowNum['CBImageDashItem']) {
               images[number].dashItem = cbimages[key].v;
             }
-            if (letter == namedRanges['CBImageSheetName'].split('$')[1]) {
+            if (CBRowNum['CBImageSheetName'] && letter == CBRowNum['CBImageSheetName']) {
               images[number].sheetName = cbimages[key].v;
             }
-            if (letter == namedRanges['CBImageTabName'].split('$')[1]) {
+            if (CBRowNum['CBImageTabName'] && letter == CBRowNum['CBImageTabName']) {
               images[number].tabName = cbimages[key].v;
             }
-            if (letter == namedRanges['CBImageMajorCategory'].split('$')[1]) {
+            if (CBRowNum['CBImageMajorCategory'] && letter == CBRowNum['CBImageMajorCategory']) {
               images[number].majorCategory = cbimages[key].v;
             }
-            if (letter == namedRanges['CBImageDescription'].split('$')[1]) {
+            if (CBRowNum['CBImageDescription'] && letter == CBRowNum['CBImageDescription']) {
               images[number].desc = cbimages[key].v;
             }
           }
@@ -287,4 +344,130 @@ module.exports.getRenderData = function(file) {
     }
   })
   return renderData;
+}
+
+
+module.exports.makeReport = function(renderData, file, user) {
+
+
+  const makeLink = function(link) {
+    link = link + '';
+    if (!link.startsWith('https://') || !link.startsWith('http://')) {
+      // The following line is based on the assumption that the URL will resolve using https.
+      // Ideally, after all checks pass, the URL should be pinged to verify the correct protocol.
+      // Better yet, it should need to be provided by the user - there are nice UX techniques to address this.
+      link = `http://${link}`
+    }
+    return link;
+  }
+
+  const pad_with_zeroes = function(number, length) {
+    var my_string = '' + number;
+    while (my_string.length < length) {
+        my_string = '0' + my_string;
+    }
+
+    return my_string;
+  }
+
+  var workbook = new Excel.Workbook();
+  var worksheet = workbook.addWorksheet('CommonBrain');
+
+  worksheet.columns = [
+    { header: `${file.title}`, key: 'A', width: 10 },
+    { header: '', key: 'B', width: 10 },
+    { header: '', key: 'C', width: 10 },
+    { header: '', key: 'D', width: 10 },
+    { header: '', key: 'E', width: 20 },
+    { header: '', key: 'F', width: 20 },
+    { header: '', key: 'G', width: 5 },
+    { header: '', key: 'H', width: 20 },
+    { header: '', key: 'I', width: 20 },
+    { header: '', key: 'J', width: 10 },
+  ];
+  worksheet.mergeCells('A1:J1');
+  worksheet.getRow(1).height = 40;
+  worksheet.getCell('A1').font = {
+      size: 40,
+      bold: true
+  };
+  let rowNum = 2;
+  let row;
+  renderData.map((dash, dashIndex)=>{
+    
+    row = worksheet.addRow([`${dash.dash.dashName || ''}  ${dash.dash.name2 || ''}`]);
+    row.height = 30;
+    row.getCell(1).font = {
+        size: 25,
+        bold: true
+    };
+    row.getCell(1).name = "Dash" + pad_with_zeroes(dashIndex+1, 2);
+    rowNum ++;
+    dash.data.map((sheet, sheetIndex)=>{
+      row = worksheet.addRow(['', `${sheet.name || ''}`]);
+      row.height = 25;
+      row.getCell(2).font = {
+          size: 20,
+          bold: true
+      };
+      row.getCell(2).name = "Dash" + pad_with_zeroes(dashIndex+1, 2) + "Sheet" + pad_with_zeroes(sheetIndex+1, 2);
+      rowNum ++;
+      sheet.data.map((tab, tabIndex)=>{
+        row = worksheet.addRow(['', '', `${tab.name || ''}`]);
+        row.height = 20;
+        row.getCell(3).font = {
+            size: 18,
+            bold: true
+        };
+        row.getCell(3).name = "Dash" + pad_with_zeroes(dashIndex+1, 2) + "Sheet" + pad_with_zeroes(sheetIndex+1, 2) + "Tab" + pad_with_zeroes(tabIndex+1, 2);
+        rowNum ++;
+
+        tab.data.map((majcat, majIndex)=>{
+          row = worksheet.addRow(['', '', '', `${majcat.name || ''}`]);
+          rowNum ++;
+
+          row.getCell(4).name = "Dash" + pad_with_zeroes(dashIndex+1, 2) + "Sheet" + pad_with_zeroes(sheetIndex+1, 2) + "Tab" + pad_with_zeroes(tabIndex+1, 2) + "Major" + pad_with_zeroes(majIndex+1, 2);
+          
+          for (let i = 0; i < majcat.data.length; i+=2) {
+            if (i+1 < majcat.data.length) {
+              row = worksheet.addRow(['', '', '', '', `${majcat.data[i].spec_category || ''}`, `${majcat.data[i].formatted || ''}`, '', `${majcat.data[i+1].spec_category || ''}`, `${majcat.data[i+1].formatted || ''}`]);
+
+              if (majcat.data[i].source && user.showHyperlink) {
+                row.getCell(6).font = { color: { argb: 'FF0000FF' } };
+                row.getCell(6).value = { text: majcat.data[i].formatted, hyperlink: makeLink(majcat.data[i].source)}; 
+              }
+              if (majcat.data[i+1].source && user.showHyperlink) {
+                row.getCell(9).font = { color: { argb: 'FF0000FF' } };
+                row.getCell(9).value = { text: majcat.data[i+1].formatted, hyperlink: makeLink(majcat.data[i+1].source) };
+              }
+
+              row.getCell(5).alignment = { wrapText: true };
+              row.getCell(6).alignment = { wrapText: true };
+              row.getCell(8).alignment = { wrapText: true };
+              row.getCell(9).alignment = { wrapText: true };
+              rowNum ++;
+            } else {
+              row = worksheet.addRow(['', '', '', '', `${majcat.data[i].spec_category || ''}`, `${majcat.data[i].formatted || ''}`]);
+
+              if (majcat.data[i].source && user.showHyperlink) {
+                row.getCell(6).font = { color: { argb: 'FF0000FF' } };
+                row.getCell(6).value = { text: majcat.data[i].formatted, hyperlink: makeLink(majcat.data[i].source) };
+              }
+              
+              row.getCell(5).alignment = { wrapText: true };
+              row.getCell(6).alignment = { wrapText: true };
+              row.getCell(8).alignment = { wrapText: true };
+              row.getCell(9).alignment = { wrapText: true };
+              rowNum++;
+            }
+          }
+        })
+      })
+    })
+  })
+
+  let filename = `${new Date().getTime()}.xlsx`;
+  return workbook.xlsx.writeFile('./tmp/' + filename).then(()=>{
+    return filename;
+  });
 }

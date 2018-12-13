@@ -77,7 +77,7 @@
       </div>
       <div class="root-images-container" :class="{'root-images-container-opened': rootImgBoxStatus=='hide'}" v-if="dashRootImges && dashRootImges.length > 0">
         <div class="root-images">
-          <div class="root-image-item" v-for="(img,index) in dashRootImges" :key="index"  v-viewer="{title: (image, imageData) => { return dashRootImges[index].desc;},}">
+          <div class="root-image-item" v-for="(img,index) in dashRootImges" :key="index"  v-viewer="{title: (image, imageData) => { return dashRootImges[index].desc ? dashRootImges[index].desc : '';},}">
             <img :src="img.link" @mouseover="mouseHoverImage($event, index)" @mouseleave="mouseLeaveImage($event, index)" ref="rootImageEl"/>
           </div>
         </div>
@@ -102,14 +102,14 @@
               <div class="data-title" v-html="formatWithSearch(data.title)"></div>
             </div>
             <div class="major-images">
-              <div class="major-image-item" v-for="(img,index) in data.images" :key="index"  :v-viewer="viewerOptions">
+              <div class="major-image-item" v-for="(img,index) in data.images" :key="index"  :v-viewer="{title: (image, imageData) => { return data.images[index].desc ? data.images[index].desc : '';},}"">
                 <img :src="img.link" />
               </div>
             </div>
           </div>
           <div class="data-elements" v-if="data.show"  :style="{'background': ((data.images && data.images.length > 0 && data.images[0].position && data.images[0].position.charAt(0).toLowerCase() == 's') ? ('url('+ data.images[0].link + ')  no-repeat center center fixed') : 'transparent')}">
             <div class="major-images" v-if="data.images && data.images.length > 0 && data.images[0].position && data.images[0].position.charAt(0).toLowerCase() == 't'">
-              <div class="major-image-item" v-for="(img,index) in data.images" :key="index"  v-viewer>
+              <div class="major-image-item" v-for="(img,index) in data.images" :key="index"  v-viewer="{title: (image, imageData) => { return data.images[index].desc ? data.images[index].desc : '';},}">
                 <img :src="img.link"  style="height: 100px"/>
               </div>
             </div>
@@ -167,10 +167,6 @@ export default {
       rootImgBoxStatus: 'show',
 
       dashItemNameLabel: 'Asset Name',
-      viewerOptions: {
-        movable: false,
-        title: (image, imageData) => { console.log(image, imageData); return 'SSS';},
-      }
     };
   },
   watch: {
@@ -730,6 +726,7 @@ export default {
   background: transparent;
   flex-basis: calc(50% - 30px);
   min-height: 30px;
+  font-size: 15px;
 }
 /* .data-item-item:nth-child(odd) {
   margin-right: 15px;
@@ -739,9 +736,11 @@ export default {
 }
 .data-item-value {
   margin-left: auto;
+  color: #000000;
+  font-weight: 500;
 }
 .data-item-value a {
-  color: #00bbff;
+  color: #2163c1;
 }
 .main-data-container {
   /* display: flex; */

@@ -8,7 +8,7 @@
       <div class="modal-inner" style="height:80vh;">
         <div class="data-container">
             <div v-for="(file, i) in allData" :key="i" class="datablock">
-                <span>{{file[i]}}</span>
+              <span>{{file[i]}}</span>
             </div>
             
         </div>
