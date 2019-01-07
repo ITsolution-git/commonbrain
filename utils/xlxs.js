@@ -347,9 +347,10 @@ module.exports.getRenderData = function(file) {
 }
 
 
-module.exports.makeReport = function(renderData, file, user) {
+module.exports.makeReport = function(renderData, file, userObj) {
 
-
+  let fakeUser = {showHyperlink: false};
+  const user = userObj ? userObj : fakeUser; 
   const makeLink = function(link) {
     link = link + '';
     if (!link.startsWith('https://') || !link.startsWith('http://')) {

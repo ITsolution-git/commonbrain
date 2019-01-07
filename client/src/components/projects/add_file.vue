@@ -102,7 +102,7 @@ export default {
             }
           }, this.$Progress))
         else 
-          resolve(ApiWrapper.post("/api/files/replace/" + this.$route.params.projectId + "/" + this.conflictFile._id, formData, {
+          resolve(ApiWrapper.post("/api/files/replace/" + this.conflictFile._id, formData, {
             onUploadProgress: function(progressEvent) {
               console.log(
                 Math.round(progressEvent.loaded * 100 / progressEvent.total)
@@ -136,7 +136,7 @@ export default {
   },
   computed: {
     userId() {
-      return this.$store.state.user.id;
+      return this.$store.state.user._id;
     },
     ...mapGetters({
       user: 'user',

@@ -1,128 +1,133 @@
 <template>
   <div>
-    <FileSidebar :sheets="sheets" :activate="activateSheet" :dashes="dashes" :showSelectDash="showSelectDash" :activeDash="activeDash" :file="file" @updateFile="updateFile" @exportExcel="exportExcel"/>
     
     <Cropper :upload="toggleCropper"  :hide="toggleCropper" v-if="cropper" imgType="image"></Cropper>
-    <div class="projects-container" v-if="selectDashScreen" style="padding: 30px;overflow-y: auto;">
-      <div>
-        <StandardInput
-          :field="'Serach ' + dashItemNameLabel"
-          v-model="searchEntityKey"
-          width="100%"
-          :placeholder="dashItemNameLabel+'...'"
-        />
-      </div>
-      <table class="standard-table">
-        <tbody>
-          <tr><th>{{dashItemNameLabel}}</th><th>Name2</th><th>Status</th><th>Geography</th><th>Other</th></tr>
-          <tr v-for="(dash,i)  in filteredDashes" :key="i">
-            <td @click="activateDash(dash)">
-              <div  class="project-name">
-                <i class="fa fa-building-o"></i> 
-                <span>{{dash.dashName}}</span>
-              </div>
-            </td>
-            <td><span>{{dash.name2}}</span></td>
-            <td><span>{{dash.status}}</span></td>
-            <td><span>{{dash.geography}}</span></td>
-            <td><span>{{dash.other}}</span></td>
-          </tr>
-          <tr v-if="filteredDashes.length == 0">
-            <td style="text-align: center" colspan="6">None</td>
-          </tr>
-          
-        </tbody>
-      </table>
-    </div>
 
-    <div class="projects-container" v-else>
-      <div class="breadcrumbs-cont" :style="{'border': '1px solid ' + user.buttonBorder.hex}">
-        <a class="breadcrumbs-item" @click="$router.push('/projects/' + projectId)" style="color: #66d0f7">Project: {{project.project_name}}</a><span>/</span>
-        <div class="breadcrumbs-item">File: {{file.name}}</div><span>/</span>
-        <div class="breadcrumbs-item" v-if="activeDash">Dash: {{activeDash.dashName}}</div><span  v-if="activeDash">/</span>
-        <div class="breadcrumbs-item">Sheet: {{activeSheet}}</div>
-      </div>
-      <div class="top-toolbar">
-        <StandardInput
-          v-model="searchMainDataKey"
-          placeholder="Search..."
-        />
-
-        <div style="margin: 0px 10px; text-align: end; display: flex">
-          <button @click="toggleCollapseAll" class="modal-btn btn-white" style="width: 120px" type="submit" :style="{background: user.fillButtons? user.theme : 'transparent', color: user.fillButtons ? '#fff' : '#111111', 'border-width': '1px', 'border-color': user.showButtonBorders ? user.buttonBorder.hex : 'none', 'border-style': 'solid'}">
-            {{collapseStatus  == 'collapse' ? 'Expand All' : 'Collapse All'}}
-          </button>
-
-          <v-tooltip bottom style="">
-            <button slot="activator" style="padding: 7px 10px" @click="rootImgBoxStatus = (rootImgBoxStatus=='show' ? 'hide' : 'show')" class="modal-btn btn-icon" :class="{'btn-icon-toggled': rootImgBoxStatus=='hide'}" type="submit" :style="{background: user.fillButtons? user.theme : 'transparent', color: user.fillButtons ? '#fff' : '#111111', 'border-width': '1px', 'border-color': user.showButtonBorders ? user.buttonBorder.hex : 'none', 'border-style': 'solid'}">
-              <i class="fa fa-image"></i>
-            </button>
-            <span>Images</span>
-          </v-tooltip>
-        </div>
-      </div>
-
-      <div class="file-logo">
-        <div v-if="file.imageFrom == 'download'" @click="toggleCropper">
-          <div class="add-image" style="padding:15px">
-            <i class="fa fa-camera" style=" margin-right:10px;"></i>
-            Upload
-          </div>
-          <img :src="imagePath" v-if="file.image" style="height: 200px; margin: 0 auto; width: auto"/>
-        </div>
-
-        <div v-if="file.imageFrom == 'file'">
-          <img :src="imagePath" v-if="imagePath" style="height: 200px; margin: 0 auto; width: auto"/>
-        </div>
-      </div>
-      <div class="root-images-container" :class="{'root-images-container-opened': rootImgBoxStatus=='hide'}" v-if="dashRootImges && dashRootImges.length > 0">
-        <div class="root-images">
-          <div class="root-image-item" v-for="(img,index) in dashRootImges" :key="index"  v-viewer="{title: (image, imageData) => { return dashRootImges[index].desc ? dashRootImges[index].desc : '';},}">
-            <img :src="img.link" @mouseover="mouseHoverImage($event, index)" @mouseleave="mouseLeaveImage($event, index)" ref="rootImageEl"/>
-          </div>
-        </div>
-
-        <div class="root-image-close-btn">
-          <i class="fa fa-close" @click="rootImgBoxStatus='hide'"></i>
-        </div>
-      </div>
-      <div class="tab-container" :style="{'border-bottom': '1px solid ' + user.buttonBorder.hex}">
-        <div v-for="(tab,i) in tabs" :class="{'active':(activeTab == tab), 'tab-name': true}" :key="i" @click="activateTab(i,tab)" class="tab" :style="{'border': '1px solid ' + user.buttonBorder.hex}">{{tab}}</div>
-      </div>
-      <div v-if="isLoading"  style="display:flex; align-items:center; justify-content:center;width:100%; height:100%;">
+    <div v-if="isLoading"  style="display:flex; align-items:center; justify-content:center;width:100%; height:100%;">
       <img class="spinner-big" src="../../img/spinner.svg" alt="">
+    </div>
+    <div v-if="pems.indexOf('read')!=-1 && !isLoading">
+
+      <FileSidebar :sheets="sheets" :activate="activateSheet" :dashes="dashes" :showSelectDash="showSelectDash" :activeDash="activeDash" :file="file" @updateFile="updateFile" @exportExcel="exportExcel" :pems="pems"/>
+      <div class="projects-container" v-if="selectDashScreen" style="padding: 30px;overflow-y: auto;">
+        <div>
+          <StandardInput
+            :field="'Serach ' + dashItemNameLabel"
+            v-model="searchEntityKey"
+            width="100%"
+            :placeholder="dashItemNameLabel+'...'"
+          />
+        </div>
+        <table class="standard-table">
+          <tbody>
+            <tr><th>{{dashItemNameLabel}}</th><th>Name2</th><th>Status</th><th>Geography</th><th>Other</th></tr>
+            <tr v-for="(dash,i)  in filteredDashes" :key="i">
+              <td @click="activateDash(dash)">
+                <div  class="project-name">
+                  <i class="fa fa-building-o"></i> 
+                  <span>{{dash.dashName}}</span>
+                </div>
+              </td>
+              <td><span>{{dash.name2}}</span></td>
+              <td><span>{{dash.status}}</span></td>
+              <td><span>{{dash.geography}}</span></td>
+              <td><span>{{dash.other}}</span></td>
+            </tr>
+            <tr v-if="filteredDashes.length == 0">
+              <td style="text-align: center" colspan="6">None</td>
+            </tr>
+            
+          </tbody>
+        </table>
       </div>
-      <div v-if="!isLoading" class="main-data-container animated-fast fadeInUp">
-        <div v-for="(data,i) in filteredMainData" :key="i" class="data-container">
-          
-          <div class="data-item" @click="toggleDropdown(i)" :style="{'border-bottom': '1px solid ' + user.buttonBorder.hex}">
-            <div style="display: flex; flex-direction: row; align-items: center">
-              <i class="fa fa-minus" v-if="data.show"></i>
-              <i class="fa fa-plus" v-if="!data.show"></i>
-              <div class="data-title" v-html="formatWithSearch(data.title)"></div>
-            </div>
-            <div class="major-images">
-              <div class="major-image-item" v-for="(img,index) in data.images" :key="index"  :v-viewer="{title: (image, imageData) => { return data.images[index].desc ? data.images[index].desc : '';},}"">
-                <img :src="img.link" />
-              </div>
-            </div>
-          </div>
-          <div class="data-elements" v-if="data.show"  :style="{'background': ((data.images && data.images.length > 0 && data.images[0].position && data.images[0].position.charAt(0).toLowerCase() == 's') ? ('url('+ data.images[0].link + ')  no-repeat center center fixed') : 'transparent')}">
-            <div class="major-images" v-if="data.images && data.images.length > 0 && data.images[0].position && data.images[0].position.charAt(0).toLowerCase() == 't'">
-              <div class="major-image-item" v-for="(img,index) in data.images" :key="index"  v-viewer="{title: (image, imageData) => { return data.images[index].desc ? data.images[index].desc : '';},}">
-                <img :src="img.link"  style="height: 100px"/>
-              </div>
-            </div>
-            <div v-for="(dat,i2) in data.data" :key="i2" class="data-item-item animated-fast fadeIn"  :class="{'left' : (dat.just != undefined && dat.just.charAt(0).toLowerCase() == 'l'), 'right' : (dat.just != undefined && dat.just.charAt(0).toLowerCase() == 'r'), 'center' : (dat.just != undefined && dat.just.charAt(0).toLowerCase() == 'c')}">
-              <div class="data-item-title"  v-html="formatWithSearch(dat.title)"></div>
-              <div v-if="(!dat.source)" class="data-item-value animated-fast fadeInUp" v-tooltip="{ content:dat.hover  , placement:'top'}"  v-html="formatWithSearch(dat.formatted)"></div>
-              <div v-if="(dat.source)" class="data-item-value animated-fast fadeInUp" v-tooltip="{ content:dat.hover  , placement:'top'}"><a :href="makeLink(dat.source)"  v-html="formatWithSearch(dat.formatted)" target="_blank"></a></div>
-            </div>
+
+      <div class="projects-container" v-else>
+        <div class="breadcrumbs-cont" :style="{'border': '1px solid ' + user.buttonBorder.hex}">
+          <a class="breadcrumbs-item" @click="$router.push('/projects/' + projectId)" style="color: #66d0f7">Project: {{project.project_name}}</a><span>/</span>
+          <div class="breadcrumbs-item">File: {{file.name}}</div><span>/</span>
+          <div class="breadcrumbs-item" v-if="activeDash">Dash: {{activeDash.dashName}}</div><span  v-if="activeDash">/</span>
+          <div class="breadcrumbs-item">Sheet: {{activeSheet}}</div>
+        </div>
+        <div class="top-toolbar">
+          <StandardInput
+            v-model="searchMainDataKey"
+            placeholder="Search..."
+          />
+
+          <div style="margin: 0px 10px; text-align: end; display: flex">
+            <button @click="toggleCollapseAll" class="modal-btn btn-white" style="width: 120px" type="submit" :style="{background: user.fillButtons? user.theme : 'transparent', color: user.fillButtons ? '#fff' : '#111111', 'border-width': '1px', 'border-color': user.showButtonBorders ? user.buttonBorder.hex : 'none', 'border-style': 'solid'}">
+              {{collapseStatus  == 'collapse' ? 'Expand All' : 'Collapse All'}}
+            </button>
+
+            <v-tooltip bottom style="">
+              <button slot="activator" style="padding: 7px 10px" @click="rootImgBoxStatus = (rootImgBoxStatus=='show' ? 'hide' : 'show')" class="modal-btn btn-icon" :class="{'btn-icon-toggled': rootImgBoxStatus=='hide'}" type="submit" :style="{background: user.fillButtons? user.theme : 'transparent', color: user.fillButtons ? '#fff' : '#111111', 'border-width': '1px', 'border-color': user.showButtonBorders ? user.buttonBorder.hex : 'none', 'border-style': 'solid'}">
+                <i class="fa fa-image"></i>
+              </button>
+              <span>Images</span>
+            </v-tooltip>
           </div>
         </div>
 
+        <div class="file-logo">
+          <div v-if="file.imageFrom == 'download'" @click="toggleCropper">
+            <div class="add-image" style="padding:15px">
+              <i class="fa fa-camera" style=" margin-right:10px;"></i>
+              Upload
+            </div>
+            <img :src="imagePath" v-if="file.image" style="height: 200px; margin: 0 auto; width: auto"/>
+          </div>
+
+          <div v-if="file.imageFrom == 'file'">
+            <img :src="imagePath" v-if="imagePath" style="height: 200px; margin: 0 auto; width: auto"/>
+          </div>
+        </div>
+        <div class="root-images-container" :class="{'root-images-container-opened': rootImgBoxStatus=='hide'}" v-if="dashRootImges && dashRootImges.length > 0">
+          <div class="root-images">
+            <div class="root-image-item" v-for="(img,index) in dashRootImges" :key="index"  v-viewer="{title: (image, imageData) => { return dashRootImges[index].desc ? dashRootImges[index].desc : '';},}">
+              <img :src="img.link" @mouseover="mouseHoverImage($event, index)" @mouseleave="mouseLeaveImage($event, index)" ref="rootImageEl"/>
+            </div>
+          </div>
+
+          <div class="root-image-close-btn">
+            <i class="fa fa-close" @click="rootImgBoxStatus='hide'"></i>
+          </div>
+        </div>
+        <div class="tab-container" :style="{'border-bottom': '1px solid ' + user.buttonBorder.hex}">
+          <div v-for="(tab,i) in tabs" :class="{'active':(activeTab == tab), 'tab-name': true}" :key="i" @click="activateTab(i,tab)" class="tab" :style="{'border': '1px solid ' + user.buttonBorder.hex}">{{tab}}</div>
+        </div>
+        <div class="main-data-container animated-fast fadeInUp">
+          <div v-for="(data,i) in filteredMainData" :key="i" class="data-container">
+            
+            <div class="data-item" @click="toggleDropdown(i)" :style="{'border-bottom': '1px solid ' + user.buttonBorder.hex}">
+              <div style="display: flex; flex-direction: row; align-items: center">
+                <i class="fa fa-minus" v-if="data.show"></i>
+                <i class="fa fa-plus" v-if="!data.show"></i>
+                <div class="data-title" v-html="formatWithSearch(data.title)"></div>
+              </div>
+              <div class="major-images">
+                <div class="major-image-item" v-for="(img,index) in data.images" :key="index"  :v-viewer="{title: (image, imageData) => { return data.images[index].desc ? data.images[index].desc : '';},}"">
+                  <img :src="img.link" />
+                </div>
+              </div>
+            </div>
+            <div class="data-elements" v-if="data.show"  :style="{'background': ((data.images && data.images.length > 0 && data.images[0].position && data.images[0].position.charAt(0).toLowerCase() == 's') ? ('url('+ data.images[0].link + ')  no-repeat center center fixed') : 'transparent')}">
+              <div class="major-images" v-if="data.images && data.images.length > 0 && data.images[0].position && data.images[0].position.charAt(0).toLowerCase() == 't'">
+                <div class="major-image-item" v-for="(img,index) in data.images" :key="index"  v-viewer="{title: (image, imageData) => { return data.images[index].desc ? data.images[index].desc : '';},}">
+                  <img :src="img.link"  style="height: 100px"/>
+                </div>
+              </div>
+              <div v-for="(dat,i2) in data.data" :key="i2" class="data-item-item animated-fast fadeIn"  :class="{'left' : (dat.just != undefined && dat.just.charAt(0).toLowerCase() == 'l'), 'right' : (dat.just != undefined && dat.just.charAt(0).toLowerCase() == 'r'), 'center' : (dat.just != undefined && dat.just.charAt(0).toLowerCase() == 'c')}">
+                <div class="data-item-title"  v-html="formatWithSearch(dat.title)"></div>
+                <div v-if="(!dat.source)" class="data-item-value animated-fast fadeInUp" v-tooltip="{ content:dat.hover  , placement:'top'}"  v-html="formatWithSearch(dat.formatted)"></div>
+                <div v-if="(dat.source)" class="data-item-value animated-fast fadeInUp" v-tooltip="{ content:dat.hover  , placement:'top'}"><a :href="makeLink(dat.source)"  v-html="formatWithSearch(dat.formatted)" target="_blank"></a></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
       </div>
     </div>
+    <NotFound v-if="pems.indexOf('read')==-1 && !isLoading" />
   </div>
 </template>
 <script>
@@ -132,6 +137,9 @@ import { mapGetters, mapActions } from 'vuex';
 import StandardInput from "../form_elements/standard_input";
 import moment from 'moment';
 import ApiWrapper from '@/shared/utils/ApiWrapper';
+import CONSTANTS from '@/shared/constants';
+import NotFound from "@/components/shared/NotFound";
+
 var _ = require('lodash');
 
 export default {
@@ -167,6 +175,8 @@ export default {
       rootImgBoxStatus: 'show',
 
       dashItemNameLabel: 'Asset Name',
+      pems: [],
+      CONSTANTS: CONSTANTS
     };
   },
   watch: {
@@ -290,13 +300,9 @@ export default {
     },
     updateFile(fields) {
 
-      ApiWrapper
+      ApiWrapper  
         .put(
           "/api/files/update/" +
-            this.userId +
-            "/" +
-            this.projectId +
-            "/" +
             this.fileId,
           fields
         )
@@ -347,13 +353,12 @@ export default {
         this.showSelectDash(true);
       } else {
         this.dashRows = this.rows;
-        this.dashImages = this.file.majorImages;  //Load all major images to this dashitem
+        this.dashImages = this.file.majorImages ? this.file.majorImages : [];  //Load all major images to this dashitem
         if (this.dashRows.length > 0) {
           this.activeSheet = this.dashRows[0].sheet_name;
           this.activateSheet(this.activeSheet);
         }
       }
-      this.isLoading = false;
     },
     activateDash(dash) {
       this.activeDash = dash;
@@ -545,11 +550,41 @@ export default {
     },
     loadFile() {
       this.getFile({
-        userId: this.userId,
-        projectId: this.projectId,
         fileId: this.fileId
       }).then(res => {
-        console.log(res);
+        let resultPems = [];
+
+        let publicPemObj = CONSTANTS.PERMISSIONS[this.file.publicPems];
+        let publicPems = publicPemObj ? publicPemObj.pems : [];
+
+        resultPems = publicPems;
+
+        if (this.user._id && this.file.permissions) { // logged in
+          this.file.permissions.map(permission => {
+            permission.emails.map(email=>{
+              if (email.toLowerCase() == this.user.email.toLowerCase()) {
+                let pemObj = CONSTANTS.PERMISSIONS[permission.pems];
+                if (Array.isArray(pemObj.pems)) {
+                  pemObj.pems.map(p => {
+                    if(resultPems.indexOf(p) == -1) {
+                      resultPems.push(p);
+                    }
+                  });
+                }
+              }
+            });
+          });
+        }
+
+        if (this.user._id == this.file.user_id) { // owner
+          resultPems = ['read', 'download', 'write']; //full permission
+        }
+        
+        this.pems = resultPems;
+
+        this.isLoading = false;
+        console.log(resultPems);
+
         this.getRows();
 
         if (this.file.imageFrom == 'file') {
@@ -594,7 +629,7 @@ export default {
       return this.$route.params.projectId;
     },
     userId() {
-      return this.$store.state.user.id;
+      return this.$store.state.user._id ? this.$store.state.user._id : 0;
     },
 
     filteredDashes() {
@@ -639,7 +674,8 @@ export default {
   components: {
     FileSidebar,
     StandardInput,
-    Cropper
+    Cropper,
+    NotFound
   }
 };
 </script>

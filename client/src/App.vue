@@ -19,6 +19,7 @@
 import Loader from './components/loader'
 import jwt_decode from "jwt-decode";
 import { mapGetters, mapActions } from 'vuex';
+const fakeUser = { theme: '#66d0f7', showHoverOnExport: false, buttonBorder: {hex: '#4a4a4a'}, showButtonBorders: true, fillButtons: true, showHyperlink: true};
 export default {
   name: "App",
   components: {
@@ -46,11 +47,15 @@ export default {
       setTimeout(()=>{
         this.$store.dispatch('getCurrentUser').then(res=>{
         }).catch(err=>{
-
+          this.$store.commit("SET_USER", fakeUser);
+          this.$store.commit("SET_GLOBAL_LOADER", false);
         });
       }, 2000)
     } else {
-      this.$router.push("/");
+      // this.$router.push("/");
+      // Can setup fake user account.
+      this.$store.commit("SET_USER", fakeUser);
+      this.$store.commit("SET_GLOBAL_LOADER", false);
     }
   },
   mounted() {

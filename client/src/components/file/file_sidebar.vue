@@ -4,7 +4,6 @@
   <Cropper :upload="toggleCropper"  :hide="toggleCropper" v-if="cropper" imgType="logo"></Cropper>
   <ReplaceFile :hide="toggleReplaceFile" :uploaded="submitReplaceFile" v-if="replaceFile" />
   <ReportViaEmail :hide="toggleReportViaEmail"   v-if="reportViaEmail"/>
-
   <ConfirmDelete :hide="toggleConfirmDelete" :del="deleteFile" v-if="confirmDelete"/>
   
   <div class="sidebar-container">
@@ -12,7 +11,7 @@
         <div @click="$router.go(-1)" class="standard-btn back" :style="{background: user.fillButtons? user.theme : 'transparent', color: user.fillButtons ? '#fff' : '#111111', 'border-width': '1px', 'border-color': user.showButtonBorders ? user.buttonBorder.hex : 'none', 'border-style': 'solid'}"><i class="fa fa-angle-left"></i> Back</div>
 
         <v-tooltip bottom style="">
-          <button slot="activator" @click="toggleReplaceFile" class="modal-btn btn-icon" style="" :style="{background: user.fillButtons? user.theme : 'transparent', color: user.fillButtons ? '#fff' : '#111111', 'border-width': '1px', 'border-color': user.showButtonBorders ? user.buttonBorder.hex : 'none', 'border-style': 'solid'}">
+          <button slot="activator" @click="toggleReplaceFile" class="modal-btn btn-icon" style="" :style="{background: user.fillButtons? user.theme : 'transparent', color: user.fillButtons ? '#fff' : '#111111', 'border-width': '1px', 'border-color': user.showButtonBorders ? user.buttonBorder.hex : 'none', 'border-style': 'solid'}" v-if="pems.indexOf('write')!=-1">
             <i class="fa fa-upload"></i>
           </button>
           <span>Replace file</span>
@@ -23,7 +22,7 @@
         </button> -->
 
         <v-tooltip bottom style="">
-          <button slot="activator" @click="downloadFile" class="modal-btn btn-icon" style="" :style="{background: user.fillButtons? user.theme : 'transparent', color: user.fillButtons ? '#fff' : '#111111', 'border-width': '1px', 'border-color': user.showButtonBorders ? user.buttonBorder.hex : 'none', 'border-style': 'solid'}">
+          <button slot="activator" @click="downloadFile" class="modal-btn btn-icon" style="" :style="{background: user.fillButtons? user.theme : 'transparent', color: user.fillButtons ? '#fff' : '#111111', 'border-width': '1px', 'border-color': user.showButtonBorders ? user.buttonBorder.hex : 'none', 'border-style': 'solid'}" v-if="pems.indexOf('download')!=-1">
             <i class="fa fa-download"></i>
           </button>
           <span>Download</span>
@@ -56,11 +55,11 @@
                     <!-- <li @click="toggleExportPdf">Export PDF</li> -->
                     <!-- <li @click.stop="toggleExportExcel">Export Excel</li> -->
                     <!-- <li @click="toggleReplaceFile">Replace File</li> -->
-                    <li @click="toggleConfirmDelete">Delete File</li>
-                    <li @click.stop="toggleImageFrom" v-if="file.imageFrom=='download'">Use Image From File</li>
-                    <li @click.stop="toggleImageFrom" v-if="file.imageFrom=='file'">Use Image From Upload</li>
-                    <li @click.stop="toggleLogoFrom" v-if="file.logoFrom=='download'">Use Logo From File</li>
-                    <li @click.stop="toggleLogoFrom" v-if="file.logoFrom=='file'">Use Logo From Upload</li>
+                    <li @click="toggleConfirmDelete" v-if="pems.indexOf('write')!=-1">Delete File</li>
+                    <li @click.stop="toggleImageFrom" v-if="file.imageFrom=='download' && pems.indexOf('write')!=-1">Use Image From File</li>
+                    <li @click.stop="toggleImageFrom" v-if="file.imageFrom=='file' && pems.indexOf('write')!=-1">Use Image From Upload</li>
+                    <li @click.stop="toggleLogoFrom" v-if="file.logoFrom=='download' && pems.indexOf('write')!=-1">Use Logo From File</li>
+                    <li @click.stop="toggleLogoFrom" v-if="file.logoFrom=='file' && pems.indexOf('write')!=-1">Use Logo From Upload</li>
                     <li @click="$router.push('/projects/'+projectId + '/rawfile/'+fileId)">Edit Charts</li>
                     <li @click.stop="toggleReportViaEmail">Send Report Via Email</li>
                   </ul>
@@ -101,12 +100,14 @@ import ApiWrapper from '@/shared/utils/ApiWrapper';
 import ReplaceFile from "./replace_file";
 import ExportPdf from "./export_pdf";
 import ToggleImageFrom from "./toggle_import_from";
+import Sharing from "./toggle_import_from";
+
 import ReportViaEmail from "./report_via_email";
 import { mapGetters, mapActions } from 'vuex';
 import ConfirmDelete from "../helpers/confirm_delete";
 export default {
   name: "file-sidebar",
-  props: ["sheets", "activate", "dashes", "activeDash", "showSelectDash", 'file', 'updateFile'],
+  props: ["sheets", "activate", "dashes", "activeDash", "showSelectDash", 'file', 'pems'],
   data() {
     return {
       hovered: 0,
@@ -130,7 +131,8 @@ export default {
     ExportPdf,
     ToggleImageFrom,
     ConfirmDelete,
-    ReportViaEmail
+    ReportViaEmail,
+    Sharing
   },
   mounted() {
   },
@@ -138,6 +140,9 @@ export default {
     ...mapActions(["getFiles"]),
     toggleExportExcel() {
       this.$emit('exportExcel');
+    },
+    updateFile(props) {
+      this.$emit('updateFile', props);
     },
     toggleLogoFrom() {
       if (this.file.logoFrom == 'file')
@@ -185,10 +190,6 @@ export default {
     deleteFile() {
       deleteRequest(
         "/api/files/" +
-          this.$store.state.user.id +
-          "/" +
-          this.$route.params.projectId +
-          "/" +
           this.$route.params.fileId
       ).then(() => {
         this.getFiles({ project_id: this.$route.params.projectId });
@@ -202,10 +203,6 @@ export default {
       ApiWrapper
         .download(
           "/api/files/download/" +
-            this.$store.state.user.id +
-            "/" +
-            this.$route.params.projectId +
-            "/" +
             this.$route.params.fileId,
           { responseType: "arraybuffer" },
           this.$Progress
@@ -247,9 +244,9 @@ export default {
       } else if (file.logoFrom == 'download') {
         this.logoPath =
           "/api/static/" +
-          this.$store.state.user._id +
+          file.user_id +
           "/" +
-          this.$route.params.projectId +
+          file.project_id +
           "/" +
           this.$route.params.fileId +
           "_logo.jpg";

@@ -7,11 +7,11 @@
       </div>
       <div class="modal-inner" style="height:80vh;">
         <div class="data-container">
-            <div v-for="(file, i) in allData" :key="i" class="datablock">
-              <span>{{file[i]}}</span>
-            </div>
-            
+          <div v-for="(file, i) in allData" :key="i" class="datablock">
+            <span>{{file[i]}}</span>
+          </div>
         </div>
+
         <div class="modal-btn-container">
           <div @click="toggleVisible" id="cancel-btn" class="modal-btn cancel">Cancel</div>
           <div id="delete-btn"  class="modal-btn confirm" :style="{background: user.fillButtons? user.theme : 'transparent', color: user.fillButtons ? '#fff' : '#111111', 'border-width': '1px', 'border-color': user.showButtonBorders ? user.buttonBorder.hex : 'none', 'border-style': 'solid'}">Export</div>
@@ -42,7 +42,8 @@ export default {
   },
   computed: {
     allData() {
-      return this.$store.state.fileStore;
+      debugger
+      return this.$store.state.files;
     },
     
     ...mapGetters({

@@ -85,8 +85,6 @@ export default {
       ApiWrapper
         .post(
           "/api/files/replace/" +
-            this.$route.params.projectId +
-            "/" +
             this.$route.params.fileId,
           formData,
           {

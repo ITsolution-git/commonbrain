@@ -63,10 +63,6 @@ export default {
       ApiWrapper
         .put(
           "/api/files/update/" +
-            this.userId +
-            "/" +
-            this.projectId +
-            "/" +
             this.fileId,
           this.chartObj
         )

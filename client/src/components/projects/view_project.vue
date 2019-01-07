@@ -3,6 +3,7 @@
       <!-- <ProjectSidebar /> -->
       <FileUpload v-if="fileUpload" :hide="toggleFileUpload" :uploaded="uploaded" />
       <ConfirmDelete :hide="toggleConfirmDelete" :del="deleteThisProject" v-if="confirmDelete"/>
+      <Sharing :file="selectedFile" :hide="toggleSharing"   v-if="showSharingModal && selectedFile" @updateFile="updateFile"/>
       <div class="projects-container">
       <div class="main-title">
         <div style="display:flex; align-items:center;">
@@ -39,12 +40,24 @@
       <div class="standard-inner">
         <table class="standard-table" style="display: flex;flex-direction: column;">
           <thead>
-            <tr style="display: flex;"><th style="flex: 3">File Name</th><th style="flex: 1">Date Uploaded</th><th style="flex: 1">Date Last Modified</th></tr>
+            <tr style="display: flex;"><th style="flex: 3 ">File Name</th><th style="flex: 1">Date Uploaded</th><th style="flex: 1">Date Last Modified</th><th style="flex: 1"></th></tr>
           </thead>
           <tbody>
             
             <tr v-if="filesLoading" class="animated flash infinite" style="display: flex;"><td colspan="3" style="text-align:left; background:#f8fafb; flex: 3"><i class="fa fa-folder-o"></i> <img class="spinner"  src="../../img/spinner.svg" alt=""></td></tr>
-            <tr v-if="!filesLoading" v-for="(file,i)  in files" :key="i" style="display: flex;"><td style="flex:3"><div  @click="$router.push($route.params.projectId + '/file/'+file._id)" class="project-name"><i class="fa fa-folder-o"></i> <span>{{file.name}}<br><span style="font-size:9pt; color:#66d0f7">New</span></span></div></td><td style="flex:1">{{formatDateTime(file.file_uploaded)}}</td><td style="flex:1">{{formatDateTime(file.file_updated)}}</td></tr>
+            <tr v-if="!filesLoading" v-for="(file,i)  in files" :key="i" style="display: flex;">
+              <td style="flex:3"><div  @click="$router.push($route.params.projectId + '/file/'+file._id)" class="project-name"><i class="fa fa-folder-o"></i> <span>{{file.name}}<br><span style="font-size:9pt; color:#66d0f7">New</span></span></div></td>
+              <td style="flex:1">{{formatDateTime(file.file_uploaded)}}</td>
+              <td style="flex:1">{{formatDateTime(file.file_updated)}}</td>
+              <td style="flex:1">
+                <v-tooltip bottom style="">
+                  <button slot="activator" @click="toggleSharing(file)" class="modal-btn btn-icon" style="" :style="{background: user.fillButtons? user.theme : 'transparent', color: user.fillButtons ? '#fff' : '#111111', 'border-width': '1px', 'border-color': user.showButtonBorders ? user.buttonBorder.hex : 'none', 'border-style': 'solid'}">
+                    <i class="fa fa-users"></i>
+                  </button>
+                  <span>Share</span>
+                </v-tooltip>
+              </td>
+            </tr>
             <tr v-if="files.length < 1 && !filesLoading"><td style="background:#fff; border-bottom:solid 1px #eaeaea; height:100px; text-align:left;" colspan="3">No Files</td></tr>
           </tbody>
         </table>
@@ -57,7 +70,9 @@
 import FileUpload from "./add_file";
 import ProjectSidebar from "./sidebar";
 import ConfirmDelete from "../helpers/confirm_delete";
+import Sharing from "@/components/shared/file_sharing";
 import { mapGetters, mapActions } from 'vuex';
+import ApiWrapper from '@/shared/utils/ApiWrapper';
 export default {
   name: "view_project",
   data() {
@@ -66,16 +81,24 @@ export default {
       optionsDropdown: false,
       projectName: "",
       isLoading: false,
-      confirmDelete: false
+      confirmDelete: false,
+      showSharingModal:false,
+
+      selectedFile: null
     };
   },
   components: {
     ProjectSidebar,
     ConfirmDelete,
-    FileUpload
+    FileUpload,
+    Sharing
   },
   methods: {
     ...mapActions(["getFiles", "deleteProject"]),
+    toggleSharing(file) {
+      this.selectedFile =  Object.assign({}, file);;
+      this.showSharingModal = !this.showSharingModal;
+    },
     toggleFileUpload() {
       this.fileUpload = !this.fileUpload;
     },
@@ -98,6 +121,22 @@ export default {
     },
     toggleOptionsDropdown() {
       this.optionsDropdown = !this.optionsDropdown;
+    },
+    updateFile(params) {
+
+      ApiWrapper
+        .put(
+          "/api/files/update/" +
+            params._id,
+          params.fields
+        )
+        .then(res => {
+          this.getFiles({
+            userId: this.$store.state.user.id,
+            projectId: this.project._id
+          });
+        });
+
     },
     formatDate: function(date2) {
       var date = new Date(date2);

@@ -100,10 +100,6 @@ export default {
           ApiWrapper
           .post(
             "/api/files/" +
-              this.userId +
-              "/" +
-              this.projectId +
-              "/" +
               this.fileId +
               "/" + this.imgType,
             formData

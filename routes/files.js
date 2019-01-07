@@ -14,7 +14,7 @@ var Pusher = require("pusher");
 var xlxsUtil = require('../utils/xlxs');
 var Excel = require('exceljs');
 var mailer = require('../utils/mailer');
-
+var authMiddleware = require('../middlewares/auth');
 
 var pusher = new Pusher({
   appId: "528462",
@@ -46,9 +46,7 @@ var upload = multer({
 // Download File
 //--------------------------------
 
-router.get("/download/:userId/:projectId/:fileId", (req, res, next) => {
-  const userId = req.params.userId;
-  const projectId = req.params.projectId;
+router.get("/download/:fileId", (req, res, next) => {
   const fileId = req.params.fileId;
   MongoClient.connect(URL, function(err, db) {
     if (err) throw err;
@@ -68,20 +66,27 @@ router.get("/download/:userId/:projectId/:fileId", (req, res, next) => {
 //--------------------------------
 router.post("/report/sendreport/:fileId", (req, res, next) => {
   
-  const fileId = req.params.fileId;
+
   MongoClient.connect(URL, function(err, db) {
     if (err) throw err;
     var collection = db.collection("files");
     var users = db.collection("users");
     var user = null;
-    users
-    .find({ _id: ObjectId(req.user._id) }, { sheet: 0 })
-    .toArray()
-    .then(result => {
-      if (result.length > 0)
-        return result[0];
-      else
-        throw new Error('User is not Found');
+
+    new Promise((resolve, reject) => {
+      if (req.user) {
+        users
+        .find({ _id: ObjectId(req.user._id) }, { sheet: 0 })
+        .toArray()
+        .then(result => {
+          if (result.length > 0)
+            resolve(result[0]);
+          else
+            resolve(null);
+        });
+      } else {
+        resolve(null);
+      }
     }).then(userObj => {
       user = userObj;
       return collection
@@ -116,21 +121,26 @@ router.post("/report/sendreport/:fileId", (req, res, next) => {
 // Download Excel File
 //--------------------------------
 router.get("/report/excel/:fileId", (req, res, next) => {
-  
   const fileId = req.params.fileId;
   MongoClient.connect(URL, function(err, db) {
     if (err) throw err;
     var collection = db.collection("files");
     var users = db.collection("users");
     var user = null;
-    users
-    .find({ _id: ObjectId(req.user._id) }, { sheet: 0 })
-    .toArray()
-    .then(result => {
-      if (result.length > 0)
-        return result[0];
-      else
-        throw new Error('User is not Found');
+    new Promise((resolve, reject) => {
+      if (req.user) {
+        users
+        .find({ _id: ObjectId(req.user._id) }, { sheet: 0 })
+        .toArray()
+        .then(result => {
+          if (result.length > 0)
+            resolve(result[0]);
+          else
+            resolve(null);
+        });
+      } else {
+        resolve(null);
+      }
     }).then(userObj => {
       user = userObj;
       return collection
@@ -141,7 +151,7 @@ router.get("/report/excel/:fileId", (req, res, next) => {
       let renderData = xlxsUtil.getRenderData(result[0]);
       return xlxsUtil.makeReport(renderData, result[0], user);
     }).then(filename=>{
-      res.download(filename);
+      res.download('./tmp/' + filename);
     }).catch(err => {
       res.status(500).json(err);
     });
@@ -154,9 +164,7 @@ router.get("/report/excel/:fileId", (req, res, next) => {
 // Delete File
 //--------------------------------
 
-router.delete("/:userId/:projectId/:fileId", (req, res, next) => {
-  const userId = req.params.userId;
-  const projectId = req.params.projectId;
+router.delete("/:fileId", (req, res, next) => {
   const fileId = req.params.fileId;
   // console.log('Deleteing')
   MongoClient.connect(URL, function(err, db) {
@@ -183,74 +191,75 @@ router.delete("/:userId/:projectId/:fileId", (req, res, next) => {
 // Upload File Image
 //--------------------------------
 
-router.post("/:userId/:projectId/:fileId/image", (req, res, next) => {
-  upload(req, res, function(err) {
-    var userId = req.params.userId;
-    var projectId = req.params.projectId;
-    var fileId = req.params.fileId;
-    if(err){
-      console.log(err)
-    }
-    var extension = req.file.filename.substr(-4);
-    var fileName = req.params.fileId;
-    fs.rename('./tmp/' + req.file.filename, './tmp/'+ fileName + extension).then(res1=>{
-      fs.move('./tmp/' + fileName + extension, './uploads/'+userId+'/'+projectId+'/' + fileName + '_image' + extension, { overwrite: true }).then(result=>{
-        MongoClient.connect(URL, function(err, db) {
-          if (err) throw err;
-          var collection = db.collection("files");
-          collection.findOne({ _id: ObjectId(fileId) }, { sheet: 0 }).then(result => {
-            if (result != null) {
+router.post("/:fileId/image", (req, res, next) => {
+  MongoClient.connect(URL, function(err, db) {
+    if (err) throw err;
+    var collection = db.collection("files");
+    collection.findOne({ _id: ObjectId(fileId) }, { sheet: 0 }).then(result => {
+      if (result != null) {
+
+        upload(req, res, function(err) {
+          var fileId = req.params.fileId;
+          if(err){
+            console.log(err)
+          }
+          var extension = req.file.filename.substr(-4);
+          var fileName = req.params.fileId;
+          fs.rename('./tmp/' + req.file.filename, './tmp/'+ fileName + extension).then(res1=>{
+            fs.move('./tmp/' + fileName + extension, './uploads/'+file.user_id+'/'+file.project_id+'/' + fileName + '_image' + extension, { overwrite: true }).then(result=>{
+        
               collection
                 .update({ _id: ObjectId(fileId) },{$set : {"image":true}})
                 .then(result => {
                   res.status(200).send({message:'uploaded'})
                 });
-            } else {
-              res.status(401).send({ error: err });
-            }
-          });
-        });
         
-      })
+            })
+          });
+        })
+
+      } else {
+        res.status(401).send({ error: err });
+      }
     });
-  })
+  });
 })
 
 //--------------------------------
 // Upload File Logo
 //--------------------------------
 
-router.post("/:userId/:projectId/:fileId/logo", (req, res, next) => {
-  upload(req, res, function(err) {
-    var userId = req.params.userId;
-    var projectId = req.params.projectId;
-    var fileId = req.params.fileId;
-    if(err){
-      console.log(err)
-    }
-    var extension = req.file.filename.substr(-4);
-    var fileName = req.params.fileId;
-    fs.rename('./tmp/' + req.file.filename, './tmp/'+ fileName + extension).then(res1=>{
-      fs.move('./tmp/' + fileName + extension, './uploads/'+userId+'/'+projectId+'/' + fileName + '_logo' + extension, { overwrite: true }).then(result=>{
-        MongoClient.connect(URL, function(err, db) {
-          if (err) throw err;
-          var collection = db.collection("files");
-          collection.findOne({ _id: ObjectId(fileId) }, { sheet: 0 }).then(result => {
-            if (result != null) {
+router.post("/:fileId/logo", (req, res, next) => {
+  MongoClient.connect(URL, function(err, db) {
+    if (err) throw err;
+    var collection = db.collection("files");
+    collection.findOne({ _id: ObjectId(fileId) }, { sheet: 0 }).then(result => {
+      if (result != null) {
+        upload(req, res, function(err) {
+          var fileId = req.params.fileId;
+          if(err){
+            console.log(err)
+          }
+          var extension = req.file.filename.substr(-4);
+          var fileName = req.params.fileId;
+          fs.rename('./tmp/' + req.file.filename, './tmp/'+ fileName + extension).then(res1=>{
+            fs.move('./tmp/' + fileName + extension, './uploads/'+userId+'/'+projectId+'/' + fileName + '_logo' + extension, { overwrite: true }).then(result=>{
+        
               collection
                 .update({ _id: ObjectId(fileId) },{$set : {"logo":true}})
                 .then(result => {
                   res.status(200).send({message:'uploaded'})
                 });
-            } else {
-              res.status(401).send({ error: err });
-            }
-          });
-        });
         
-      })
+            })
+          });
+        })
+
+      } else {
+        res.status(401).send({ error: err });
+      }
     });
-  })
+  });
 })
 //--------------------------------
 // Upload File
@@ -373,7 +382,7 @@ router.post("/:projectId/add", (req, res, next) => {
 // Replace File
 //--------------------------------
 
-router.post("/replace/:projectId/:fileId", (req, res, next) => {
+router.post("/replace/:fileId", (req, res, next) => {
   var fileId = req.params.fileId;
   MongoClient.connect(URL, function(err, db) {
     if (err) throw err;
@@ -383,8 +392,8 @@ router.post("/replace/:projectId/:fileId", (req, res, next) => {
       .toArray()
       .then(result => {
         upload(req, res, function(err) {
-          var projectId = req.params.projectId;
-          var userId = req.body.userId;
+          var projectId = result[0].project_id;
+          var userId = result[0].user_id;
           var fileName = result[0].filename;
           mkdirp("./uploads/test", function(err) {
             var dir = "/uploads/" + userId + "/" + projectId;
@@ -472,7 +481,7 @@ router.post("/replace/:projectId/:fileId", (req, res, next) => {
 //--------------------------------
 // Update File 
 //--------------------------------
-router.put("/update/:userId/:projectId/:fileId", (req, res, next) => {
+router.put("/update/:fileId", (req, res, next) => {
   var chart = req.body;
   
   MongoClient.connect(URL, function(err, db) {
@@ -737,7 +746,7 @@ router.post("/test", (req, res, next) => {
 // Get Files
 //--------------------------------
 
-router.get("/:userId/:projectId", (req, res, next) => {
+router.get("/projects/:projectId", (req, res, next) => {
   const userId = req.params.userId;
   const projectId = req.params.projectId;
   MongoClient.connect(URL, function(err, db) {
@@ -751,29 +760,52 @@ router.get("/:userId/:projectId", (req, res, next) => {
       });
   });
 });
+//--------------------------------
+// Get Shared Files
+//--------------------------------
+
+router.post("/shared", (req, res, next) => {
+  const email = req.body.email;
+  MongoClient.connect(URL, function(err, db) {
+    if (err) throw err;
+    var collection = db.collection("files");
+
+    collection
+      .find({ "permissions.emails" : { "$in" : [email] } })
+      .toArray()
+      .then(result => {
+        res.status(200).send(result);
+      });
+  });
+});
+
+
 
 //--------------------------------
 // Get File
 //--------------------------------
 
-router.get("/:userId/:projectId/:fileId", (req, res, next) => {
-  const userId = req.params.userId;
-  const projectId = req.params.projectId;
+router.get("/:fileId", (req, res, next) => {
   const fileId = req.params.fileId;
+  let file = null;
 
   MongoClient.connect(URL, function(err, db) {
     if (err) throw err;
     var collection = db.collection("files");
     var projects = db.collection('projects');
-    Promise.all([
-      collection
-      .find({ _id: ObjectId(fileId) }, { sheet: 0 })
-      .toArray(), 
-      projects
-      .find({ _id: ObjectId(projectId) })
-      .toArray()])
+    collection
+    .find({ _id: ObjectId(fileId) }, { sheet: 0 })
+    .toArray()
     .then(result=>{
-      res.status(200).send({file: result[0], project: result[1]});
+      file = result;
+      
+      projects
+      .find({ _id: ObjectId(file.project_id) })
+      .toArray()
+      .then(result=>{
+        res.status(200).send({file: file, project: result[0]});  
+      })
+      
     });
   });
 });

@@ -36,7 +36,7 @@ app.use(express.static(path.join(__dirname + '/client/dist')));
 
 app.use("/api/auth", authRoutes);
 app.use("/api/projects", authMiddleware, projectRoutes);
-app.use("/api/files", authMiddleware, fileRoutes);
+app.use("/api/files", fileRoutes);
 app.use("/api/users", authMiddleware, userRoutes);
 app.use("/api/upload", authMiddleware, uploadRoutes);
 app.use("/api/templates", authMiddleware, templateRoutes);
