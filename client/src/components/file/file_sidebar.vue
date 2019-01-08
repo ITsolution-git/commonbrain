@@ -238,7 +238,6 @@ export default {
   },
   watch: {
     file(file) {
-
       if (file.logoFrom == 'file') {
         this.logoPath = file.logoFileUrl;
       } else if (file.logoFrom == 'download') {
@@ -251,6 +250,21 @@ export default {
           this.$route.params.fileId +
           "_logo.jpg";
       }
+    }
+  },
+  mounted() {
+    debugger
+    if (this.file.logoFrom == 'file') {
+      this.logoPath = this.file.logoFileUrl;
+    } else if (file.logoFrom == 'download') {
+      this.logoPath =
+        "/api/static/" +
+        this.file.user_id +
+        "/" +
+        this.file.project_id +
+        "/" +
+        this.$route.params.fileId +
+        "_logo.jpg";
     }
   }
 };
