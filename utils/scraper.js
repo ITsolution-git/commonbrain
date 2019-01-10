@@ -18,7 +18,7 @@ module.exports.scrapeOFAC = (searchObj) => {
   .type('input[name="ctl00$MainContent$Slider1_Boundcontrol"]', '')
   .type('input[name="ctl00$MainContent$Slider1_Boundcontrol"]', searchObj.minimumScore)
   .click('input[name="ctl00$MainContent$btnSearch"]')
-  .wait('#gvSearchResults')
+  .wait('#scrollResults')
   .wait(1000 * 5)
   .evaluate(() => {
     let rows = document.querySelectorAll('#gvSearchResults tr');
