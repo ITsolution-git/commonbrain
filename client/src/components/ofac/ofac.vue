@@ -76,7 +76,9 @@
                   <td><span>{{item.list}}</span></td>
                   <td><span>{{item.score}}</span></td>
                 </tr>
-                
+                <tr v-if="result.result.length == 0">
+                  <td colspan="6"><span>No Result.</span></td>
+                </tr>
               </tbody>
             </table>
           </div>
