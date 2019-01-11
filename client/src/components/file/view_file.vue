@@ -83,8 +83,8 @@
         </div>
         <div class="root-images-container" :class="{'root-images-container-opened': rootImgBoxStatus=='hide'}" v-if="dashRootImges && dashRootImges.length > 0">
           <div class="root-images">
-            <div class="root-image-item" v-for="(img,index) in dashRootImges" :key="index"  v-viewer="{title: (image, imageData) => { return dashRootImges[index].desc ? dashRootImges[index].desc : '';},}">
-              <img :src="img.link" @mouseover="mouseHoverImage($event, index)" @mouseleave="mouseLeaveImage($event, index)" ref="rootImageEl"/>
+            <div class="root-image-item" v-viewer="{title: (image, imageData) => { return dashRootImges[index].desc ? dashRootImges[index].desc : '';},}">
+              <img :src="img.link" @mouseover="mouseHoverImage($event, index)" @mouseleave="mouseLeaveImage($event, index)" ref="rootImageEl"  v-for="(img,index) in dashRootImges" :key="index" />
             </div>
           </div>
 
@@ -105,15 +105,15 @@
                 <div class="data-title" v-html="formatWithSearch(data.title)"></div>
               </div>
               <div class="major-images">
-                <div class="major-image-item" v-for="(img,index) in data.images" :key="index"  :v-viewer="{title: (image, imageData) => { return data.images[index].desc ? data.images[index].desc : '';},}"">
+                <div class="major-image-item"  :v-viewer="{title: (image, imageData) => { return data.images[index].desc ? data.images[index].desc : '';},}" v-for="(img,index) in data.images" :key="index">
                   <img :src="img.link" />
                 </div>
               </div>
             </div>
             <div class="data-elements" v-if="data.show"  :style="{'background': ((data.images && data.images.length > 0 && data.images[0].position && data.images[0].position.charAt(0).toLowerCase() == 's') ? ('url('+ data.images[0].link + ')  no-repeat center center fixed') : 'transparent')}">
               <div class="major-images" v-if="data.images && data.images.length > 0 && data.images[0].position && data.images[0].position.charAt(0).toLowerCase() == 't'">
-                <div class="major-image-item" v-for="(img,index) in data.images" :key="index"  v-viewer="{title: (image, imageData) => { return data.images[index].desc ? data.images[index].desc : '';},}">
-                  <img :src="img.link"  style="height: 100px"/>
+                <div class="major-image-item"   v-viewer="{title: (image, imageData) => { return data.images[index].desc ? data.images[index].desc : '';},}">
+                  <img :src="img.link"  style="height: 100px" v-for="(img,index) in data.images" :key="index"/>
                 </div>
               </div>
               <div v-for="(dat,i2) in data.data" :key="i2" class="data-item-item animated-fast fadeIn"  :class="{'left' : (dat.just != undefined && dat.just.charAt(0).toLowerCase() == 'l'), 'right' : (dat.just != undefined && dat.just.charAt(0).toLowerCase() == 'r'), 'center' : (dat.just != undefined && dat.just.charAt(0).toLowerCase() == 'c')}">
@@ -190,7 +190,7 @@ export default {
       clearTimeout(this.imgTimer);
       this.imgTimer = setTimeout(()=>{
         this.$refs.rootImageEl[index].click();
-      }, 1000)
+      }, 200)
       
     },
     mouseLeaveImage(event) {
