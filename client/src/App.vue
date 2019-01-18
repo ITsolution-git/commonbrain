@@ -54,6 +54,7 @@ export default {
     } else {
       // this.$router.push("/");
       // Can setup fake user account.
+      debugger
       this.$store.commit("SET_USER", fakeUser);
       this.$store.commit("SET_GLOBAL_LOADER", false);
     }

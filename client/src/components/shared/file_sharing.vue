@@ -123,7 +123,7 @@ export default {
   },
   computed: {
     publicLink() {
-      return `${location.protocol}//${location.host}/#/projects/${this.projectId}/${this.file._id}`;
+      return `${location.protocol}//${location.host}/#/projects/${this.projectId}/file/${this.file._id}`;
     },
     projectId() {
       return this.$route.params.projectId;
