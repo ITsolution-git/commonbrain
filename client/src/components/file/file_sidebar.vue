@@ -69,7 +69,6 @@
           </v-tooltip>
         </div>
       </div>
-          {{logoPath}}
       <div class="file-logo">
         <div v-if="file.logoFrom == 'download'" @click="toggleCropper">
           <div class="add-image" style="padding:15px">
@@ -246,6 +245,8 @@ export default {
           "/api/static/" +
           file.user_id +
           "/" +
+          file.project_id +
+          "/" +
           this.$route.params.fileId +
           "_logo.jpg";
       }
@@ -258,6 +259,8 @@ export default {
       this.logoPath =
         "/api/static/" +
         this.file.user_id +
+        "/" +
+        this.file.project_id +
         "/" +
         this.$route.params.fileId +
         "_logo.jpg";

@@ -192,21 +192,24 @@ router.delete("/:fileId", (req, res, next) => {
 //--------------------------------
 
 router.post("/:fileId/image", (req, res, next) => {
+  let fileId = req.params.fileId;
+
   MongoClient.connect(URL, function(err, db) {
     if (err) throw err;
     var collection = db.collection("files");
     collection.findOne({ _id: ObjectId(fileId) }, { sheet: 0 }).then(result => {
+        console.log(result);
       if (result != null) {
-
         upload(req, res, function(err) {
           var fileId = req.params.fileId;
           if(err){
-            console.log(err)
+            console.log(err);
+            throw err;
           }
           var extension = req.file.filename.substr(-4);
           var fileName = req.params.fileId;
           fs.rename('./tmp/' + req.file.filename, './tmp/'+ fileName + extension).then(res1=>{
-            fs.move('./tmp/' + fileName + extension, './uploads/'+file.user_id+'/'+file.project_id+'/' + fileName + '_image' + extension, { overwrite: true }).then(result=>{
+            fs.move('./tmp/' + fileName + extension, './uploads/'+result.user_id+'/'+result.project_id+'/' + fileName + '_image' + extension, { overwrite: true }).then(result=>{
         
               collection
                 .update({ _id: ObjectId(fileId) },{$set : {"image":true}})
@@ -241,11 +244,12 @@ router.post("/:fileId/logo", (req, res, next) => {
           var fileId = req.params.fileId;
           if(err){
             console.log(err)
+            throw err;
           }
           var extension = req.file.filename.substr(-4);
           var fileName = req.params.fileId;
           fs.rename('./tmp/' + req.file.filename, './tmp/'+ fileName + extension).then(res1=>{
-            fs.move('./tmp/' + fileName + extension, './uploads/' + result.user_id + '/' + fileName + '_logo' + extension, { overwrite: true }).then(result=>{
+            fs.move('./tmp/' + fileName + extension, './uploads/' + result.user_id + '/'  + result.project_id + '/' + fileName + '_logo' + extension, { overwrite: true }).then(result=>{
         
               collection
                 .update({ _id: ObjectId(fileId) },{$set : {"logo":true}})

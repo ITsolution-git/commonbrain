@@ -592,7 +592,7 @@ export default {
         } else if (this.file.imageFrom == 'download') {
           this.imagePath =
             "/api/static/" +
-            this.$store.state.user.id +
+            this.$store.state.user._id +
             "/" +
             this.$route.params.projectId +
             "/" +
