@@ -13,6 +13,8 @@ var fileRoutes = require("./routes/files");
 var templateRoutes = require("./routes/templates");
 
 var authMiddleware = require('./middlewares/auth');
+var loadToken = require('./middlewares/loadToken');
+
 var morgan = require("morgan");
 var nodemailer = require('nodemailer');
 var smtpTransport = require("nodemailer-smtp-transport");
@@ -36,7 +38,7 @@ app.use(express.static(path.join(__dirname + '/client/dist')));
 
 app.use("/api/auth", authRoutes);
 app.use("/api/projects", authMiddleware, projectRoutes);
-app.use("/api/files", fileRoutes);
+app.use("/api/files", loadToken, fileRoutes);
 app.use("/api/users", authMiddleware, userRoutes);
 app.use("/api/upload", authMiddleware, uploadRoutes);
 app.use("/api/templates", authMiddleware, templateRoutes);

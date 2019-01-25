@@ -230,6 +230,8 @@ router.post("/:fileId/image", (req, res, next) => {
 //--------------------------------
 
 router.post("/:fileId/logo", (req, res, next) => {
+  let fileId = req.params.fileId;
+
   MongoClient.connect(URL, function(err, db) {
     if (err) throw err;
     var collection = db.collection("files");
@@ -243,7 +245,7 @@ router.post("/:fileId/logo", (req, res, next) => {
           var extension = req.file.filename.substr(-4);
           var fileName = req.params.fileId;
           fs.rename('./tmp/' + req.file.filename, './tmp/'+ fileName + extension).then(res1=>{
-            fs.move('./tmp/' + fileName + extension, './uploads/'+userId+'/'+projectId+'/' + fileName + '_logo' + extension, { overwrite: true }).then(result=>{
+            fs.move('./tmp/' + fileName + extension, './uploads/' + result.user_id + '/' + fileName + '_logo' + extension, { overwrite: true }).then(result=>{
         
               collection
                 .update({ _id: ObjectId(fileId) },{$set : {"logo":true}})

@@ -69,6 +69,7 @@
           </v-tooltip>
         </div>
       </div>
+          {{logoPath}}
       <div class="file-logo">
         <div v-if="file.logoFrom == 'download'" @click="toggleCropper">
           <div class="add-image" style="padding:15px">
@@ -245,23 +246,18 @@ export default {
           "/api/static/" +
           file.user_id +
           "/" +
-          file.project_id +
-          "/" +
           this.$route.params.fileId +
           "_logo.jpg";
       }
     }
   },
   mounted() {
-    debugger
     if (this.file.logoFrom == 'file') {
       this.logoPath = this.file.logoFileUrl;
-    } else if (file.logoFrom == 'download') {
+    } else if (this.file.logoFrom == 'download') {
       this.logoPath =
         "/api/static/" +
         this.file.user_id +
-        "/" +
-        this.file.project_id +
         "/" +
         this.$route.params.fileId +
         "_logo.jpg";
