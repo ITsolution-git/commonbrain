@@ -8,7 +8,7 @@
     </div>
     <div v-if="pems.indexOf('read')!=-1 && !isLoading">
 
-      <FileSidebar :sheets="sheets" :activate="activateSheet" :dashes="dashes" :showSelectDash="showSelectDash" :activeDash="activeDash" :file="file" @updateFile="updateFile" @exportExcel="exportExcel" :pems="pems"/>
+      <FileSidebar :sheets="sheets" :activate="activateSheet" :dashes="dashes" :showSelectDash="showSelectDash" :activeDash="activeDash" :file="file" @updateFile="updateFile" @exportExcel="exportExcel" :pems="pems" :activeSheet="activeSheet" :selectDashScreen="selectDashScreen" :loadFile="loadFile"/>
       <div class="projects-container" v-if="selectDashScreen" style="padding: 30px;overflow-y: auto;">
         <div>
           <StandardInput
@@ -68,7 +68,7 @@
           </div>
         </div>
 
-        <div class="file-logo">
+        <!-- <div class="file-logo">
           <div v-if="file.imageFrom == 'download'" @click="toggleCropper">
             <div class="add-image" style="padding:15px">
               <i class="fa fa-camera" style=" margin-right:10px;"></i>
@@ -81,6 +81,7 @@
             <img :src="imagePath" v-if="imagePath" style="height: 200px; margin: 0 auto; width: auto"/>
           </div>
         </div>
+         -->
         <div class="root-images-container" :class="{'root-images-container-opened': rootImgBoxStatus=='hide'}" v-if="dashRootImges && dashRootImges.length > 0">
           <div class="root-images">
             <div class="root-image-item" v-viewer="{title: (image, imageData) => { return dashRootImges[index].desc ? dashRootImges[index].desc : '';},}">
@@ -307,8 +308,7 @@ export default {
           fields
         )
         .then(res => {
-          // this.loadFile();
-          window.location.reload();
+          this.loadFile();
         });
 
     },
@@ -381,7 +381,7 @@ export default {
     },
     activateSheet(sheet) {
       var that = this;
-      this.isLoading = true;
+      // this.isLoading = true;
       setTimeout(function() {
         that.activeSheet = sheet;
         that.activeRows = [];
@@ -393,7 +393,7 @@ export default {
       }, 10);
     },
     activateTab(i, tab) {
-      this.isLoading = true;
+      // this.isLoading = true;
       this.activeTab = tab;
       this.activeData = [];
       this.mainData = {};
@@ -549,6 +549,11 @@ export default {
       }
     },
     loadFile() {
+      this.dashes = [];
+      this.tabs = [];
+      this.rows = [];
+      this.dashRows = [];
+      
       this.getFile({
         fileId: this.fileId
       }).then(res => {

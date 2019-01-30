@@ -33,7 +33,7 @@ import ApiWrapper from '@/shared/utils/ApiWrapper';
 import { mapGetters, mapActions } from 'vuex';
 //import auth from "../../auth";
 export default {
-  props: ["hide", "upload", "imgType"],
+  props: ["hide", "upload", "imgType", "refresh"],
   data() {
     return {
       cropped: null,
@@ -106,7 +106,9 @@ export default {
           )
           .then(res => {
             //console.log(res.data);
-            window.location.reload();
+            // window.location.reload();
+            this.hide();
+            this.refresh();
           });
         }
       });

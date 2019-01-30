@@ -334,7 +334,7 @@ table td {
   color: #66d0f7;
 }
 .sidebar-container {
-  /*overflow-x: scroll;*/
+  overflow-x: scroll;
   position: fixed;
   height: calc(100vh - 70px);
   width: 300px;

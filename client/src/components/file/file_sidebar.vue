@@ -1,7 +1,7 @@
 <template>
 <div>
   <ExportPdf :hide="toggleExportPdf" v-if="exportPdf" />
-  <Cropper :upload="toggleCropper"  :hide="toggleCropper" v-if="cropper" imgType="logo"></Cropper>
+  <Cropper :upload="toggleCropper"  :hide="toggleCropper" v-if="cropper" imgType="logo" :refresh="refresh"></Cropper>
   <ReplaceFile :hide="toggleReplaceFile" :uploaded="submitReplaceFile" v-if="replaceFile" />
   <ReportViaEmail :hide="toggleReportViaEmail"   v-if="reportViaEmail"/>
   <ConfirmDelete :hide="toggleConfirmDelete" :del="deleteFile" v-if="confirmDelete"/>
@@ -56,10 +56,10 @@
                     <!-- <li @click.stop="toggleExportExcel">Export Excel</li> -->
                     <!-- <li @click="toggleReplaceFile">Replace File</li> -->
                     <li @click="toggleConfirmDelete" v-if="pems.indexOf('write')!=-1">Delete File</li>
-                    <li @click.stop="toggleImageFrom" v-if="file.imageFrom=='download' && pems.indexOf('write')!=-1">Use Image From File</li>
-                    <li @click.stop="toggleImageFrom" v-if="file.imageFrom=='file' && pems.indexOf('write')!=-1">Use Image From Upload</li>
-                    <li @click.stop="toggleLogoFrom" v-if="file.logoFrom=='download' && pems.indexOf('write')!=-1">Use Logo From File</li>
-                    <li @click.stop="toggleLogoFrom" v-if="file.logoFrom=='file' && pems.indexOf('write')!=-1">Use Logo From Upload</li>
+                    <!-- <li @click.stop="toggleImageFrom" v-if="file.imageFrom=='download' && pems.indexOf('write')!=-1">Use Image From File</li>
+                    <li @click.stop="toggleImageFrom" v-if="file.imageFrom=='file' && pems.indexOf('write')!=-1">Use Image From Upload</li> -->
+                    <!-- <li @click.stop="toggleLogoFrom" v-if="file.logoFrom=='download' && pems.indexOf('write')!=-1">Use Logo From File</li>
+                    <li @click.stop="toggleLogoFrom" v-if="file.logoFrom=='file' && pems.indexOf('write')!=-1">Use Logo From Upload</li> -->
                     <li @click="$router.push('/projects/'+projectId + '/rawfile/'+fileId)">Edit Charts</li>
                     <li @click.stop="toggleReportViaEmail">Send Report Via Email</li>
                   </ul>
@@ -70,24 +70,23 @@
         </div>
       </div>
       <div class="file-logo">
-        <div v-if="file.logoFrom == 'download'" @click="toggleCropper">
-          <div class="add-image" style="padding:15px">
-            <i class="fa fa-camera" style=" margin-right:10px;"></i>
-            Upload
-          </div>
-          <img :src="logoPath ? logoPath : '/static/brain.svg'" v-if="file.logo"/>
+        <div class="add-image" style="padding:15px" @click="toggleCropper">
+          <i class="fa fa-camera" style=" margin-right:10px;"></i>
+          Upload Logo
         </div>
-        <div v-if="file.logoFrom == 'file'">
-          <img :src="logoPath ? logoPath : '/static/brain.svg'" :style="{padding: logoPath ? '0px' : '40px'}"/>
+
+          <img :src="logoPath ? logoPath + '?' + imageUniqueNumber : '/static/brain.svg'"/>
+        <div class="switch-image">
+          <v-switch :label="'Switch Logo Source'" v-model="formLogoFrom" @change="toggleLogoFromForm" hide-details></v-switch>
         </div>
       </div>
-      <div class="dash-nav" v-if="activeDash" @click="showSelectDash(true)">
+      <div class="dash-nav" v-if="activeDash" :class="{'active': selectDashScreen}" @click="activateDash()">
         <span style="font-weight: bold">{{activeDash.dashName}}</span>
         <i class="fa fa-angle-right" ></i>
       </div>
       <div class="file-nav">
           <ul>
-              <li v-for="(sheet,i) in sheets" :key="i" :class="{'active':(activeNav == i)}" @click="activateSheet(i,sheet)">{{sheet}}</li>
+              <li v-for="(sheet,index) in sheets" :key="index" :class="{'active':(!selectDashScreen && activeSheet == sheet)}" @click="activateSheet(index, sheet)">{{sheet}}</li>
           </ul>
       </div>
     </div>
@@ -107,22 +106,23 @@ import { mapGetters, mapActions } from 'vuex';
 import ConfirmDelete from "../helpers/confirm_delete";
 export default {
   name: "file-sidebar",
-  props: ["sheets", "activate", "dashes", "activeDash", "showSelectDash", 'file', 'pems'],
+  props: ["sheets", "activate", "dashes", "activeDash", "showSelectDash", 'file', 'pems', "activeSheet", "selectDashScreen", "loadFile"],
   data() {
     return {
       hovered: 0,
       addProjectOpen: false,
-      activeNav: 0,
       cropper: false,
       logoPath: "",
       optionsDropdown: false,
       replaceFile: false,
       exportPdf: false,
       imageSelect: false,
+      formLogoFrom: false,
 
       exportExcel: false,
       confirmDelete: false,
-      reportViaEmail: false
+      reportViaEmail: false,
+      imageUniqueNumber: new Date().getTime()
     };
   },
   components: {
@@ -138,11 +138,22 @@ export default {
   },
   methods: {
     ...mapActions(["getFiles"]),
+    refresh() {
+      this.$emit('updateFile', {logoFrom: 'download'});
+      this.imageUniqueNumber = new Date().getTime();
+    },
     toggleExportExcel() {
       this.$emit('exportExcel');
     },
     updateFile(props) {
       this.$emit('updateFile', props);
+    },
+    toggleLogoFromForm() {
+      if (!this.formLogoFrom)
+        this.$emit('updateFile', {logoFrom: 'download'});
+      else if (this.formLogoFrom)
+        this.$emit('updateFile', {logoFrom: 'file'});
+      this.optionsDropdown = false;
     },
     toggleLogoFrom() {
       if (this.file.logoFrom == 'file')
@@ -182,8 +193,10 @@ export default {
     mouseOver(num) {
       this.hovered = num;
     },
+    activateDash() {
+      this.showSelectDash(true);
+    },
     activateSheet(i, sheet) {
-      this.activeNav = i;
       this.showSelectDash(false);
       this.activate(sheet);
     },
@@ -240,6 +253,7 @@ export default {
     file(file) {
       if (file.logoFrom == 'file') {
         this.logoPath = file.logoFileUrl;
+        this.formLogoFrom = true;
       } else if (file.logoFrom == 'download') {
         this.logoPath =
           "/api/static/" +
@@ -249,12 +263,14 @@ export default {
           "/" +
           this.$route.params.fileId +
           "_logo.jpg";
+        this.formLogoFrom = false;
       }
     }
   },
   mounted() {
     if (this.file.logoFrom == 'file') {
       this.logoPath = this.file.logoFileUrl;
+      this.formLogoFrom = true;
     } else if (this.file.logoFrom == 'download') {
       this.logoPath =
         "/api/static/" +
@@ -264,6 +280,7 @@ export default {
         "/" +
         this.$route.params.fileId +
         "_logo.jpg";
+      this.formLogoFrom = false;
     }
   }
 };
@@ -292,17 +309,42 @@ export default {
   height: 150px;
   width: 100%;
 }
+
+.file-logo {
+  min-height: 50px;
+  position: relative;
+}
+.file-logo div.add-image,
+.file-logo div.switch-image {
+  display: none;
+  position: absolute;
+  background: #eef0f2;
+  opacity: 0.5;
+  width: 100%;
+}
+
 .file-logo img,
 .file-logo div.add-image {
   width: 100%;
-  display: flex;
   align-items: center;
   justify-content: center;
   background: #eef0f2;
 }
-.file-logo div.add-image:hover {
+.file-logo div.switch-image {
+  align-items: center;
+  justify-content: center;
+  bottom: 0px;
+  padding: 5px 45px;
+}
+.file-logo:hover div.add-image,
+.file-logo:hover div.switch-image {
+  display: flex;
+}
+.file-logo div.add-image:hover,
+.file-logo:hover div.switch-image {
   cursor: pointer;
-  background: #e2e5e7;
+  background: #fff;
+  opacity: 1;
 }
 
 .dash-nav{
@@ -318,11 +360,17 @@ export default {
 .dash-nav:hover{
   color: #66d0f7;
 }
+
 .dash-nav i {
   transition: all 0.5s;
   margin-right: 10px;
-
 }
+
+.dash-nav.active {
+  color: #66d0f7;
+  background: #fff;
+}
+
 .dash-nav:hover i {
   margin-right: 0px;
 }
@@ -347,5 +395,9 @@ export default {
 .add-project-btn {
   border: 1px solid #4a4a4a;
   border-radius: 3px;
+}
+.add-project-btn-dropdown {
+  right: -45px;
+  left: auto;
 }
 </style>
