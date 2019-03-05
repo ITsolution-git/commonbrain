@@ -35,7 +35,7 @@
     <div id="login-panel" class="login-panel">
       <div class="net"></div>
       <div class="main-splash">
-        <div style="flex:1; max-width:600px"><h1>Make Data Management Fun</h1><span>An easy way to collect all your data in one place.</span><br><div @click="toggleLearnMore" class="main-btn">Get Started</div></div>
+        <div style="flex:1; max-width:600px"><h1>Make running RE business fun</h1><span>An easy way to collect all your data in one place.</span><br><div @click="toggleLearnMore" class="main-btn">Get Started</div></div>
         <div v-if="$mq == 'lg'" style="flex:1; display:flex;align-items:center;justify-content:center;"><img style="width:200px;" src="../../img/brain.svg" alt=""></div>
 
       </div>
