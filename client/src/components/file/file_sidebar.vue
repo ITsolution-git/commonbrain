@@ -311,7 +311,7 @@ export default {
 }
 
 .file-logo {
-  min-height: 50px;
+  min-height: 100px;
   position: relative;
 }
 .file-logo div.add-image,
