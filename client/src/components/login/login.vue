@@ -9,9 +9,11 @@
         <i v-if="mobile" @click="toggleMobileNav" class="fa fa-bars nav-toggle"></i>
         <div class="top-nav" :class="{'mobile':mobile, 'collapsed':!navOpen}">
           <ul>
-            <li>Home</li>
-            <li>About</li>
-            <li>Services</li>
+            <li @click="scrollTo('#home')">Home</li>
+            <li @click="scrollTo('#about-us')">About</li>
+            <li @click="scrollTo('#services')">Services</li>
+            <li @click="scrollTo('#company')">Company</li>
+            <li @click="scrollTo('#contact-us')">Contact Us</li>
             <li @click="toggleUserLogin">User Login</li>
             <li @click="signup = !signup">Sign Up</li>
             <li><div @click="toggleLearnMore" class="get-started">Get Started</div></li>
@@ -23,10 +25,11 @@
         <i v-if="mobile" @click="toggleMobileNav" class="fa fa-bars nav-toggle"></i>
         <div class="top-nav" :class="{'mobile':mobile, 'collapsed':!navOpen}">
           <ul>
-            <li>Home</li>
-            <li>About</li>
-            <li>Services</li>
-            <li>Company</li>
+            <li @click="scrollTo('#home')">Home</li>
+            <li @click="scrollTo('#about-us')">About</li>
+            <li @click="scrollTo('#services')">Services</li>
+            <li @click="scrollTo('#company')">Company</li>
+            <li @click="scrollTo('#contact-us')">Contact Us</li>
             <li><div @click="toggleLearnMore" class="get-started">Get Started</div></li>
           </ul>
         </div>
@@ -49,7 +52,7 @@
           <div v-if="$mq != 'sm'" class="col-sm-12">
             <img style="width:100%;" src="../../img/rait_1_1.png" alt="">
           </div>
-          <div class="col-sm-12" style="display:flex;align-items:center; justify-content:center; text-align:center; color:#fff; ">
+          <div class="col-sm-12" style="display:flex;align-items:center; justify-content:center; text-align:center; color:#000; ">
             <div>
             <h1>Visualize Your Assets</h1><br>
             <span class="sub-text">CommonBrain makes it easy to add important aspects of your business – operational, financial  and legal compliance data on our dashboard. CommonBrain is totally customizable by you so you can decide what is important to see. With the fast pace of changes for your needs, simple business tasks become complex and annoying without an easy way to edit and share your assets or asset portfolios on the fly.</span>
@@ -76,7 +79,7 @@
         </div>
       </div>
     </div>
-     <div class="section-3">
+    <div class="section-3" id="about-us">
       <div class="container">
         <div class="row" style="padding-top:25px;">
           <div  class="col-sm-12" style="display:flex;align-items:center;  justify-content:center; text-align:center; ">
@@ -103,7 +106,7 @@
         </div>
       </div>
     </div>
-    <div class="section-4">
+    <div class="section-4" id="services">
       <div class="container" style="text-align:center">
         <h1 style="color:#fff"> Our Services</h1>
         <div class="row" style="padding-top:25px; align-items:start">
@@ -162,6 +165,15 @@
         </div>
       </div>
     </div>
+
+    <div class="section-5" id="contact-us">
+      <div class="container" style="text-align:center">
+        <h1 style="color:#000"> Contact Us</h1>
+        <div class="row" style="padding-top:25px; align-items:start">
+          <ContactForm />
+        </div>
+      </div>
+    </div>
     <div class="footer">
       <div class="container">
         <div class="row" style="padding-top:25px;">
@@ -204,6 +216,8 @@ import LearnMore from "./learn_more";
 import UserLogin from "./login_form";
 import Signup from "./signup";
 import { mapActions } from "vuex";
+import VueScrollTo from 'vue-scrollto';
+import ContactForm from './ContactForm';
 export default {
   name: "login",
   data() {
@@ -224,6 +238,17 @@ export default {
     if (this.$mq == "sm") {
       this.mobile = true;
     }
+
+    if (this.$route.path == '/services') {
+      var cancelScroll = this.$scrollTo('#services', 500, {offset: -70});  
+    } else if (this.$route.path == '/about-us') {
+      var cancelScroll = this.$scrollTo('#about-us', 500, {offset: -70});  
+    } else if (this.$route.path == '/contact-us') {
+      var cancelScroll = this.$scrollTo('#contact-us', 500, {offset: -70});  
+    } else if (this.$route.path == '/services') {
+      var cancelScroll = this.$scrollTo('#services', 500, {offset: -70});  
+    }
+    
   },
   watch: {
     $mq(val) {
@@ -257,13 +282,17 @@ export default {
     },
     toggleMobileNav() {
       this.navOpen = !this.navOpen;
+    },
+    scrollTo(target) {
+      var cancelScroll = this.$scrollTo(target, 500, {offset: -70});  
     }
   },
   components: {
     StandardInput,
     LearnMore,
     UserLogin,
-    Signup
+    Signup,
+    ContactForm
   }
 };
 </script>
@@ -328,6 +357,11 @@ export default {
   background: #3abaeb;
   padding: 55px 15px;
   width: 100%;
+}
+.section-5 {
+  background: #fff;
+  padding: 55px 15px;
+  width: 100%; 
 }
 .footer {
   background: #4d585d;

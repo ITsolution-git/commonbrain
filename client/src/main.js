@@ -14,6 +14,7 @@ import VueMq from 'vue-mq';
 import Vuetify from 'vuetify'
 import VueProgressBar from 'vue-progressbar'
 import Viewer from 'v-viewer'
+import VueScrollTo from 'vue-scrollto';
 
 import 'vuetify/dist/vuetify.min.css';
 import 'viewerjs/dist/viewer.css'
@@ -39,6 +40,20 @@ Vue.component("v-select", vSelect);
 Vue.component("v-loader", Loader);
 Vue.use(Vuetify);
 Vue.use(Viewer);
+
+Vue.use(VueScrollTo, {
+  container: "body",
+  duration: 500,
+  easing: "ease",
+  offset: 0,
+  force: true,
+  cancelable: true,
+  onStart: false,
+  onDone: false,
+  onCancel: false,
+  x: false,
+  y: true
+});
 
 Vue.use(VueProgressBar, {
   color: 'rgb(255, 255, 255)',

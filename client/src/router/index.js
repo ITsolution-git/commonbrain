@@ -14,6 +14,18 @@ var baseRoutes = [
     components: {
       login: Login
     }
+  },
+  {
+    path: "/services",
+    components: {
+      login: Login
+    }
+  },
+  {
+    path: "/contact-us",
+    components: {
+      login: Login
+    }
   }
 ];
 
